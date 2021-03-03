@@ -5,26 +5,39 @@ using UnityEngine;
 public class Hopper : MonoBehaviour
 {
     [SerializeField] Transform body, endEffector, target;
-    [SerializeField] float duration = 2;
+    [SerializeField] float duration = 2.4f;
 
     int session;
+    int[] sessions = new int[2];
+    int current = 0;
+
     float timer = 0;
+
+    HopperBackend.Boundary boundary = new HopperBackend.Boundary();
+    HopperBackend.Solution solution = new HopperBackend.Solution();
+    Quaternion prevTargetRotation;
 
     void Awake()
     {
-        session = HopperBackend.CreateSession(duration);
+        session = HopperBackend.CreateSession();
     }
 
     void Start()
     {
-        SetInitialStates();
-        SetFinalStates();
+        SetBoundary();
         HopperBackend.StartOptimization(session);
     }
 
     void Update()
     {
-        GetStates();
+        UpdateStates();
+
+        if (timer >= duration)
+        {
+            timer = 0;
+            SetBoundary();
+            HopperBackend.StartOptimization(session);
+        }
     }
 
     void OnDestroy()
@@ -32,30 +45,32 @@ public class Hopper : MonoBehaviour
         HopperBackend.EndSession(session);
     }
 
-    void SetInitialStates()
+    void SetBoundary()
     {
-        HopperBackend.SetInitialBaseLinearPosition(session, body.position);
-        HopperBackend.SetInitialBaseAngularPosition(session, transform.rotation.eulerAngles);
-        HopperBackend.SetInitialEEPosition(session, 0, endEffector.position);
+        boundary.initialBaseLinearPosition = body.position;
+        boundary.initialBaseLinearVelocity = solution.baseLinearVelocity;
+        boundary.initialBaseAngularPosition = prevTargetRotation.eulerAngles;
+        // boundary.initialBaseAngularVelocity = solution.baseAngularVelocity;
+
+        boundary.finalBaseLinearPosition = target.position;
+        boundary.finalBaseAngularPosition = target.rotation.eulerAngles;
+        boundary.initialEEPosition = endEffector.position;
+        boundary.duration = 2.4;
+
+        prevTargetRotation = target.rotation;
+
+        HopperBackend.SetBoundary(session, ref boundary);
     }
 
-    void SetFinalStates()
-    {
-        HopperBackend.SetFinalBaseLinearPosition(session, target.position);
-        HopperBackend.SetFinalBaseAngularPosition(session, transform.rotation.eulerAngles);
-    }
-
-    void GetStates()
+    void UpdateStates()
     {
         if (timer >= duration) return;
 
-        Vector3 baseLinear, baseAngular, eeMotion, eeForce;
-        bool contact;
-        if (HopperBackend.GetSolution(session, timer, out baseLinear, out baseAngular, out eeMotion, out eeForce, out contact))
+        if (HopperBackend.GetSolution(session, timer, out solution))
         {
-            body.position = baseLinear;
-            body.rotation = Quaternion.Euler(baseAngular);
-            endEffector.position = eeMotion;
+            body.position = solution.baseLinearPosition;
+            body.rotation = Quaternion.Euler(solution.baseAngularPosition);
+            endEffector.position = solution.eeMotion;
 
             timer += Time.deltaTime;
         }

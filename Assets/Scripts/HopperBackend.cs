@@ -6,84 +6,153 @@ using UnityEngine;
 public static class HopperBackend
 {
     [DllImport("hopper", EntryPoint = "create_session")]
-    public static extern int CreateSession(double duration = 2.0);
+    public static extern int CreateSession();
 
     [DllImport("hopper", EntryPoint = "end_session")]
     public static extern void EndSession(int session);
 
-    [DllImport("hopper", EntryPoint = "set_initial_base_linear_position")]
-    static extern void SetInitialBaseLinearPosition(int session, double x, double y, double z);
+    [StructLayout(LayoutKind.Sequential)]
+    struct _Boundary
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearVelocity;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseAngularPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseAngularVelocity;
 
-    [DllImport("hopper", EntryPoint = "set_initial_base_linear_velocity")]
-    static extern void SetInitialBaseLinearVelocity(int session, double x, double y, double z);
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] finalBaseLinearPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] finalBaseLinearVelocity;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] finalBaseAngularPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] finalBaseAngularVelocity;
 
-    [DllImport("hopper", EntryPoint = "set_initial_base_angular_position")]
-    static extern void SetInitialBaseAngularPosition(int session, double x, double y, double z);
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialEEPosition;
 
-    [DllImport("hopper", EntryPoint = "set_initial_base_angular_velocity")]
-    static extern void SetInitialBaseAngularVelocity(int session, double x, double y, double z);
+        public double duration;
+    }
 
-    [DllImport("hopper", EntryPoint = "set_final_base_linear_position")]
-    static extern void SetFinalBaseLinearPosition(int session, double x, double y, double z);
+    [DllImport("hopper", EntryPoint = "set_boundary")]
+    static extern void SetBoundary(int session, ref _Boundary boundary);
 
-    [DllImport("hopper", EntryPoint = "set_final_base_linear_velocity")]
-    static extern void SetFinalBaseLinearVelocity(int session, double x, double y, double z);
+    public struct Boundary
+    {
+        public Vector3 initialBaseLinearPosition;
+        public Vector3 initialBaseLinearVelocity;
+        public Vector3 initialBaseAngularPosition;
+        public Vector3 initialBaseAngularVelocity;
 
-    [DllImport("hopper", EntryPoint = "set_final_base_angular_position")]
-    static extern void SetFinalBaseAngularPosition(int session, double x, double y, double z);
+        public Vector3 finalBaseLinearPosition;
+        public Vector3 finalBaseLinearVelocity;
+        public Vector3 finalBaseAngularPosition;
+        public Vector3 finalBaseAngularVelocity;
 
-    [DllImport("hopper", EntryPoint = "set_final_base_angular_velocity")]
-    static extern void SetFinalBaseAngularVelocity(int session, double x, double y, double z);
+        public Vector3 initialEEPosition;
 
-    [DllImport("hopper", EntryPoint = "set_initial_ee_position")]
-    static extern void SetInitialEEPosition(int session, int id, double x, double y);
+        public double duration;
+    }
+
+    static double[] LinearVector3ToArray(Vector3 vec)
+    {
+        var array = new double[3];
+        array[0] = vec.z;
+        array[1] = -vec.x;
+        array[2] = vec.y;
+        return array;
+    }
+
+    static double[] AngularVector3ToArray(Vector3 vec)
+    {
+        var v = vec * Mathf.Deg2Rad;
+        var array = new double[3];
+        array[0] = -v.z;
+        array[1] = v.x;
+        array[2] = -v.y;
+        return array;
+    }
+
+    public static void SetBoundary(int session, ref Boundary boundary)
+    {
+        var _boundary = new _Boundary();
+
+        _boundary.initialBaseLinearPosition = LinearVector3ToArray(boundary.initialBaseLinearPosition);
+        _boundary.initialBaseLinearVelocity = LinearVector3ToArray(boundary.initialBaseLinearVelocity);
+        _boundary.initialBaseAngularPosition = AngularVector3ToArray(boundary.initialBaseAngularPosition);
+        _boundary.initialBaseAngularVelocity = AngularVector3ToArray(boundary.initialBaseAngularVelocity);
+
+        _boundary.finalBaseLinearPosition = LinearVector3ToArray(boundary.finalBaseLinearPosition);
+        _boundary.finalBaseLinearVelocity = LinearVector3ToArray(boundary.finalBaseLinearVelocity);
+        _boundary.finalBaseAngularPosition = AngularVector3ToArray(boundary.finalBaseAngularPosition);
+        _boundary.finalBaseAngularVelocity = AngularVector3ToArray(boundary.finalBaseAngularVelocity);
+
+        _boundary.initialEEPosition = LinearVector3ToArray(boundary.initialEEPosition);
+        _boundary.duration = boundary.duration;
+
+        SetBoundary(session, ref _boundary);
+    }
 
     [DllImport("hopper", EntryPoint = "start_optimization")]
     public static extern void StartOptimization(int session);
 
+    [StructLayout(LayoutKind.Sequential)]
+    struct _Solution
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearVelocity;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseAngularPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseAngularVelocity;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] eeMotion;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] eeForce;
+        public bool contact;
+    }
+
     [DllImport("hopper", EntryPoint = "get_solution")]
-    static extern bool GetSolution(int session, double time, IntPtr baseLinear, IntPtr baseAngular, IntPtr eeMotion, IntPtr eeForce, out bool contact);
+    static extern bool GetSolution(int session, double time, ref _Solution solution);
 
-    public static void SetInitialBaseLinearPosition(int session, Vector3 data) => SetInitialBaseLinearPosition(session, data.z, -data.x, data.y);
-    public static void SetInitialBaseLinearVelocity(int session, Vector3 data) => SetInitialBaseLinearVelocity(session, data.z, -data.x, data.y);
-    public static void SetInitialBaseAngularPosition(int session, Vector3 data) => SetInitialBaseAngularPosition(session, -data.z, data.x, -data.y);
-    public static void SetInitialBaseAngularVelocity(int session, Vector3 data) => SetInitialBaseAngularVelocity(session, -data.z, data.x, -data.y);
-    public static void SetFinalBaseLinearPosition(int session, Vector3 data) => SetFinalBaseLinearPosition(session, data.z, -data.x, data.y);
-    public static void SetFinalBaseLinearVelocity(int session, Vector3 data) => SetFinalBaseLinearVelocity(session, data.z, -data.x, data.y);
-    public static void SetFinalBaseAngularPosition(int session, Vector3 data) => SetFinalBaseAngularPosition(session, -data.z, data.x, -data.y);
-    public static void SetFinalBaseAngularVelocity(int session, Vector3 data) => SetFinalBaseAngularVelocity(session, -data.z, data.x, -data.y);
-    public static void SetInitialEEPosition(int session, int id, Vector3 data) => SetInitialEEPosition(session, id, data.z, -data.x);
-
-    static Vector3 GetLinearVector(IntPtr ptr)
+    public struct Solution
     {
-        var array = new double[3];
-        Marshal.Copy(ptr, array, 0, array.Length);
-        return new Vector3(-(float)array[1], (float)array[2], (float)array[0]);
+        public Vector3 baseLinearPosition;
+        public Vector3 baseLinearVelocity;
+        public Vector3 baseAngularPosition;
+        public Vector3 baseAngularVelocity;
+
+        public Vector3 eeMotion;
+        public Vector3 eeForce;
+        public bool contact;
     }
 
-    static Vector3 GetAngularVector(IntPtr ptr)
+    static Vector3 LinearArrayToVector3(double[] array)
     {
-        var array = new double[3];
-        Marshal.Copy(ptr, array, 0, array.Length);
-        return new Vector3((float)array[1], -(float)array[2], -(float)array[0]);
+        var vec = Vector3.zero;
+        vec.x = -(float)array[1];
+        vec.y = (float)array[2];
+        vec.z = (float)array[0];
+        return vec;
     }
 
-    public static bool GetSolution(int session, double time, out Vector3 baseLinear, out Vector3 baseAngular, out Vector3 eeMotion, out Vector3 eeForce, out bool contact)
+    static Vector3 AngularArrayToVector3(double[] array)
     {
-        var ps = (new IntPtr[4]).Select(x => Marshal.AllocHGlobal(sizeof(double) * 3)).ToArray();
-        var result = GetSolution(session, time, ps[0], ps[1], ps[2], ps[3], out contact);
+        var vec = Vector3.zero;
+        vec.x = (float)array[1];
+        vec.y = -(float)array[2];
+        vec.z = -(float)array[0];
+        return vec * Mathf.Rad2Deg;
+    }
 
-        if (result)
-        {
-            baseLinear = GetLinearVector(ps[0]);
-            baseAngular = GetAngularVector(ps[1]);
-            eeMotion = GetLinearVector(ps[2]);
-            eeForce = GetLinearVector(ps[3]);
-        }
-        else
-            baseLinear = baseAngular = eeMotion = eeForce = Vector3.zero;
+    public static bool GetSolution(int session, double time, out Solution solution)
+    {
+        var _solution = new _Solution();
+        var result = GetSolution(session, time, ref _solution);
 
-        foreach (var p in ps) Marshal.FreeHGlobal(p);
-        return result;
+        solution = new Solution();
+        if (!result) return false;
+
+        solution.baseLinearPosition = LinearArrayToVector3(_solution.baseLinearPosition);
+        solution.baseLinearVelocity = LinearArrayToVector3(_solution.baseLinearVelocity);
+        solution.baseAngularPosition = AngularArrayToVector3(_solution.baseAngularPosition);
+        solution.baseAngularVelocity = AngularArrayToVector3(_solution.baseAngularVelocity);
+        solution.eeMotion = LinearArrayToVector3(_solution.eeMotion);
+        solution.eeForce = LinearArrayToVector3(_solution.eeForce);
+        solution.contact = _solution.contact;
+
+        return true;
     }
 }
