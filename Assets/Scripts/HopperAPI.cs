@@ -3,7 +3,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-public static class HopperBackend
+public static class HopperAPI
 {
     [DllImport("hopper", EntryPoint = "create_session")]
     public static extern int CreateSession();
@@ -12,7 +12,7 @@ public static class HopperBackend
     public static extern void EndSession(int session);
 
     [StructLayout(LayoutKind.Sequential)]
-    struct _Boundary
+    struct _Bound
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearPosition;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearVelocity;
@@ -29,10 +29,10 @@ public static class HopperBackend
         public double duration;
     }
 
-    [DllImport("hopper", EntryPoint = "set_boundary")]
-    static extern void SetBoundary(int session, ref _Boundary boundary);
+    [DllImport("hopper", EntryPoint = "set_bound")]
+    static extern void SetBoundary(int session, ref _Bound boundary);
 
-    public struct Boundary
+    public struct Bound
     {
         public Vector3 initialBaseLinearPosition;
         public Vector3 initialBaseLinearVelocity;
@@ -46,7 +46,22 @@ public static class HopperBackend
 
         public Vector3 initialEEPosition;
 
-        public double duration;
+        public float duration;
+
+        static float NearestAngle(float a, float b)
+        {
+            float c = Mathf.Cos((b - a) * Mathf.Deg2Rad);
+            float s = Mathf.Sin((b - a) * Mathf.Deg2Rad);
+            float d = Mathf.Acos(c) * Mathf.Rad2Deg;
+            return s < 0 ? a - d : a + d;
+        }
+
+        public void CorrectAngles()
+        {
+            finalBaseAngularPosition.x = NearestAngle(initialBaseAngularPosition.x, finalBaseAngularPosition.x);
+            finalBaseAngularPosition.y = NearestAngle(initialBaseAngularPosition.y, finalBaseAngularPosition.y);
+            finalBaseAngularPosition.z = NearestAngle(initialBaseAngularPosition.z, finalBaseAngularPosition.z);
+        }
     }
 
     static double[] LinearVector3ToArray(Vector3 vec)
@@ -68,22 +83,24 @@ public static class HopperBackend
         return array;
     }
 
-    public static void SetBoundary(int session, ref Boundary boundary)
+    public static void SetBound(int session, ref Bound bound)
     {
-        var _boundary = new _Boundary();
+        bound.CorrectAngles();
 
-        _boundary.initialBaseLinearPosition = LinearVector3ToArray(boundary.initialBaseLinearPosition);
-        _boundary.initialBaseLinearVelocity = LinearVector3ToArray(boundary.initialBaseLinearVelocity);
-        _boundary.initialBaseAngularPosition = AngularVector3ToArray(boundary.initialBaseAngularPosition);
-        _boundary.initialBaseAngularVelocity = AngularVector3ToArray(boundary.initialBaseAngularVelocity);
+        var _boundary = new _Bound();
 
-        _boundary.finalBaseLinearPosition = LinearVector3ToArray(boundary.finalBaseLinearPosition);
-        _boundary.finalBaseLinearVelocity = LinearVector3ToArray(boundary.finalBaseLinearVelocity);
-        _boundary.finalBaseAngularPosition = AngularVector3ToArray(boundary.finalBaseAngularPosition);
-        _boundary.finalBaseAngularVelocity = AngularVector3ToArray(boundary.finalBaseAngularVelocity);
+        _boundary.initialBaseLinearPosition = LinearVector3ToArray(bound.initialBaseLinearPosition);
+        _boundary.initialBaseLinearVelocity = LinearVector3ToArray(bound.initialBaseLinearVelocity);
+        _boundary.initialBaseAngularPosition = AngularVector3ToArray(bound.initialBaseAngularPosition);
+        _boundary.initialBaseAngularVelocity = AngularVector3ToArray(bound.initialBaseAngularVelocity);
 
-        _boundary.initialEEPosition = LinearVector3ToArray(boundary.initialEEPosition);
-        _boundary.duration = boundary.duration;
+        _boundary.finalBaseLinearPosition = LinearVector3ToArray(bound.finalBaseLinearPosition);
+        _boundary.finalBaseLinearVelocity = LinearVector3ToArray(bound.finalBaseLinearVelocity);
+        _boundary.finalBaseAngularPosition = AngularVector3ToArray(bound.finalBaseAngularPosition);
+        _boundary.finalBaseAngularVelocity = AngularVector3ToArray(bound.finalBaseAngularVelocity);
+
+        _boundary.initialEEPosition = LinearVector3ToArray(bound.initialEEPosition);
+        _boundary.duration = bound.duration;
 
         SetBoundary(session, ref _boundary);
     }
@@ -92,7 +109,7 @@ public static class HopperBackend
     public static extern void StartOptimization(int session);
 
     [StructLayout(LayoutKind.Sequential)]
-    struct _Solution
+    struct _State
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearPosition;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearVelocity;
@@ -105,9 +122,9 @@ public static class HopperBackend
     }
 
     [DllImport("hopper", EntryPoint = "get_solution")]
-    static extern bool GetSolution(int session, double time, ref _Solution solution);
+    static extern bool GetSolution(int session, double time, ref _State state);
 
-    public struct Solution
+    public struct State
     {
         public Vector3 baseLinearPosition;
         public Vector3 baseLinearVelocity;
@@ -137,21 +154,21 @@ public static class HopperBackend
         return vec * Mathf.Rad2Deg;
     }
 
-    public static bool GetSolution(int session, double time, out Solution solution)
+    public static bool GetSolution(int session, double time, out State state)
     {
-        var _solution = new _Solution();
-        var result = GetSolution(session, time, ref _solution);
+        var _state = new _State();
+        var result = GetSolution(session, time, ref _state);
 
-        solution = new Solution();
+        state = new State();
         if (!result) return false;
 
-        solution.baseLinearPosition = LinearArrayToVector3(_solution.baseLinearPosition);
-        solution.baseLinearVelocity = LinearArrayToVector3(_solution.baseLinearVelocity);
-        solution.baseAngularPosition = AngularArrayToVector3(_solution.baseAngularPosition);
-        solution.baseAngularVelocity = AngularArrayToVector3(_solution.baseAngularVelocity);
-        solution.eeMotion = LinearArrayToVector3(_solution.eeMotion);
-        solution.eeForce = LinearArrayToVector3(_solution.eeForce);
-        solution.contact = _solution.contact;
+        state.baseLinearPosition = LinearArrayToVector3(_state.baseLinearPosition);
+        state.baseLinearVelocity = LinearArrayToVector3(_state.baseLinearVelocity);
+        state.baseAngularPosition = AngularArrayToVector3(_state.baseAngularPosition);
+        state.baseAngularVelocity = AngularArrayToVector3(_state.baseAngularVelocity);
+        state.eeMotion = LinearArrayToVector3(_state.eeMotion);
+        state.eeForce = LinearArrayToVector3(_state.eeForce);
+        state.contact = _state.contact;
 
         return true;
     }
