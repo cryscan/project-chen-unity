@@ -1,10 +1,13 @@
-﻿using System.Collections;
+﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Hopper : MonoBehaviour
 {
-    [SerializeField] Transform body, endEffector, target;
+    [SerializeField] HopperAPI.RobotModel model;
+    [SerializeField] Transform body, target;
+    [SerializeField] Transform[] endEffectors;
     [SerializeField] float duration = 2.4f;
 
     int session;
@@ -15,15 +18,19 @@ public class Hopper : MonoBehaviour
 
     HopperAPI.Bound bound = new HopperAPI.Bound();
     HopperAPI.State state = new HopperAPI.State();
+    HopperAPI.ModelInfo modelInfo;
+
     Quaternion prevTargetRotation;
 
     void Awake()
     {
-        session = HopperAPI.CreateSession();
+        session = HopperAPI.CreateSession(model);
+        modelInfo = HopperAPI.GetModelInfo(session);
     }
 
     void Start()
     {
+        InitStance();
         SetBound();
         HopperAPI.StartOptimization(session);
     }
@@ -40,9 +47,41 @@ public class Hopper : MonoBehaviour
         }
     }
 
+    void OnDrawGizmos()
+    {
+        DrawEndEffectorLimits();
+    }
+
     void OnDestroy()
     {
         HopperAPI.EndSession(session);
+    }
+
+    void DrawEndEffectorLimits()
+    {
+        Gizmos.matrix = body.localToWorldMatrix;
+        for (int id = 0; id < modelInfo.eeCount; ++id)
+            Gizmos.DrawWireCube(modelInfo.nominalStance[id], modelInfo.maxDeviation * 2);
+    }
+
+    void InitStance()
+    {
+        var stanceHeight = Enumerable.Average(modelInfo.nominalStance.Select(x => -x.y));
+
+        {
+            var position = body.position;
+            position.y = stanceHeight;
+            body.position = position;
+        }
+
+        for (int id = 0; id < modelInfo.eeCount; ++id)
+        {
+            var position = modelInfo.nominalStance[id] + body.position;
+            endEffectors[id].position = position;
+        }
+
+        for (int id = modelInfo.eeCount; id < endEffectors.Length; ++id)
+            endEffectors[id].gameObject.SetActive(false);
     }
 
     void SetBound()
@@ -54,12 +93,17 @@ public class Hopper : MonoBehaviour
 
         bound.finalBaseLinearPosition = target.position;
         bound.finalBaseAngularPosition = target.rotation.eulerAngles;
-        bound.initialEEPosition = endEffector.position;
-        bound.duration = 2.4f;
+
+        bound.initialEEPositions = new Vector3[modelInfo.eeCount];
+        for (int id = 0; id < modelInfo.eeCount; ++id)
+            bound.initialEEPositions[id] = endEffectors[id].position;
+
+        // bound.maxIter = 20;
+        bound.maxCpuTime = duration;
 
         prevTargetRotation = target.rotation;
 
-        HopperAPI.SetBound(session, ref bound);
+        HopperAPI.SetBound(session, bound);
     }
 
     void UpdateStates()
@@ -70,7 +114,8 @@ public class Hopper : MonoBehaviour
         {
             body.position = state.baseLinearPosition;
             body.rotation = Quaternion.Euler(state.baseAngularPosition);
-            endEffector.position = state.eeMotion;
+            for (int id = 0; id < HopperAPI.GetEECount(session); ++id)
+                endEffectors[id].position = state.eeMotions[id];
 
             timer += Time.deltaTime;
         }
