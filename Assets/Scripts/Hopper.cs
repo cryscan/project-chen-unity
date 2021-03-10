@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Hopper : MonoBehaviour
 {
-    [SerializeField] HopperAPI.RobotModel model;
+    [SerializeField] RobotModelObject robotModelObject;
     [SerializeField] Transform body;
     [SerializeField] Transform endEffectorParent;
     [SerializeField] Transform target;
@@ -24,7 +24,7 @@ public class Hopper : MonoBehaviour
 
     void Awake()
     {
-        session = HopperAPI.CreateSession(model);
+        session = HopperAPI.CreateSession(robotModelObject.model);
         modelInfo = HopperAPI.GetModelInfo(session);
 
         endEffectors = Enumerable.Range(0, endEffectorParent.childCount).Select(x => endEffectorParent.GetChild(x)).ToArray();
