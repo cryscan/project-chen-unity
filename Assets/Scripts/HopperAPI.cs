@@ -252,4 +252,7 @@ public static class HopperAPI
 
         return true;
     }
+
+    [DllImport("hopper", EntryPoint = "solution_ready")]
+    public static extern bool SolutionReady(int session);
 }

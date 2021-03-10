@@ -6,13 +6,15 @@ using UnityEngine;
 public class Hopper : MonoBehaviour
 {
     [SerializeField] HopperAPI.RobotModel model;
-    [SerializeField] Transform body, target;
-    [SerializeField] Transform[] endEffectors;
+    [SerializeField] Transform body;
+    [SerializeField] Transform endEffectorParent;
+    [SerializeField] Transform target;
+
     [SerializeField] float duration = 2.4f;
 
+    Transform[] endEffectors;
+
     int session;
-    int[] sessions = new int[2];
-    int current = 0;
 
     float timer = 0;
 
@@ -20,31 +22,32 @@ public class Hopper : MonoBehaviour
     HopperAPI.State state = new HopperAPI.State();
     HopperAPI.ModelInfo modelInfo;
 
-    Quaternion prevTargetRotation;
-
     void Awake()
     {
         session = HopperAPI.CreateSession(model);
         modelInfo = HopperAPI.GetModelInfo(session);
+
+        endEffectors = Enumerable.Range(0, endEffectorParent.childCount).Select(x => endEffectorParent.GetChild(x)).ToArray();
     }
 
     void Start()
     {
         InitStance();
-        SetBound();
-        HopperAPI.StartOptimization(session);
+        StartOptimization();
     }
 
     void Update()
     {
         UpdateStates();
 
+        /*
         if (timer >= duration)
         {
             timer = 0;
             SetBound();
             HopperAPI.StartOptimization(session);
         }
+        */
     }
 
     void OnDrawGizmos()
@@ -56,6 +59,15 @@ public class Hopper : MonoBehaviour
     {
         HopperAPI.EndSession(session);
     }
+
+    public void StartOptimization()
+    {
+        timer = 0;
+        SetBound();
+        HopperAPI.StartOptimization(session);
+    }
+
+    public bool SolutionReady() => HopperAPI.SolutionReady(session);
 
     void DrawEndEffectorLimits()
     {
@@ -88,7 +100,7 @@ public class Hopper : MonoBehaviour
     {
         bound.initialBaseLinearPosition = body.position;
         bound.initialBaseLinearVelocity = state.baseLinearVelocity;
-        bound.initialBaseAngularPosition = prevTargetRotation.eulerAngles;
+        bound.initialBaseAngularPosition = state.baseAngularPosition;
         bound.initialBaseAngularVelocity = state.baseAngularVelocity;
 
         bound.finalBaseLinearPosition = target.position;
@@ -97,11 +109,6 @@ public class Hopper : MonoBehaviour
         bound.initialEEPositions = new Vector3[modelInfo.eeCount];
         for (int id = 0; id < modelInfo.eeCount; ++id)
             bound.initialEEPositions[id] = endEffectors[id].position;
-
-        // bound.maxIter = 20;
-        bound.maxCpuTime = duration;
-
-        prevTargetRotation = target.rotation;
 
         HopperAPI.SetBound(session, bound);
     }
