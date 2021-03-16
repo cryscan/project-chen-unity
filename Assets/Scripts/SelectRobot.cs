@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SelectRobotModel : MonoBehaviour
+public class SelectRobot : MonoBehaviour
 {
-    [SerializeField] RobotModelObject robotModelObject;
-
+    [SerializeField] Hopper hopper;
     string sceneName;
 
     void Awake()
@@ -14,26 +13,31 @@ public class SelectRobotModel : MonoBehaviour
         sceneName = SceneManager.GetActiveScene().name;
     }
 
+    void Start()
+    {
+        hopper.SetRobot(GameManager.instance.robot);
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            robotModelObject.model = HopperAPI.RobotModel.Monoped;
+            GameManager.instance.robot = HopperAPI.Robot.Monoped;
             SceneManager.LoadScene(sceneName);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            robotModelObject.model = HopperAPI.RobotModel.Biped;
+            GameManager.instance.robot = HopperAPI.Robot.Biped;
             SceneManager.LoadScene(sceneName);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            robotModelObject.model = HopperAPI.RobotModel.Hyq;
+            GameManager.instance.robot = HopperAPI.Robot.Hyq;
             SceneManager.LoadScene(sceneName);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            robotModelObject.model = HopperAPI.RobotModel.Anymal;
+            GameManager.instance.robot = HopperAPI.Robot.Anymal;
             SceneManager.LoadScene(sceneName);
         }
     }

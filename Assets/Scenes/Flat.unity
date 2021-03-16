@@ -947,7 +947,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1006191944}
-  - component: {fileID: 1006191943}
+  - component: {fileID: 1006191945}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -955,19 +955,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1006191943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1006191942}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6d3b5d86a8c6d72594df135782aeb1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  robotModelObject: {fileID: 11400000, guid: df3c2e105cfb0d1509d37d97223c100d, type: 2}
 --- !u!4 &1006191944
 Transform:
   m_ObjectHideFlags: 0
@@ -982,6 +969,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1006191945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1006191942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0a009c09ed4a72b0b3b0fccf7cfd018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1047955769
 GameObject:
   m_ObjectHideFlags: 0
@@ -1386,6 +1385,50 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1357749915}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1387342583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1387342585}
+  - component: {fileID: 1387342584}
+  m_Layer: 0
+  m_Name: Robot Selection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1387342584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387342583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6d3b5d86a8c6d72594df135782aeb1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hopper: {fileID: 1419803254}
+--- !u!4 &1387342585
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387342583}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.1360054, y: -2.477017, z: 0.61569417}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1401608396
 GameObject:
   m_ObjectHideFlags: 0
@@ -1510,8 +1553,9 @@ Transform:
   - {fileID: 47775552}
   - {fileID: 1271501506}
   - {fileID: 1238346097}
+  - {fileID: 2142358826}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1419803254
 MonoBehaviour:
@@ -1525,11 +1569,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50404d74cfea38938bd5df08d38d9715, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  robotModelObject: {fileID: 11400000, guid: df3c2e105cfb0d1509d37d97223c100d, type: 2}
+  robot: 0
   body: {fileID: 47775552}
   endEffectorParent: {fileID: 1271501506}
   target: {fileID: 1238346097}
   duration: 2.4
+  cut: 2.4
 --- !u!1 &1751462084
 GameObject:
   m_ObjectHideFlags: 0
@@ -1929,6 +1974,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   hopper: {fileID: 1419803254}
+  body: {fileID: 47775552}
   target: {fileID: 1238346097}
 --- !u!4 &2142358826
 Transform:
@@ -1945,8 +1991,8 @@ Transform:
   - {fileID: 1751462085}
   - {fileID: 568352425}
   - {fileID: 2015043368}
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_Father: {fileID: 1419803253}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2143435927
 GameObject:
@@ -2040,5 +2086,5 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

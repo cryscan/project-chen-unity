@@ -6,6 +6,7 @@ public class Pointer : MonoBehaviour
 {
     [SerializeField] LayerMask layer;
     [SerializeField] Hopper hopper;
+    [SerializeField] Transform body;
     [SerializeField] Transform target;
 
     Camera _camera;
@@ -18,7 +19,12 @@ public class Pointer : MonoBehaviour
 
     void Update()
     {
-        if (!locked) transform.rotation = Quaternion.identity;
+        if (!locked)
+        {
+            var forward = transform.position - body.position;
+            forward.y = 0;
+            transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+        }
 
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -38,7 +44,8 @@ public class Pointer : MonoBehaviour
                 target.position = position;
                 target.rotation = transform.rotation;
 
-                if (hopper.SolutionReady()) hopper.StartOptimization();
+                if (hopper.SolutionReady())
+                    hopper.StartOptimization();
             }
 
             locked = !locked;

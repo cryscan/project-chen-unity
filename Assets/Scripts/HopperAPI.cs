@@ -3,65 +3,23 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-public static class HopperAPI
+namespace CHopper
 {
-    [System.Serializable]
-    public enum RobotModel { Monoped, Biped, Hyq, Anymal }
-
-    [DllImport("hopper", EntryPoint = "create_session")]
-    public static extern int CreateSession(RobotModel model = 0);
-
-    [DllImport("hopper", EntryPoint = "end_session")]
-    public static extern void EndSession(int session);
-
     [StructLayout(LayoutKind.Sequential)]
-    struct _ModelInfo
+    struct Model
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)] public double[] nominalStance;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] maxDeviation;
-    }
 
-    [DllImport("hopper", EntryPoint = "get_model_info")]
-    static extern void GetModelInfo(int session, ref _ModelInfo modelInfo);
-
-    [DllImport("hopper", EntryPoint = "get_ee_count")]
-    public static extern int GetEECount(int session);
-
-    public struct ModelInfo
-    {
-        public Vector3[] nominalStance;
-        public Vector3 maxDeviation;
+        public double mass;
         public int eeCount;
     }
 
-    public static ModelInfo GetModelInfo(int session)
-    {
-        var _modelInfo = new _ModelInfo();
-        GetModelInfo(session, ref _modelInfo);
-
-        var modelInfo = new ModelInfo();
-        var eeCount = GetEECount(session);
-
-        modelInfo.eeCount = eeCount;
-        modelInfo.nominalStance = new Vector3[eeCount];
-        for (int id = 0; id < eeCount; ++id)
-        {
-            var array = new double[3];
-            Array.Copy(_modelInfo.nominalStance, id * 3, array, 0, array.Length);
-            modelInfo.nominalStance[id] = LinearArrayToVector3(array);
-        }
-
-        modelInfo.maxDeviation = LinearArrayToVector3(_modelInfo.maxDeviation);
-        modelInfo.maxDeviation.x = Mathf.Abs(modelInfo.maxDeviation.x);
-        modelInfo.maxDeviation.y = Mathf.Abs(modelInfo.maxDeviation.y);
-        modelInfo.maxDeviation.z = Mathf.Abs(modelInfo.maxDeviation.z);
-
-        return modelInfo;
-    }
-
     [StructLayout(LayoutKind.Sequential)]
-    struct _Bound
+    class Parameters
     {
+        public double duration;
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearPosition;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearVelocity;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseAngularPosition;
@@ -74,18 +32,82 @@ public static class HopperAPI
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)] public double[] initialEEPositions;
 
-        public double duration;
+        public byte boundsFinalLinearPosition;
+        public byte boundsFinalLinearVelocity;
+        public byte boundsFinalAngularPosition;
+        public byte boundsFinalAngularVelocity;
+    }
 
+    [StructLayout(LayoutKind.Sequential)]
+    class Options
+    {
         public double maxCpuTime;
         public int maxIter;
         public bool optimizePhaseDurations;
     }
 
-    [DllImport("hopper", EntryPoint = "set_bound")]
-    static extern void SetBound(int session, ref _Bound bound);
-
-    public class Bound
+    [StructLayout(LayoutKind.Sequential)]
+    struct State
     {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearVelocity;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseAngularPosition;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseAngularVelocity;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)] public double[] eeMotions;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)] public double[] eeForces;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)] public bool[] contacts;
+    }
+}
+
+public static class HopperAPI
+{
+    [System.Serializable]
+    public enum Robot { Monoped, Biped, Hyq, Anymal }
+
+    [System.Serializable]
+    public enum Dim3D { Z, X, Y };
+
+    [DllImport("hopper", EntryPoint = "create_session")]
+    public static extern int CreateSession(Robot model = 0);
+
+    [DllImport("hopper", EntryPoint = "end_session")]
+    public static extern void EndSession(int session);
+
+    [DllImport("hopper", EntryPoint = "get_robot_model")]
+    static extern void GetRobotModel(int session, out CHopper.Model model);
+
+    [DllImport("hopper", EntryPoint = "get_ee_count")]
+    public static extern int GetEECount(int session);
+
+    [DllImport("hopper", EntryPoint = "set_params")]
+    static extern void SetParams(int session, CHopper.Parameters parameters);
+
+    [DllImport("hopper", EntryPoint = "set_options")]
+    static extern void SetOptions(int session, CHopper.Options options);
+
+    [DllImport("hopper", EntryPoint = "start_optimization")]
+    public static extern void StartOptimization(int session);
+
+    [DllImport("hopper", EntryPoint = "solution_ready")]
+    public static extern bool SolutionReady(int session);
+
+    [DllImport("hopper", EntryPoint = "get_solution_state")]
+    static extern bool GetSolutionState(int session, double time, out CHopper.State state);
+
+    public class Model
+    {
+        public Vector3[] nominalStance;
+        public Vector3 maxDeviation;
+
+        public double mass;
+        public int eeCount;
+    }
+
+    public class Parameters
+    {
+        public float duration = 2.4f;
+
         public Vector3 initialBaseLinearPosition;
         public Vector3 initialBaseLinearVelocity;
         public Vector3 initialBaseAngularPosition;
@@ -98,26 +120,148 @@ public static class HopperAPI
 
         public Vector3[] initialEEPositions;
 
-        public float duration = 2.4f;
+        public Dim3D[] boundsFinalLinearPosition = { Dim3D.X, Dim3D.Z };
+        public Dim3D[] boundsFinalLinearVelocity = { Dim3D.X, Dim3D.Y, Dim3D.Z };
+        public Dim3D[] boundsFinalAngularPosition = { Dim3D.X, Dim3D.Y, Dim3D.Z };
+        public Dim3D[] boundsFinalAngularVelocity = { Dim3D.X, Dim3D.Y, Dim3D.Z };
 
-        public float maxCpuTime = 20.0f;
-        public int maxIter;
-        public bool optimizePhaseDurations = false;
-
-        static float NearestAngle(float a, float b)
-        {
-            float c = Mathf.Cos((b - a) * Mathf.Deg2Rad);
-            float s = Mathf.Sin((b - a) * Mathf.Deg2Rad);
-            float d = Mathf.Acos(c) * Mathf.Rad2Deg;
-            return s < 0 ? a - d : a + d;
-        }
-
-        public void CorrectAngles()
+        public void UpdateAngles()
         {
             finalBaseAngularPosition.x = NearestAngle(initialBaseAngularPosition.x, finalBaseAngularPosition.x);
             finalBaseAngularPosition.y = NearestAngle(initialBaseAngularPosition.y, finalBaseAngularPosition.y);
             finalBaseAngularPosition.z = NearestAngle(initialBaseAngularPosition.z, finalBaseAngularPosition.z);
         }
+    }
+
+    public class Options
+    {
+        public float maxCpuTime = 20.0f;
+        public int maxIter;
+        public bool optimizePhaseDurations = false;
+    }
+
+    public struct State
+    {
+        public Vector3 baseLinearPosition;
+        public Vector3 baseLinearVelocity;
+        public Vector3 baseAngularPosition;
+        public Vector3 baseAngularVelocity;
+
+        public Vector3[] eeMotions;
+        public Vector3[] eeForces;
+        public bool[] contacts;
+    }
+
+    public static Model GetRobotModel(int session)
+    {
+        var m = new CHopper.Model();
+        GetRobotModel(session, out m);
+
+        var model = new Model();
+
+        model.mass = m.mass;
+        model.eeCount = m.eeCount;
+
+        model.nominalStance = new Vector3[m.eeCount];
+        for (int id = 0; id < m.eeCount; ++id)
+        {
+            var array = new double[3];
+            Array.Copy(m.nominalStance, id * 3, array, 0, array.Length);
+            model.nominalStance[id] = LinearArrayToVector3(array);
+        }
+
+        model.maxDeviation = LinearArrayToVector3(m.maxDeviation);
+        model.maxDeviation.x = Mathf.Abs(model.maxDeviation.x);
+        model.maxDeviation.y = Mathf.Abs(model.maxDeviation.y);
+        model.maxDeviation.z = Mathf.Abs(model.maxDeviation.z);
+
+        return model;
+    }
+
+    public static void SetParams(int session, Parameters parameters)
+    {
+        parameters.UpdateAngles();
+
+        var p = new CHopper.Parameters();
+
+        p.duration = parameters.duration;
+
+        p.initialBaseLinearPosition = LinearVector3ToArray(parameters.initialBaseLinearPosition);
+        p.initialBaseLinearVelocity = LinearVector3ToArray(parameters.initialBaseLinearVelocity);
+        p.initialBaseAngularPosition = AngularVector3ToArray(parameters.initialBaseAngularPosition);
+        p.initialBaseAngularVelocity = AngularVector3ToArray(parameters.initialBaseAngularVelocity);
+
+        p.finalBaseLinearPosition = LinearVector3ToArray(parameters.finalBaseLinearPosition);
+        p.finalBaseLinearVelocity = LinearVector3ToArray(parameters.finalBaseLinearVelocity);
+        p.finalBaseAngularPosition = AngularVector3ToArray(parameters.finalBaseAngularPosition);
+        p.finalBaseAngularVelocity = AngularVector3ToArray(parameters.finalBaseAngularVelocity);
+
+        p.initialEEPositions = new double[12];
+        for (int id = 0; id < GetEECount(session); ++id)
+        {
+            var array = LinearVector3ToArray(parameters.initialEEPositions[id]);
+            Array.Copy(array, 0, p.initialEEPositions, id * 3, array.Length);
+        }
+
+        p.boundsFinalLinearPosition = ConvertBoundDims(parameters.boundsFinalLinearPosition);
+        p.boundsFinalLinearVelocity = ConvertBoundDims(parameters.boundsFinalLinearVelocity);
+        p.boundsFinalAngularPosition = ConvertBoundDims(parameters.boundsFinalAngularPosition);
+        p.boundsFinalAngularVelocity = ConvertBoundDims(parameters.boundsFinalAngularVelocity);
+
+        SetParams(session, p);
+    }
+
+    public static void SetOptions(int session, Options options)
+    {
+        var o = new CHopper.Options();
+        o.maxCpuTime = options.maxCpuTime;
+        o.maxIter = options.maxIter;
+        o.optimizePhaseDurations = options.optimizePhaseDurations;
+        SetOptions(session, o);
+    }
+
+    public static bool GetSolutionState(int session, double time, out State state)
+    {
+        var s = new CHopper.State();
+        var result = GetSolutionState(session, time, out s);
+
+        state = new State();
+        if (!result) return false;
+
+        state.baseLinearPosition = LinearArrayToVector3(s.baseLinearPosition);
+        state.baseLinearVelocity = LinearArrayToVector3(s.baseLinearVelocity);
+        state.baseAngularPosition = AngularArrayToVector3(s.baseAngularPosition);
+        state.baseAngularVelocity = AngularArrayToVector3(s.baseAngularVelocity);
+
+        var eeCount = GetEECount(session);
+        state.eeMotions = new Vector3[eeCount];
+        state.eeForces = new Vector3[eeCount];
+        state.contacts = new bool[eeCount];
+
+        for (int id = 0; id < eeCount; ++id)
+        {
+            var array = new double[3];
+
+            Array.Copy(s.eeMotions, id * 3, array, 0, array.Length);
+            state.eeMotions[id] = LinearArrayToVector3(array);
+
+            Array.Copy(s.eeForces, id * 3, array, 0, array.Length);
+            state.eeForces[id] = LinearArrayToVector3(array);
+
+            state.contacts[id] = s.contacts[id];
+        }
+
+        return true;
+    }
+
+    /* Util functions */
+
+    static float NearestAngle(float a, float b)
+    {
+        float c = Mathf.Cos((b - a) * Mathf.Deg2Rad);
+        float s = Mathf.Sin((b - a) * Mathf.Deg2Rad);
+        float d = Mathf.Acos(c) * Mathf.Rad2Deg;
+        return s < 0 ? a - d : a + d;
     }
 
     static double[] LinearVector3ToArray(Vector3 vec)
@@ -139,68 +283,6 @@ public static class HopperAPI
         return array;
     }
 
-    public static void SetBound(int session, Bound bound)
-    {
-        bound.CorrectAngles();
-
-        var _bound = new _Bound();
-
-        _bound.initialBaseLinearPosition = LinearVector3ToArray(bound.initialBaseLinearPosition);
-        _bound.initialBaseLinearVelocity = LinearVector3ToArray(bound.initialBaseLinearVelocity);
-        _bound.initialBaseAngularPosition = AngularVector3ToArray(bound.initialBaseAngularPosition);
-        _bound.initialBaseAngularVelocity = AngularVector3ToArray(bound.initialBaseAngularVelocity);
-
-        _bound.finalBaseLinearPosition = LinearVector3ToArray(bound.finalBaseLinearPosition);
-        _bound.finalBaseLinearVelocity = LinearVector3ToArray(bound.finalBaseLinearVelocity);
-        _bound.finalBaseAngularPosition = AngularVector3ToArray(bound.finalBaseAngularPosition);
-        _bound.finalBaseAngularVelocity = AngularVector3ToArray(bound.finalBaseAngularVelocity);
-
-        _bound.initialEEPositions = new double[12];
-        for (int id = 0; id < GetEECount(session); ++id)
-        {
-            var array = LinearVector3ToArray(bound.initialEEPositions[id]);
-            Array.Copy(array, 0, _bound.initialEEPositions, id * 3, array.Length);
-        }
-        _bound.duration = bound.duration;
-
-        _bound.maxCpuTime = bound.maxCpuTime;
-        _bound.maxIter = bound.maxIter;
-        _bound.optimizePhaseDurations = bound.optimizePhaseDurations;
-
-        SetBound(session, ref _bound);
-    }
-
-    [DllImport("hopper", EntryPoint = "start_optimization")]
-    public static extern void StartOptimization(int session);
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct _State
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearPosition;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearVelocity;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseAngularPosition;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseAngularVelocity;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)] public double[] eeMotions;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)] public double[] eeForces;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)] public bool[] contacts;
-    }
-
-    [DllImport("hopper", EntryPoint = "get_solution")]
-    static extern bool GetSolution(int session, double time, ref _State state);
-
-    public struct State
-    {
-        public Vector3 baseLinearPosition;
-        public Vector3 baseLinearVelocity;
-        public Vector3 baseAngularPosition;
-        public Vector3 baseAngularVelocity;
-
-        public Vector3[] eeMotions;
-        public Vector3[] eeForces;
-        public bool[] contacts;
-    }
-
     static Vector3 LinearArrayToVector3(double[] array)
     {
         var vec = Vector3.zero;
@@ -219,40 +301,42 @@ public static class HopperAPI
         return vec * Mathf.Rad2Deg;
     }
 
-    public static bool GetSolution(int session, double time, out State state)
+    static byte ConvertBoundDims(Dim3D[] dims)
     {
-        var _state = new _State();
-        var result = GetSolution(session, time, ref _state);
+        byte result = 0;
+        if (dims.Contains(Dim3D.Z)) result |= 1;
+        if (dims.Contains(Dim3D.X)) result |= 2;
+        if (dims.Contains(Dim3D.Y)) result |= 4;
+        return result;
+    }
+}
 
-        state = new State();
-        if (!result) return false;
+public class HopperSession
+{
+    int session;
 
-        state.baseLinearPosition = LinearArrayToVector3(_state.baseLinearPosition);
-        state.baseLinearVelocity = LinearArrayToVector3(_state.baseLinearVelocity);
-        state.baseAngularPosition = AngularArrayToVector3(_state.baseAngularPosition);
-        state.baseAngularVelocity = AngularArrayToVector3(_state.baseAngularVelocity);
+    public double duration { get; private set; }
+    public bool ready { get => HopperAPI.SolutionReady(session); }
 
-        var eeCount = GetEECount(session);
-        state.eeMotions = new Vector3[eeCount];
-        state.eeForces = new Vector3[eeCount];
-        state.contacts = new bool[eeCount];
+    public HopperSession(HopperAPI.Robot robot, HopperAPI.Parameters bound, HopperAPI.Options option)
+    {
+        session = HopperAPI.CreateSession(robot);
+        duration = bound.duration;
 
-        for (int id = 0; id < eeCount; ++id)
-        {
-            var array = new double[3];
-
-            Array.Copy(_state.eeMotions, id * 3, array, 0, array.Length);
-            state.eeMotions[id] = LinearArrayToVector3(array);
-
-            Array.Copy(_state.eeForces, id * 3, array, 0, array.Length);
-            state.eeForces[id] = LinearArrayToVector3(array);
-
-            state.contacts[id] = _state.contacts[id];
-        }
-
-        return true;
+        HopperAPI.SetParams(session, bound);
+        HopperAPI.SetOptions(session, option);
+        HopperAPI.StartOptimization(session);
     }
 
-    [DllImport("hopper", EntryPoint = "solution_ready")]
-    public static extern bool SolutionReady(int session);
+    public HopperAPI.State GetState(float time)
+    {
+        var state = new HopperAPI.State();
+        HopperAPI.GetSolutionState(session, time, out state);
+        return state;
+    }
+
+    ~HopperSession()
+    {
+        HopperAPI.EndSession(session);
+    }
 }
