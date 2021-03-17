@@ -349,6 +349,13 @@ public static class HopperAPI
         public Session(HopperAPI.Robot robot)
         {
             session = CreateSession(robot);
+            Debug.Log($"Session {session} created");
+        }
+
+        ~Session()
+        {
+            HopperAPI.EndSession(session);
+            Debug.Log($"Session {session} ended");
         }
 
         public HopperAPI.Model GetModel() => HopperAPI.GetModel(session);
@@ -366,11 +373,6 @@ public static class HopperAPI
             var state = new HopperAPI.State();
             HopperAPI.GetSolutionState(session, time, out state);
             return state;
-        }
-
-        ~Session()
-        {
-            HopperAPI.EndSession(session);
         }
     }
 }

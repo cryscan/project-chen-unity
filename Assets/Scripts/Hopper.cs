@@ -56,6 +56,15 @@ public class Hopper : MonoBehaviour
         session.SetParams(GetParams());
         session.SetOptions(GetOptions());
 
+        foreach (var p in pathPoints)
+        {
+            var pathPoint = new HopperAPI.PathPoint();
+            pathPoint.time = p.time;
+            pathPoint.linear = p.transform.position;
+            pathPoint.angular = p.transform.rotation.eulerAngles;
+            session.AddPathPoint(pathPoint);
+        }
+
         timer = 0;
         session.Optimize();
     }
