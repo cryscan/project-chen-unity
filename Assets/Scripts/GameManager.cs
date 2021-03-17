@@ -17,4 +17,10 @@ public class GameManager : MonoBehaviour
         }
         else if (instance != this) Destroy(gameObject);
     }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
+    }
 }
