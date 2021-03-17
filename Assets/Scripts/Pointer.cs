@@ -15,6 +15,11 @@ public class Pointer : MonoBehaviour
     [SerializeField] float speed = 1;
     [SerializeField] float stepsPerSecond = 1;
 
+    [Header("Gaits")]
+    [SerializeField] HopperAPI.Gait monopedGait = HopperAPI.Gait.Hop1;
+    [SerializeField] HopperAPI.Gait bipedGait = HopperAPI.Gait.Walk1;
+    [SerializeField] HopperAPI.Gait quadrupedGait = HopperAPI.Gait.Walk2;
+
     Camera _camera;
     bool locked = false;
 
@@ -45,9 +50,10 @@ public class Pointer : MonoBehaviour
     {
         if (!locked)
         {
-            var forward = transform.position - body.position;
-            forward.y = 0;
-            transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+            // var forward = transform.position - body.position;
+            // forward.y = 0;
+            // transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+            transform.rotation = Quaternion.identity;
         }
 
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -68,10 +74,10 @@ public class Pointer : MonoBehaviour
 
     HopperAPI.Gait ChooseGait()
     {
-        if (hopper.model.eeCount == 1) return HopperAPI.Gait.Hop1;
-        else if (hopper.model.eeCount == 2) return HopperAPI.Gait.Walk1;
-        else if (hopper.model.eeCount == 4) return HopperAPI.Gait.Walk2;
-        return HopperAPI.Gait.Walk1;
+        if (hopper.model.eeCount == 1) return monopedGait;
+        else if (hopper.model.eeCount == 2) return bipedGait;
+        else if (hopper.model.eeCount == 4) return quadrupedGait;
+        return HopperAPI.Gait.Stand;
     }
 
     void Confirm()
