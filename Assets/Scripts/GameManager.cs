@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
 
-    public HopperAPI.Robot robot { get; set; }
+    public HopperAPI.Robot robot;
 
     void Awake()
     {

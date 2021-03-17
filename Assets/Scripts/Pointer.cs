@@ -4,13 +4,22 @@ using UnityEngine;
 
 public class Pointer : MonoBehaviour
 {
+    [Header("Configure")]
     [SerializeField] LayerMask layer;
     [SerializeField] Hopper hopper;
     [SerializeField] Transform body;
     [SerializeField] Transform target;
+    [SerializeField] HopperAPI.Gait gait = HopperAPI.Gait.Walk1;
+    [SerializeField] GameObject pathPointPrefab;
+
+    [Header("Trajectory")]
+    [SerializeField] float speed = 1;
+    [SerializeField] float stepsPerSecond = 1;
 
     Camera _camera;
     bool locked = false;
+
+    List<GameObject> pathPoints = new List<GameObject>();
 
     void Awake()
     {
@@ -18,6 +27,22 @@ public class Pointer : MonoBehaviour
     }
 
     void Update()
+    {
+        UpdateTransform();
+
+        if (Input.GetKeyDown(KeyCode.G))
+            hopper.optimizeGaits = !hopper.optimizeGaits;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (locked) AddPathPoint();
+            locked = !locked;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return)) Confirm();
+    }
+
+    void UpdateTransform()
     {
         if (!locked)
         {
@@ -34,20 +59,53 @@ public class Pointer : MonoBehaviour
             if (!locked) transform.position = point;
             else transform.LookAt(point, Vector3.up);
         }
+    }
 
-        if (Input.GetMouseButtonDown(0))
+    void AddPathPoint()
+    {
+        var pathPoint = Instantiate(pathPointPrefab, transform.position, transform.rotation);
+        pathPoints.Add(pathPoint);
+    }
+
+    void Confirm()
+    {
+        locked = false;
+        if (pathPoints.Count == 0) return;
+
+        hopper.Reset();
+
+        float distance = Vector3.Distance(body.position, pathPoints[0].transform.position);
+        List<float> acc = new List<float>();
+        acc.Add(distance);
+
+        for (int i = 0; i < pathPoints.Count - 1; ++i)
         {
-            if (locked)
-            {
-                var position = transform.position;
-                position.y = target.position.y;
-                target.position = position;
-                target.rotation = transform.rotation;
-
-                hopper.Optimize();
-            }
-
-            locked = !locked;
+            var current = pathPoints[i].transform;
+            var next = pathPoints[i + 1].transform;
+            distance += Vector3.Distance(current.position, next.position);
+            acc.Add(distance);
         }
+
+        float duration = distance / speed;
+        hopper.duration = duration;
+
+        for (int i = 0; i < pathPoints.Count - 1; ++i)
+        {
+            var time = duration * acc[i] / distance;
+            hopper.pathPoints.Add(new Hopper.PathPoint() { time = time, transform = pathPoints[i].transform });
+        }
+
+        int steps = Mathf.CeilToInt(duration * stepsPerSecond);
+        hopper.gaits.Add(HopperAPI.Gait.Stand);
+        for (int i = 0; i < steps; ++i) hopper.gaits.Add(gait);
+        hopper.gaits.Add(HopperAPI.Gait.Stand);
+
+        var last = pathPoints[pathPoints.Count - 1].transform;
+        target.position = last.position;
+        target.rotation = last.rotation;
+
+        hopper.Optimize();
+
+        pathPoints.Clear();
     }
 }

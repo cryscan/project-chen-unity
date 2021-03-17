@@ -6,36 +6,41 @@ using UnityEngine;
 public class Hopper : MonoBehaviour
 {
     [System.Serializable]
-    struct PathPoint
+    public struct PathPoint
     {
         public float time;
         public Transform transform;
     }
 
+    [Header("Robot")]
     [SerializeField] HopperAPI.Robot robot;
     [SerializeField] Transform body;
     [SerializeField] Transform eeParent;
-    [SerializeField] Transform target;
-    [SerializeField] PathPoint[] pathPoints;
 
-    [SerializeField] float duration = 2.4f;
-    [SerializeField] float cut = 2.4f;
+    [Header("Trajectory")]
+    public bool optimizeGaits = false;
+    public List<PathPoint> pathPoints;
+    public Transform target;
 
-    Transform[] ees;
+    public float duration = 2.4f;
+    public List<HopperAPI.Gait> gaits;
+
+    Transform[] ee;
 
     float timer = 0;
 
-    HopperAPI.Session session;
+    public HopperAPI.Session session { get; private set; }
     HopperAPI.State state = new HopperAPI.State();
     HopperAPI.Model model;
 
+    void Awake()
+    {
+        ee = Enumerable.Range(0, eeParent.childCount).Select(x => eeParent.GetChild(x)).ToArray();
+    }
+
     void Start()
     {
-        session = new HopperAPI.Session(robot);
-        model = session.GetModel();
-
-        ees = Enumerable.Range(0, eeParent.childCount).Select(x => eeParent.GetChild(x)).ToArray();
-
+        Reset();
         InitStance();
     }
 
@@ -46,7 +51,7 @@ public class Hopper : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        DrawEndEffectorLimits();
+        DrawEELimits();
     }
 
     public void SetRobot(HopperAPI.Robot robot) => this.robot = robot;
@@ -55,6 +60,7 @@ public class Hopper : MonoBehaviour
     {
         session.SetParams(GetParams());
         session.SetOptions(GetOptions());
+        session.SetDuration(duration);
 
         foreach (var p in pathPoints)
         {
@@ -62,16 +68,26 @@ public class Hopper : MonoBehaviour
             pathPoint.time = p.time;
             pathPoint.linear = p.transform.position;
             pathPoint.angular = p.transform.rotation.eulerAngles;
-            session.AddPathPoint(pathPoint);
+            session.PushPathPoint(pathPoint);
         }
 
+        foreach (var gait in gaits)
+            session.PushGait(gait);
+
         timer = 0;
-        session.Optimize();
+        session.StartOptimization();
     }
 
-    public bool SolutionReady() => session.ready;
+    public void Reset()
+    {
+        session = new HopperAPI.Session(robot);
+        model = session.GetModel();
 
-    void DrawEndEffectorLimits()
+        pathPoints.Clear();
+        gaits.Clear();
+    }
+
+    void DrawEELimits()
     {
         if (model == null) return;
 
@@ -93,11 +109,11 @@ public class Hopper : MonoBehaviour
         for (int id = 0; id < model.eeCount; ++id)
         {
             var position = model.nominalStance[id] + body.position;
-            ees[id].position = position;
+            ee[id].position = position;
         }
 
-        for (int id = model.eeCount; id < ees.Length; ++id)
-            ees[id].gameObject.SetActive(false);
+        for (int id = model.eeCount; id < ee.Length; ++id)
+            ee[id].gameObject.SetActive(false);
     }
 
     HopperAPI.Parameters GetParams()
@@ -112,13 +128,13 @@ public class Hopper : MonoBehaviour
         parameters.finalBaseLinearPosition = target.position;
         parameters.finalBaseAngularPosition = target.rotation.eulerAngles;
 
-        var distance = Vector3.Distance(target.position, body.position);
-        var velocity = target.forward * distance / duration;
-        parameters.finalBaseLinearVelocity = velocity;
+        // var distance = Vector3.Distance(target.position, body.position);
+        // var velocity = target.forward * distance / duration;
+        // parameters.finalBaseLinearVelocity = velocity;
 
         parameters.initialEEPositions = new Vector3[model.eeCount];
         for (int id = 0; id < model.eeCount; ++id)
-            parameters.initialEEPositions[id] = ees[id].position;
+            parameters.initialEEPositions[id] = ee[id].position;
 
         return parameters;
     }
@@ -126,13 +142,14 @@ public class Hopper : MonoBehaviour
     HopperAPI.Options GetOptions()
     {
         var option = new HopperAPI.Options();
-        // option.maxCpuTime = cut;
+        option.maxCpuTime = 0;
+        option.optimizePhaseDurations = optimizeGaits;
         return option;
     }
 
     void UpdateStates()
     {
-        if (timer >= cut) return;
+        if (timer >= duration) return;
 
         if (session.ready)
         {
@@ -140,7 +157,7 @@ public class Hopper : MonoBehaviour
             body.position = state.baseLinearPosition;
             body.rotation = Quaternion.Euler(state.baseAngularPosition);
             for (int id = 0; id < model.eeCount; ++id)
-                ees[id].position = state.eeMotions[id];
+                ee[id].position = state.eeMotions[id];
 
             timer += Time.deltaTime;
         }

@@ -18,8 +18,6 @@ namespace CHopper
     [StructLayout(LayoutKind.Sequential)]
     class Parameters
     {
-        public double duration;
-
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearPosition;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseLinearVelocity;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] initialBaseAngularPosition;
@@ -75,6 +73,15 @@ public static class HopperAPI
     public enum Robot { Monoped, Biped, Hyq, Anymal }
 
     [System.Serializable]
+    public enum Gait
+    {
+        Stand = 0, Flight,
+        Walk1, Walk2, Walk2E,
+        Run2, Run2E, Run1, Run1E, Run3, Run3E,
+        Hop1, Hop1E, Hop2, Hop3, Hop3E, Hop5, Hop5E
+    }
+
+    [System.Serializable]
     public enum Dim3D { Z, X, Y };
 
     [DllImport("hopper", EntryPoint = "create_session")]
@@ -95,8 +102,14 @@ public static class HopperAPI
     [DllImport("hopper", EntryPoint = "set_options")]
     static extern void SetOptions(int session, CHopper.Options options);
 
-    [DllImport("hopper", EntryPoint = "add_path_point")]
-    static extern void AddPathPoint(int session, CHopper.PathPoint pathPoint);
+    [DllImport("hopper", EntryPoint = "set_duration")]
+    public static extern void SetDuration(int session, double duration);
+
+    [DllImport("hopper", EntryPoint = "push_path_point")]
+    static extern void PushPathPoint(int session, CHopper.PathPoint pathPoint);
+
+    [DllImport("hopper", EntryPoint = "push_gait")]
+    public static extern void PushGait(int session, Gait gait);
 
     [DllImport("hopper", EntryPoint = "start_optimization")]
     public static extern void StartOptimization(int session);
@@ -118,8 +131,6 @@ public static class HopperAPI
 
     public class Parameters
     {
-        public float duration = 2.4f;
-
         public Vector3 initialBaseLinearPosition;
         public Vector3 initialBaseLinearVelocity;
         public Vector3 initialBaseAngularPosition;
@@ -202,8 +213,6 @@ public static class HopperAPI
 
         var p = new CHopper.Parameters();
 
-        p.duration = parameters.duration;
-
         p.initialBaseLinearPosition = LinearVector3ToArray(parameters.initialBaseLinearPosition);
         p.initialBaseLinearVelocity = LinearVector3ToArray(parameters.initialBaseLinearVelocity);
         p.initialBaseAngularPosition = AngularVector3ToArray(parameters.initialBaseAngularPosition);
@@ -238,16 +247,16 @@ public static class HopperAPI
         SetOptions(session, o);
     }
 
-    public static void AddPathPoint(int session, PathPoint pathPoint)
+    public static void PushPathPoint(int session, PathPoint pathPoint)
     {
         var p = new CHopper.PathPoint();
         p.time = pathPoint.time;
         p.linear = LinearVector3ToArray(pathPoint.linear);
         p.angular = AngularVector3ToArray(pathPoint.angular);
-        AddPathPoint(session, p);
+        PushPathPoint(session, p);
     }
 
-    public static bool GetSolutionState(int session, double time, out State state)
+    public static bool GetSolutionState(int session, float time, out State state)
     {
         var s = new CHopper.State();
         var result = GetSolutionState(session, time, out s);
@@ -344,6 +353,7 @@ public static class HopperAPI
         int session;
 
         public double duration { get; private set; }
+        public bool optimized { get; private set; } = false;
         public bool ready { get => SolutionReady(session); }
 
         public Session(HopperAPI.Robot robot)
@@ -361,12 +371,17 @@ public static class HopperAPI
         public HopperAPI.Model GetModel() => HopperAPI.GetModel(session);
 
         public void SetParams(HopperAPI.Parameters parameters) => HopperAPI.SetParams(session, parameters);
-
         public void SetOptions(HopperAPI.Options options) => HopperAPI.SetOptions(session, options);
+        public void SetDuration(float duration) => HopperAPI.SetDuration(session, duration);
 
-        public void AddPathPoint(HopperAPI.PathPoint pathPoint) => HopperAPI.AddPathPoint(session, pathPoint);
+        public void PushPathPoint(HopperAPI.PathPoint pathPoint) => HopperAPI.PushPathPoint(session, pathPoint);
+        public void PushGait(HopperAPI.Gait gait) => HopperAPI.PushGait(session, gait);
 
-        public void Optimize() => HopperAPI.StartOptimization(session);
+        public void StartOptimization()
+        {
+            optimized = true;
+            HopperAPI.StartOptimization(session);
+        }
 
         public HopperAPI.State GetState(float time)
         {
