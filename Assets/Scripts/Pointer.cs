@@ -44,8 +44,7 @@ public class Pointer : MonoBehaviour
                 target.position = position;
                 target.rotation = transform.rotation;
 
-                if (hopper.SolutionReady())
-                    hopper.StartOptimization();
+                hopper.Optimize();
             }
 
             locked = !locked;

@@ -5,31 +5,36 @@ using UnityEngine;
 
 public class Hopper : MonoBehaviour
 {
+    [System.Serializable]
+    struct PathPoint
+    {
+        public float time;
+        public Transform transform;
+    }
+
     [SerializeField] HopperAPI.Robot robot;
     [SerializeField] Transform body;
-    [SerializeField] Transform endEffectorParent;
+    [SerializeField] Transform eeParent;
     [SerializeField] Transform target;
+    [SerializeField] PathPoint[] pathPoints;
 
     [SerializeField] float duration = 2.4f;
     [SerializeField] float cut = 2.4f;
 
-    Transform[] endEffectors;
-
-    int session;
+    Transform[] ees;
 
     float timer = 0;
 
+    HopperAPI.Session session;
     HopperAPI.State state = new HopperAPI.State();
     HopperAPI.Model model;
 
     void Start()
     {
-        session = HopperAPI.CreateSession(robot);
-        model = HopperAPI.GetRobotModel(session);
+        session = new HopperAPI.Session(robot);
+        model = session.GetModel();
 
-        endEffectors = Enumerable.Range(0, endEffectorParent.childCount).Select(x => endEffectorParent.GetChild(x)).ToArray();
-
-        Debug.Log($"Session {session} Created");
+        ees = Enumerable.Range(0, eeParent.childCount).Select(x => eeParent.GetChild(x)).ToArray();
 
         InitStance();
     }
@@ -44,23 +49,18 @@ public class Hopper : MonoBehaviour
         DrawEndEffectorLimits();
     }
 
-    void OnDestroy()
-    {
-        HopperAPI.EndSession(session);
-    }
-
     public void SetRobot(HopperAPI.Robot robot) => this.robot = robot;
 
-    public void StartOptimization()
+    public void Optimize()
     {
-        SetBound();
-        SetOption();
+        session.SetParams(GetParams());
+        session.SetOptions(GetOptions());
 
         timer = 0;
-        HopperAPI.StartOptimization(session);
+        session.Optimize();
     }
 
-    public bool SolutionReady() => HopperAPI.SolutionReady(session);
+    public bool SolutionReady() => session.ready;
 
     void DrawEndEffectorLimits()
     {
@@ -84,14 +84,14 @@ public class Hopper : MonoBehaviour
         for (int id = 0; id < model.eeCount; ++id)
         {
             var position = model.nominalStance[id] + body.position;
-            endEffectors[id].position = position;
+            ees[id].position = position;
         }
 
-        for (int id = model.eeCount; id < endEffectors.Length; ++id)
-            endEffectors[id].gameObject.SetActive(false);
+        for (int id = model.eeCount; id < ees.Length; ++id)
+            ees[id].gameObject.SetActive(false);
     }
 
-    void SetBound()
+    HopperAPI.Parameters GetParams()
     {
         var parameters = new HopperAPI.Parameters();
 
@@ -109,28 +109,29 @@ public class Hopper : MonoBehaviour
 
         parameters.initialEEPositions = new Vector3[model.eeCount];
         for (int id = 0; id < model.eeCount; ++id)
-            parameters.initialEEPositions[id] = endEffectors[id].position;
+            parameters.initialEEPositions[id] = ees[id].position;
 
-        HopperAPI.SetParams(session, parameters);
+        return parameters;
     }
 
-    void SetOption()
+    HopperAPI.Options GetOptions()
     {
         var option = new HopperAPI.Options();
         // option.maxCpuTime = cut;
-        HopperAPI.SetOptions(session, option);
+        return option;
     }
 
     void UpdateStates()
     {
         if (timer >= cut) return;
 
-        if (HopperAPI.GetSolutionState(session, timer, out state))
+        if (session.ready)
         {
+            state = session.GetState(timer);
             body.position = state.baseLinearPosition;
             body.rotation = Quaternion.Euler(state.baseAngularPosition);
-            for (int id = 0; id < HopperAPI.GetEECount(session); ++id)
-                endEffectors[id].position = state.eeMotions[id];
+            for (int id = 0; id < model.eeCount; ++id)
+                ees[id].position = state.eeMotions[id];
 
             timer += Time.deltaTime;
         }

@@ -47,6 +47,15 @@ namespace CHopper
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    class PathPoint
+    {
+        public double time;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] linear;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] angular;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     struct State
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] baseLinearPosition;
@@ -74,8 +83,8 @@ public static class HopperAPI
     [DllImport("hopper", EntryPoint = "end_session")]
     public static extern void EndSession(int session);
 
-    [DllImport("hopper", EntryPoint = "get_robot_model")]
-    static extern void GetRobotModel(int session, out CHopper.Model model);
+    [DllImport("hopper", EntryPoint = "get_model")]
+    static extern void GetModel(int session, out CHopper.Model model);
 
     [DllImport("hopper", EntryPoint = "get_ee_count")]
     public static extern int GetEECount(int session);
@@ -85,6 +94,9 @@ public static class HopperAPI
 
     [DllImport("hopper", EntryPoint = "set_options")]
     static extern void SetOptions(int session, CHopper.Options options);
+
+    [DllImport("hopper", EntryPoint = "add_path_point")]
+    static extern void AddPathPoint(int session, CHopper.PathPoint pathPoint);
 
     [DllImport("hopper", EntryPoint = "start_optimization")]
     public static extern void StartOptimization(int session);
@@ -140,6 +152,12 @@ public static class HopperAPI
         public bool optimizePhaseDurations = false;
     }
 
+    public class PathPoint
+    {
+        public float time;
+        public Vector3 linear, angular;
+    }
+
     public struct State
     {
         public Vector3 baseLinearPosition;
@@ -152,10 +170,10 @@ public static class HopperAPI
         public bool[] contacts;
     }
 
-    public static Model GetRobotModel(int session)
+    public static Model GetModel(int session)
     {
         var m = new CHopper.Model();
-        GetRobotModel(session, out m);
+        GetModel(session, out m);
 
         var model = new Model();
 
@@ -218,6 +236,15 @@ public static class HopperAPI
         o.maxIter = options.maxIter;
         o.optimizePhaseDurations = options.optimizePhaseDurations;
         SetOptions(session, o);
+    }
+
+    public static void AddPathPoint(int session, PathPoint pathPoint)
+    {
+        var p = new CHopper.PathPoint();
+        p.time = pathPoint.time;
+        p.linear = LinearVector3ToArray(pathPoint.linear);
+        p.angular = AngularVector3ToArray(pathPoint.angular);
+        AddPathPoint(session, p);
     }
 
     public static bool GetSolutionState(int session, double time, out State state)
@@ -309,34 +336,41 @@ public static class HopperAPI
         if (dims.Contains(Dim3D.Y)) result |= 4;
         return result;
     }
-}
 
-public class HopperSession
-{
-    int session;
+    /* Object Oriented API */
 
-    public double duration { get; private set; }
-    public bool ready { get => HopperAPI.SolutionReady(session); }
-
-    public HopperSession(HopperAPI.Robot robot, HopperAPI.Parameters bound, HopperAPI.Options option)
+    public class Session
     {
-        session = HopperAPI.CreateSession(robot);
-        duration = bound.duration;
+        int session;
 
-        HopperAPI.SetParams(session, bound);
-        HopperAPI.SetOptions(session, option);
-        HopperAPI.StartOptimization(session);
-    }
+        public double duration { get; private set; }
+        public bool ready { get => SolutionReady(session); }
 
-    public HopperAPI.State GetState(float time)
-    {
-        var state = new HopperAPI.State();
-        HopperAPI.GetSolutionState(session, time, out state);
-        return state;
-    }
+        public Session(HopperAPI.Robot robot)
+        {
+            session = CreateSession(robot);
+        }
 
-    ~HopperSession()
-    {
-        HopperAPI.EndSession(session);
+        public HopperAPI.Model GetModel() => HopperAPI.GetModel(session);
+
+        public void SetParams(HopperAPI.Parameters parameters) => HopperAPI.SetParams(session, parameters);
+
+        public void SetOptions(HopperAPI.Options options) => HopperAPI.SetOptions(session, options);
+
+        public void AddPathPoint(HopperAPI.PathPoint pathPoint) => HopperAPI.AddPathPoint(session, pathPoint);
+
+        public void Optimize() => HopperAPI.StartOptimization(session);
+
+        public HopperAPI.State GetState(float time)
+        {
+            var state = new HopperAPI.State();
+            HopperAPI.GetSolutionState(session, time, out state);
+            return state;
+        }
+
+        ~Session()
+        {
+            HopperAPI.EndSession(session);
+        }
     }
 }
