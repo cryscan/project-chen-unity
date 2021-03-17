@@ -9,7 +9,6 @@ public class Pointer : MonoBehaviour
     [SerializeField] Hopper hopper;
     [SerializeField] Transform body;
     [SerializeField] Transform target;
-    [SerializeField] HopperAPI.Gait gait = HopperAPI.Gait.Walk1;
     [SerializeField] GameObject pathPointPrefab;
 
     [Header("Trajectory")]
@@ -67,6 +66,14 @@ public class Pointer : MonoBehaviour
         pathPoints.Add(pathPoint);
     }
 
+    HopperAPI.Gait ChooseGait()
+    {
+        if (hopper.model.eeCount == 1) return HopperAPI.Gait.Hop1;
+        else if (hopper.model.eeCount == 2) return HopperAPI.Gait.Walk1;
+        else if (hopper.model.eeCount == 4) return HopperAPI.Gait.Walk2;
+        return HopperAPI.Gait.Walk1;
+    }
+
     void Confirm()
     {
         locked = false;
@@ -97,7 +104,7 @@ public class Pointer : MonoBehaviour
 
         int steps = Mathf.CeilToInt(duration * stepsPerSecond);
         hopper.gaits.Add(HopperAPI.Gait.Stand);
-        for (int i = 0; i < steps; ++i) hopper.gaits.Add(gait);
+        for (int i = 0; i < steps; ++i) hopper.gaits.Add(ChooseGait());
         hopper.gaits.Add(HopperAPI.Gait.Stand);
 
         var last = pathPoints[pathPoints.Count - 1].transform;

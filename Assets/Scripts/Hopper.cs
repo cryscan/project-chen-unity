@@ -31,7 +31,7 @@ public class Hopper : MonoBehaviour
 
     public HopperAPI.Session session { get; private set; }
     HopperAPI.State state = new HopperAPI.State();
-    HopperAPI.Model model;
+    public HopperAPI.Model model { get; private set; }
 
     void Awake()
     {
@@ -149,7 +149,11 @@ public class Hopper : MonoBehaviour
 
     void UpdateStates()
     {
-        if (timer >= duration) return;
+        if (timer >= duration)
+        {
+            timer = 0;
+            return;
+        }
 
         if (session.ready)
         {
