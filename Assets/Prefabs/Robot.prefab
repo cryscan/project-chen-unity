@@ -50,11 +50,14 @@ MonoBehaviour:
   hopper: {fileID: 402675005259790785}
   body: {fileID: 402675006695849207}
   target: {fileID: 402675005472631494}
-  gait: 2
   pathPointPrefab: {fileID: 744515480446056350, guid: 88f0205d88b43e749bf1aff5aa4937ca,
     type: 3}
-  speed: 1
+  speed: 2
   stepsPerSecond: 1.5
+  monopedGait: 11
+  bipedGait: 7
+  quadrupedGait: 5
+  quadrupedEndGait: 6
 --- !u!1 &402675004964278507
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,6 +113,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -134,6 +138,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &402675005259790787
 GameObject:
   m_ObjectHideFlags: 0

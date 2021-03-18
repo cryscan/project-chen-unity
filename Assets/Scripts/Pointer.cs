@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+  * Nominal Configures:
+  * Biped:      speed = 2,  steps = 1.5,    gait = Run1.
+  * Quadruped:  speed = 1,  steps = 2,      gait = Run2.
+  */
+
 public class Pointer : MonoBehaviour
 {
     [Header("Configure")]
@@ -12,13 +18,14 @@ public class Pointer : MonoBehaviour
     [SerializeField] GameObject pathPointPrefab;
 
     [Header("Trajectory")]
-    [SerializeField] float speed = 1;
-    [SerializeField] float stepsPerSecond = 1;
+    [SerializeField] float speed = 2;
+    [SerializeField] float stepsPerSecond = 1.5f;
 
     [Header("Gaits")]
     [SerializeField] HopperAPI.Gait monopedGait = HopperAPI.Gait.Hop1;
-    [SerializeField] HopperAPI.Gait bipedGait = HopperAPI.Gait.Walk1;
-    [SerializeField] HopperAPI.Gait quadrupedGait = HopperAPI.Gait.Walk2;
+    [SerializeField] HopperAPI.Gait bipedGait = HopperAPI.Gait.Run1;
+    [SerializeField] HopperAPI.Gait quadrupedGait = HopperAPI.Gait.Run2;
+    [SerializeField] HopperAPI.Gait quadrupedEndGait = HopperAPI.Gait.Run2E;
 
     Camera _camera;
     bool locked = false;
@@ -72,14 +79,6 @@ public class Pointer : MonoBehaviour
         pathPoints.Add(pathPoint);
     }
 
-    HopperAPI.Gait ChooseGait()
-    {
-        if (hopper.model.eeCount == 1) return monopedGait;
-        else if (hopper.model.eeCount == 2) return bipedGait;
-        else if (hopper.model.eeCount == 4) return quadrupedGait;
-        return HopperAPI.Gait.Stand;
-    }
-
     void Confirm()
     {
         locked = false;
@@ -110,7 +109,17 @@ public class Pointer : MonoBehaviour
 
         int steps = Mathf.CeilToInt(duration * stepsPerSecond);
         hopper.gaits.Add(HopperAPI.Gait.Stand);
-        for (int i = 0; i < steps; ++i) hopper.gaits.Add(ChooseGait());
+        for (int i = 0; i < steps; ++i)
+        {
+            HopperAPI.Gait gait = HopperAPI.Gait.Stand;
+            var eeCount = hopper.model.eeCount;
+
+            if (eeCount == 1) gait = monopedGait;
+            else if (eeCount == 2) gait = bipedGait;
+            else if (eeCount == 4) gait = (i == steps - 1) ? quadrupedEndGait : quadrupedGait;
+
+            hopper.gaits.Add(gait);
+        }
         hopper.gaits.Add(HopperAPI.Gait.Stand);
 
         var last = pathPoints[pathPoints.Count - 1].transform;
