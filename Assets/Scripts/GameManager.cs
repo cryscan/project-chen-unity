@@ -6,8 +6,6 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
 
-    public HopperAPI.Robot robot;
-
     void Awake()
     {
         if (instance == null)

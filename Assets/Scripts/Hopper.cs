@@ -29,7 +29,7 @@ public class Hopper : MonoBehaviour
 
     Transform[] ee;
 
-    float timer = 0;
+    public float timer { get; set; } = 0;
 
     public HopperAPI.Session session { get; private set; }
     HopperAPI.State state = new HopperAPI.State();
@@ -154,11 +154,7 @@ public class Hopper : MonoBehaviour
 
     void UpdateStates()
     {
-        if (timer >= duration)
-        {
-            timer = 0;
-            return;
-        }
+        if (timer >= duration) return;
 
         if (session.ready)
         {

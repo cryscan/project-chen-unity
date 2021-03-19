@@ -6,39 +6,22 @@ using UnityEngine.SceneManagement;
 public class SelectRobot : MonoBehaviour
 {
     [SerializeField] Hopper hopper;
-    string sceneName;
-
-    void Awake()
-    {
-        sceneName = SceneManager.GetActiveScene().name;
-    }
+    string[] scenes = { "Monoped", "Biped", "HyQ", "ANYmal" };
 
     void Start()
     {
-        hopper.SetRobot(GameManager.instance.robot);
+        // hopper.SetRobot(GameManager.instance.robot);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            GameManager.instance.robot = HopperAPI.Robot.Monoped;
-            SceneManager.LoadScene(sceneName);
-        }
+            SceneManager.LoadScene(scenes[0]);
         if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            GameManager.instance.robot = HopperAPI.Robot.Biped;
-            SceneManager.LoadScene(sceneName);
-        }
+            SceneManager.LoadScene(scenes[1]);
         if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            GameManager.instance.robot = HopperAPI.Robot.Hyq;
-            SceneManager.LoadScene(sceneName);
-        }
+            SceneManager.LoadScene(scenes[2]);
         if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            GameManager.instance.robot = HopperAPI.Robot.Anymal;
-            SceneManager.LoadScene(sceneName);
-        }
+            SceneManager.LoadScene(scenes[3]);
     }
 }

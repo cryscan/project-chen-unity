@@ -49,7 +49,7 @@ public class TerrainBuilder : MonoBehaviour
 
                 var ray = new Ray(start, Vector3.down);
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, maxHeight, layer))
+                if (Physics.Raycast(ray, out hit, maxHeight * 2, layer))
                 {
                     var height = hit.point.y;
                     terrain.SetHeight(i, j, height);

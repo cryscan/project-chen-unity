@@ -22,10 +22,8 @@ public class Pointer : MonoBehaviour
     [SerializeField] float stepsPerSecond = 1.5f;
 
     [Header("Gaits")]
-    [SerializeField] HopperAPI.Gait monopedGait = HopperAPI.Gait.Hop1;
-    [SerializeField] HopperAPI.Gait bipedGait = HopperAPI.Gait.Run1;
-    [SerializeField] HopperAPI.Gait quadrupedGait = HopperAPI.Gait.Run2;
-    [SerializeField] HopperAPI.Gait quadrupedEndGait = HopperAPI.Gait.Run2E;
+    [SerializeField] HopperAPI.Gait nominalGait;
+    [SerializeField] HopperAPI.Gait endGait;
 
     Camera _camera;
     bool locked = false;
@@ -43,6 +41,9 @@ public class Pointer : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.G))
             hopper.optimizeGaits = !hopper.optimizeGaits;
+
+        if (Input.GetKeyDown(KeyCode.R))
+            hopper.timer = 0;
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -98,7 +99,7 @@ public class Pointer : MonoBehaviour
             acc.Add(distance);
         }
 
-        float duration = distance / speed;
+        float duration = Mathf.Max(distance / speed, 1.2f);
         hopper.duration = duration;
 
         for (int i = 0; i < pathPoints.Count - 1; ++i)
@@ -108,15 +109,16 @@ public class Pointer : MonoBehaviour
         }
 
         int steps = Mathf.CeilToInt(duration * stepsPerSecond);
+
         hopper.gaits.Add(HopperAPI.Gait.Stand);
         for (int i = 0; i < steps; ++i)
         {
             HopperAPI.Gait gait = HopperAPI.Gait.Stand;
             var eeCount = hopper.model.eeCount;
 
-            if (eeCount == 1) gait = monopedGait;
-            else if (eeCount == 2) gait = bipedGait;
-            else if (eeCount == 4) gait = (i == steps - 1) ? quadrupedEndGait : quadrupedGait;
+            if (eeCount == 1) gait = nominalGait;
+            else if (eeCount == 2) gait = nominalGait;
+            else if (eeCount == 4) gait = (i == steps - 1) ? endGait : nominalGait;
 
             hopper.gaits.Add(gait);
         }
