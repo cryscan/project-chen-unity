@@ -12,6 +12,8 @@ public class Hopper : MonoBehaviour
         public Transform transform;
     }
 
+    [SerializeField] TerrainBuilder terrainBuilder;
+
     [Header("Robot")]
     [SerializeField] HopperAPI.Robot robot;
     [SerializeField] Transform body;
@@ -82,6 +84,9 @@ public class Hopper : MonoBehaviour
     {
         session = new HopperAPI.Session(robot);
         model = session.GetModel();
+
+        if (terrainBuilder)
+            session.SetTerrain(terrainBuilder.terrain);
 
         pathPoints.Clear();
         gaits.Clear();

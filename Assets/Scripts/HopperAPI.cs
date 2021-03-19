@@ -96,6 +96,9 @@ public static class HopperAPI
     [DllImport("hopper", EntryPoint = "get_ee_count")]
     public static extern int GetEECount(int session);
 
+    [DllImport("hopper", EntryPoint = "set_terrain")]
+    public static extern void SetTerrain(int session, int terrain);
+
     [DllImport("hopper", EntryPoint = "set_params")]
     static extern void SetParams(int session, CHopper.Parameters parameters);
 
@@ -119,6 +122,24 @@ public static class HopperAPI
 
     [DllImport("hopper", EntryPoint = "get_solution_state")]
     static extern bool GetSolutionState(int session, double time, out CHopper.State state);
+
+    [DllImport("hopper", EntryPoint = "create_terrain")]
+    static extern int CreateTerrain(double posX, double posY, double posZ, uint x, uint y, double unitSize);
+
+    [DllImport("hopper", EntryPoint = "end_terrain")]
+    public static extern void EndTerrain(int terrain);
+
+    [DllImport("hopper", EntryPoint = "set_height")]
+    public static extern void SetHeight(int terrain, uint x, uint y, double height);
+
+    [DllImport("hopper", EntryPoint = "get_height")]
+    public static extern double GetHeight(int terrain, double x, double y);
+
+    [DllImport("hopper", EntryPoint = "get_height_derivatives")]
+    public static extern void GetHeightDerivatives(int terrain, double x, double y, out double dx, out double dy);
+
+
+    /* Session */
 
     public class Model
     {
@@ -290,6 +311,16 @@ public static class HopperAPI
         return true;
     }
 
+
+    /* Terrain */
+
+    public static int CreateTerrain(Vector3 pos, uint x, uint y, float unitSize)
+    {
+        var posArray = LinearVector3ToArray(pos);
+        return CreateTerrain(posArray[0], posArray[1], posArray[2], x, y, unitSize);
+    }
+
+
     /* Util functions */
 
     static float NearestAngle(float a, float b)
@@ -346,11 +377,12 @@ public static class HopperAPI
         return result;
     }
 
+
     /* Object Oriented API */
 
     public class Session
     {
-        int session;
+        public int session { get; private set; }
 
         public double duration { get; private set; }
         public bool optimized { get; private set; } = false;
@@ -359,17 +391,18 @@ public static class HopperAPI
         public Session(HopperAPI.Robot robot)
         {
             session = CreateSession(robot);
-            Debug.Log($"Session {session} created");
+            Debug.Log($"Session {session} Created");
         }
 
         ~Session()
         {
             HopperAPI.EndSession(session);
-            Debug.Log($"Session {session} ended");
+            Debug.Log($"Session {session} Ended");
         }
 
         public HopperAPI.Model GetModel() => HopperAPI.GetModel(session);
 
+        public void SetTerrain(HopperAPI.Terrain terrain) => HopperAPI.SetTerrain(session, terrain.terrain);
         public void SetParams(HopperAPI.Parameters parameters) => HopperAPI.SetParams(session, parameters);
         public void SetOptions(HopperAPI.Options options) => HopperAPI.SetOptions(session, options);
         public void SetDuration(float duration) => HopperAPI.SetDuration(session, duration);
@@ -388,6 +421,50 @@ public static class HopperAPI
             var state = new HopperAPI.State();
             HopperAPI.GetSolutionState(session, time, out state);
             return state;
+        }
+    }
+
+    public class Terrain
+    {
+        public int terrain { get; private set; }
+
+        public Vector3 origin { get; private set; }
+        public Vector2 size { get; private set; }
+        public float unitSize { get; private set; }
+
+        uint x, y;
+
+        public Terrain(Vector3 origin, uint x, uint y, float unitSize)
+        {
+            this.origin = origin;
+            this.size = new Vector2(x * unitSize, y * unitSize);
+            this.unitSize = unitSize;
+
+            this.x = x;
+            this.y = y;
+
+            terrain = HopperAPI.CreateTerrain(origin, x, y, unitSize);
+            Debug.Log($"Terrain {terrain} Created");
+        }
+
+        ~Terrain()
+        {
+            HopperAPI.EndTerrain(terrain);
+            Debug.Log($"Terrain {terrain} Ended");
+        }
+
+        public void SetHeight(uint x, uint y, double height)
+        {
+            if (x > this.x || y > this.y) return;
+            HopperAPI.SetHeight(terrain, x, y, height);
+        }
+
+        public double GetHeight(double x, double y) => HopperAPI.GetHeight(terrain, x, y);
+        public Vector2 GetHeightDerivatives(double x, double y)
+        {
+            double dx, dy;
+            HopperAPI.GetHeightDerivatives(terrain, x, y, out dx, out dy);
+            return new Vector2((float)dx, (float)dy);
         }
     }
 }
