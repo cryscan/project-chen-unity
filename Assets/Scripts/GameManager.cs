@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance { get; private set; }
 
+    [SerializeField] float timeScale = 1;
+
     void Awake()
     {
         if (instance == null)
@@ -18,6 +20,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        Time.timeScale = timeScale;
+
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
     }

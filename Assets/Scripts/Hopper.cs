@@ -18,6 +18,9 @@ public class Hopper : MonoBehaviour
     [SerializeField] HopperAPI.Robot robot;
     [SerializeField] Transform body;
     [SerializeField] Transform eeParent;
+    [SerializeField] TerrainFollower terrainFollower;
+
+    [SerializeField] Material stanceMaterial, flightMaterial;
 
     [Header("Trajectory")]
     public bool optimizeGaits = false;
@@ -28,6 +31,7 @@ public class Hopper : MonoBehaviour
     public List<HopperAPI.Gait> gaits;
 
     Transform[] ee;
+    MeshRenderer[] eeMeshRenderers;
 
     public float timer { get; set; } = 0;
 
@@ -38,6 +42,9 @@ public class Hopper : MonoBehaviour
     void Awake()
     {
         ee = Enumerable.Range(0, eeParent.childCount).Select(x => eeParent.GetChild(x)).ToArray();
+        eeMeshRenderers = ee.Select(x => x.GetComponentInChildren<MeshRenderer>()).ToArray();
+
+        if (terrainFollower) terrainFollower.terrainBuilder = terrainBuilder;
     }
 
     void Start()
@@ -105,17 +112,11 @@ public class Hopper : MonoBehaviour
     {
         var stanceHeight = Enumerable.Average(model.nominalStance.Select(x => -x.y));
 
-        {
-            var position = body.position;
-            position.y = stanceHeight;
-            body.position = position;
-        }
+        var translation = new Vector3(0, stanceHeight, 0);
+        body.Translate(translation - body.localPosition, Space.Self);
 
         for (int id = 0; id < model.eeCount; ++id)
-        {
-            var position = model.nominalStance[id] + body.position;
-            ee[id].position = position;
-        }
+            ee[id].Translate(model.nominalStance[id] + translation - ee[id].localPosition, Space.Self);
 
         for (int id = model.eeCount; id < ee.Length; ++id)
             ee[id].gameObject.SetActive(false);
@@ -147,7 +148,7 @@ public class Hopper : MonoBehaviour
     HopperAPI.Options GetOptions()
     {
         var option = new HopperAPI.Options();
-        option.maxCpuTime = 0;
+        option.maxCpuTime = 180;
         option.optimizePhaseDurations = optimizeGaits;
         return option;
     }
@@ -161,8 +162,19 @@ public class Hopper : MonoBehaviour
             state = session.GetState(timer);
             body.position = state.baseLinearPosition;
             body.rotation = Quaternion.Euler(state.baseAngularPosition);
+
+            Vector3 rootPosition = Vector3.zero;
             for (int id = 0; id < model.eeCount; ++id)
+            {
                 ee[id].position = state.eeMotions[id];
+                rootPosition += ee[id].position;
+
+                var force = state.eeForces[id].magnitude;
+                eeMeshRenderers[id].material = force > 0 ? stanceMaterial : flightMaterial;
+            }
+
+            terrainFollower.transform.position = rootPosition / model.eeCount;
+            terrainFollower.transform.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);
 
             timer += Time.deltaTime;
         }
