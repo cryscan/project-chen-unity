@@ -30,17 +30,21 @@ public class Hopper : MonoBehaviour
     public float duration = 2.4f;
     public List<HopperAPI.Gait> gaits;
 
+    HierarchyRecorder recorder;
+
     Transform[] ee;
     MeshRenderer[] eeMeshRenderers;
 
     public float timer { get; set; } = 0;
 
     public HopperAPI.Session session { get; private set; }
-    HopperAPI.State state = new HopperAPI.State();
     public HopperAPI.Model model { get; private set; }
+    HopperAPI.State state = new HopperAPI.State();
 
     void Awake()
     {
+        recorder = GetComponent<HierarchyRecorder>();
+
         ee = Enumerable.Range(0, eeParent.childCount).Select(x => eeParent.GetChild(x)).ToArray();
         eeMeshRenderers = ee.Select(x => x.GetComponentInChildren<MeshRenderer>()).ToArray();
 
@@ -155,7 +159,11 @@ public class Hopper : MonoBehaviour
 
     void UpdateStates()
     {
-        if (timer >= duration) return;
+        if (timer >= duration)
+        {
+            recorder.EndRecording();
+            return;
+        }
 
         if (session.ready)
         {
@@ -177,6 +185,7 @@ public class Hopper : MonoBehaviour
             terrainFollower.transform.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);
 
             timer += Time.deltaTime;
+            recorder.BeginRecording();
         }
     }
 }
