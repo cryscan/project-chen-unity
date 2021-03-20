@@ -656,7 +656,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 768
   size: {x: 8, y: 10}
-  unitSize: 0.02
+  unitSize: 0.01
   maxHeight: 100
 --- !u!1 &2866406092380767376
 GameObject:
