@@ -12,11 +12,13 @@ public class TerrainFollower : MonoBehaviour
 
     void Start()
     {
-        terrain = terrainBuilder.terrain;
+        if (terrainBuilder) terrain = terrainBuilder.terrain;
     }
 
     void LateUpdate()
     {
+        if (!terrainBuilder) return;
+
         var position = transform.position;
         position.y = (float)terrain.GetHeight(position.z, -position.x);
         transform.position = position;

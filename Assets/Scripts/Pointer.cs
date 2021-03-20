@@ -69,7 +69,7 @@ public class Pointer : MonoBehaviour
 
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 20, layer))
+        if (Physics.Raycast(ray, out hit, 100, layer))
         {
             var point = hit.point;
             if (!locked) transform.position = point;

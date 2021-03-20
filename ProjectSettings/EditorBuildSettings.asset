@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Monoped.unity
     guid: 4843f3cfcecb81e3e902cd982ccbb153
   - enabled: 1
-    path: Assets/Scenes/Biped.unity
+    path: Assets/Scenes/Biped Flat.unity
     guid: 7b622172cc6084a79976e1291f950e58
   m_configObjects: {}
