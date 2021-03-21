@@ -33,9 +33,6 @@ public class Pointer : MonoBehaviour
     void Awake()
     {
         _camera = Camera.main;
-
-        transform.SetParent(null);
-        target.SetParent(null);
     }
 
     void Update()

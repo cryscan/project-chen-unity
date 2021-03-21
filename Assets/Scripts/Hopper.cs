@@ -31,6 +31,7 @@ public class Hopper : MonoBehaviour
     public List<HopperAPI.Gait> gaits;
 
     HierarchyRecorder recorder;
+    Vector3 rootPosition;
 
     Transform[] ee;
     MeshRenderer[] eeMeshRenderers;
@@ -124,13 +125,16 @@ public class Hopper : MonoBehaviour
 
         for (int id = model.eeCount; id < ee.Length; ++id)
             ee[id].gameObject.SetActive(false);
+
+        state.baseLinearPosition = body.transform.position;
+        state.baseAngularPosition = body.transform.rotation.eulerAngles;
     }
 
     HopperAPI.Parameters GetParams()
     {
         var parameters = new HopperAPI.Parameters();
 
-        parameters.initialBaseLinearPosition = body.position;
+        parameters.initialBaseLinearPosition = state.baseLinearPosition;
         parameters.initialBaseLinearVelocity = state.baseLinearVelocity;
         parameters.initialBaseAngularPosition = state.baseAngularPosition;
         parameters.initialBaseAngularVelocity = state.baseAngularVelocity;
@@ -168,21 +172,25 @@ public class Hopper : MonoBehaviour
         if (session.ready)
         {
             state = session.GetState(timer);
+
+            // Update root position.
+            rootPosition = Vector3.zero;
+            for (int id = 0; id < model.eeCount; ++id) rootPosition += state.eeMotions[id];
+            rootPosition /= model.eeCount;
+
+            transform.position = rootPosition;
+            transform.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);
+
             body.position = state.baseLinearPosition;
             body.rotation = Quaternion.Euler(state.baseAngularPosition);
 
-            Vector3 rootPosition = Vector3.zero;
             for (int id = 0; id < model.eeCount; ++id)
             {
                 ee[id].position = state.eeMotions[id];
-                rootPosition += ee[id].position;
 
                 var force = state.eeForces[id].magnitude;
                 eeMeshRenderers[id].material = force > 0 ? stanceMaterial : flightMaterial;
             }
-
-            terrainFollower.transform.position = rootPosition / model.eeCount;
-            terrainFollower.transform.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);
 
             timer += Time.deltaTime;
             recorder.BeginRecording();
