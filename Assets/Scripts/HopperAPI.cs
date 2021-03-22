@@ -51,6 +51,7 @@ namespace CHopper
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] linear;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public double[] angular;
+        public byte bounds;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -82,7 +83,12 @@ public static class HopperAPI
     }
 
     [System.Serializable]
-    public enum Dim3D { Z, X, Y };
+    [System.Flags]
+    public enum Dim3D : byte { Z = 1, X = 2, Y = 4 };
+
+    [System.Serializable]
+    [System.Flags]
+    public enum Dim6D : byte { AZ = 1, AX = 2, AY = 4, LZ = 8, LX = 16, LY = 32 };
 
     [DllImport("hopper", EntryPoint = "create_session")]
     public static extern int CreateSession(Robot model = 0);
@@ -164,10 +170,10 @@ public static class HopperAPI
 
         public Vector3[] initialEEPositions;
 
-        public Dim3D[] boundsFinalLinearPosition = { Dim3D.X, Dim3D.Z };
-        public Dim3D[] boundsFinalLinearVelocity = { Dim3D.X, Dim3D.Y, Dim3D.Z };
-        public Dim3D[] boundsFinalAngularPosition = { Dim3D.X, Dim3D.Y, Dim3D.Z };
-        public Dim3D[] boundsFinalAngularVelocity = { Dim3D.X, Dim3D.Y, Dim3D.Z };
+        public Dim3D boundsFinalLinearPosition = Dim3D.X | Dim3D.Z;
+        public Dim3D boundsFinalLinearVelocity = Dim3D.X | Dim3D.Y | Dim3D.Z;
+        public Dim3D boundsFinalAngularPosition = Dim3D.X | Dim3D.Y | Dim3D.Z;
+        public Dim3D boundsFinalAngularVelocity = Dim3D.X | Dim3D.Y | Dim3D.Z;
 
         public void UpdateAngles()
         {
@@ -188,6 +194,7 @@ public static class HopperAPI
     {
         public float time;
         public Vector3 linear, angular;
+        public Dim6D bounds;
     }
 
     public struct State
@@ -251,10 +258,10 @@ public static class HopperAPI
             Array.Copy(array, 0, p.initialEEPositions, id * 3, array.Length);
         }
 
-        p.boundsFinalLinearPosition = ConvertBoundDims(parameters.boundsFinalLinearPosition);
-        p.boundsFinalLinearVelocity = ConvertBoundDims(parameters.boundsFinalLinearVelocity);
-        p.boundsFinalAngularPosition = ConvertBoundDims(parameters.boundsFinalAngularPosition);
-        p.boundsFinalAngularVelocity = ConvertBoundDims(parameters.boundsFinalAngularVelocity);
+        p.boundsFinalLinearPosition = (byte)parameters.boundsFinalLinearPosition;
+        p.boundsFinalLinearVelocity = (byte)parameters.boundsFinalLinearVelocity;
+        p.boundsFinalAngularPosition = (byte)parameters.boundsFinalAngularPosition;
+        p.boundsFinalAngularVelocity = (byte)parameters.boundsFinalAngularVelocity;
 
         SetParams(session, p);
     }
@@ -274,6 +281,7 @@ public static class HopperAPI
         p.time = pathPoint.time;
         p.linear = LinearVector3ToArray(pathPoint.linear);
         p.angular = AngularVector3ToArray(pathPoint.angular);
+        p.bounds = (byte)pathPoint.bounds;
         PushPathPoint(session, p);
     }
 

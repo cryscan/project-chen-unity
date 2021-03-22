@@ -68,6 +68,16 @@ public class Hopper : MonoBehaviour
         DrawEELimits();
     }
 
+    void OnGUI()
+    {
+        if (GUILayout.Button("Hopper Reset")) Reset();
+        if (GUILayout.Button("Hopper Optimize"))
+        {
+            ResetSession();
+            Optimize();
+        }
+    }
+
     public void SetRobot(HopperAPI.Robot robot) => this.robot = robot;
 
     public void Optimize()
@@ -92,14 +102,17 @@ public class Hopper : MonoBehaviour
         session.StartOptimization();
     }
 
-    public void Reset()
+    void ResetSession()
     {
         session = new HopperAPI.Session(robot);
         model = session.GetModel();
 
-        if (terrainBuilder)
-            session.SetTerrain(terrainBuilder.terrain);
+        if (terrainBuilder) session.SetTerrain(terrainBuilder.terrain);
+    }
 
+    public void Reset()
+    {
+        ResetSession();
         pathPoints.Clear();
         gaits.Clear();
     }
