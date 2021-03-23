@@ -28,6 +28,7 @@ namespace Dynamatica.Unity.Components
         }
     }
 
+    [RequireComponent(typeof(HierarchyRecorder))]
     public class Dynamatica : MonoBehaviour
     {
         [Header("Model")]
@@ -45,9 +46,12 @@ namespace Dynamatica.Unity.Components
         EndEffector[] ee;
         float timer = 0;
 
+        HierarchyRecorder recorder;
+
         void Awake()
         {
             ee = GetComponentsInChildren<EndEffector>();
+            recorder = GetComponent<HierarchyRecorder>();
         }
 
         void Start()
@@ -65,6 +69,7 @@ namespace Dynamatica.Unity.Components
         {
             if (timer > path.duration)
             {
+                recorder.EndRecording();
                 return;
             }
 
@@ -88,6 +93,7 @@ namespace Dynamatica.Unity.Components
                     ee[id].force = state.eeForces[id];
                 }
 
+                recorder.Record();
                 timer += Time.deltaTime;
             }
         }
