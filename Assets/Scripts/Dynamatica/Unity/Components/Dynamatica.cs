@@ -16,10 +16,14 @@ namespace Dynamatica.Unity.Components
 
         [Header("Trajectory")]
         public Path path;
-        public bool optimizeGaits;
 
         [Header("Terrain")]
         [SerializeField] TerrainBuilder terrainBuilder;
+
+        [Header("Optimization")]
+        [SerializeField] int maxIter = 0;
+        [SerializeField] float maxCpuTime = 120;
+        public bool optimizeGaits;
 
         public Session session { get; private set; }
         public Model model { get; private set; }
@@ -138,13 +142,13 @@ namespace Dynamatica.Unity.Components
 
             transform.SetPositionAndRotation(position, rotation);
 
-            state.baseLinearPosition = start.linear;
+            var stanceHeight = Enumerable.Average(model.nominalStance.Select(v => -v.y));
+            body.localPosition = new Vector3(0, stanceHeight, 0);
+
+            state.baseLinearPosition = body.transform.position;
             state.baseLinearVelocity = Vector3.zero;
             state.baseAngularPosition = start.angular;
             state.baseAngularVelocity = Vector3.zero;
-
-            var stanceHeight = Enumerable.Average(model.nominalStance.Select(v => -v.y));
-            body.localPosition = new Vector3(0, stanceHeight, 0);
 
             for (int id = 0; id < model.eeCount; ++id)
             {
@@ -181,7 +185,8 @@ namespace Dynamatica.Unity.Components
         {
             var options = new Options();
 
-            options.maxCpuTime = 180;
+            options.maxIter = maxIter;
+            options.maxCpuTime = maxCpuTime;
             options.optimizePhaseDurations = optimizeGaits;
             return options;
         }

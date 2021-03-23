@@ -131,8 +131,10 @@ MonoBehaviour:
   robot: 0
   body: {fileID: 402675006695849207}
   path: {fileID: 0}
-  optimizeGaits: 0
   terrainBuilder: {fileID: 0}
+  maxIter: 0
+  maxCpuTime: 240
+  optimizeGaits: 0
 --- !u!114 &1201950680085977023
 MonoBehaviour:
   m_ObjectHideFlags: 0
