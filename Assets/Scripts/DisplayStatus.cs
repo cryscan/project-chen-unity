@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Hopper))]
+[RequireComponent(typeof(Dynamatica.Unity.Components.Dynamatica))]
 public class DisplayStatus : MonoBehaviour
 {
     [SerializeField] Text statusText;
     [SerializeField] Text optimizeGaitsText;
 
-    Hopper hopper;
+    Dynamatica.Unity.Components.Dynamatica dynamatica;
 
     void Awake()
     {
-        hopper = GetComponent<Hopper>();
+        dynamatica = GetComponent<Dynamatica.Unity.Components.Dynamatica>();
     }
 
     void Update()
     {
-        if (hopper)
-        {
-            if (!hopper.session.optimized) statusText.text = "Ready";
-            else if (hopper.session.ready) statusText.text = "Optimized";
-            else statusText.text = "Optimizing...";
+        if (!dynamatica) return;
 
-            if (hopper.optimizeGaits) optimizeGaitsText.text = "Optimize Gaits: On";
-            else optimizeGaitsText.text = "Optimize Gaits: Off";
-        }
+        if (!dynamatica.session.dirty) statusText.text = "Ready";
+        else if (dynamatica.session.ready) statusText.text = "Optimized";
+        else statusText.text = "Optimizing...";
     }
 }
