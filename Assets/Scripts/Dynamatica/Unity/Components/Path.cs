@@ -45,8 +45,8 @@ namespace Dynamatica.Unity.Components
             for (int i = 0; i < nodes.Length - 1; ++i)
             {
                 var distance = Vector3.Distance(nodes[i].transform.position, nodes[i + 1].transform.position);
-                accumulator.Add(distance);
                 length += distance;
+                accumulator.Add(length);
             }
 
             pathPoints = new PathPoint[nodes.Length];
@@ -70,13 +70,15 @@ namespace Dynamatica.Unity.Components
             int steps = Mathf.CeilToInt(duration * stepFrequency);
             if (steps == 0) return;
 
-            gaits = new Gait[steps];
-            gaits[0] = gaits[steps - 1] = Gait.Stand;
+            var gaits = new List<Gait>();
+            gaits.Add(Gait.Stand);
+            for (int i = 0; i < steps; ++i) gaits.Add(nominalGait);
+            gaits.Add(Gait.Stand);
 
-            for (int i = 1; i < steps - 1; ++i) gaits[i] = nominalGait;
+            this.gaits = gaits.ToArray();
         }
 
-        static float ConvertAngle(float angle) => angle % 360 - 180;
+        static float ConvertAngle(float angle) => angle % 360;
         static Vector3 ConvertEulerAngles(Vector3 angles)
         {
             angles.x = ConvertAngle(angles.x);

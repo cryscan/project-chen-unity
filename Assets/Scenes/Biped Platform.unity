@@ -449,7 +449,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2
   minDuration: 1.2
-  stepFrequency: 2
+  stepFrequency: 1.5
   nominalGait: 7
 --- !u!4 &282342393
 Transform:
@@ -1469,7 +1469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2
   minDuration: 1.2
-  stepFrequency: 2
+  stepFrequency: 1.5
   nominalGait: 7
 --- !u!4 &1409286387
 Transform:
@@ -1518,7 +1518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2.4
   minDuration: 1.2
-  stepFrequency: 2
+  stepFrequency: 1.5
   nominalGait: 7
 --- !u!4 &1504381565
 Transform:
@@ -1613,7 +1613,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2.4
   minDuration: 1.2
-  stepFrequency: 2
+  stepFrequency: 1.5
   nominalGait: 7
 --- !u!4 &1783878042
 Transform:
