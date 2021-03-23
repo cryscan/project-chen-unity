@@ -7,27 +7,6 @@ using Dynamatica.Runtime;
 
 namespace Dynamatica.Unity.Components
 {
-    [DisallowMultipleComponent]
-    public class EndEffector : MonoBehaviour
-    {
-        public Vector3 force;
-        public bool contact { get => force.magnitude > 0; }
-
-        [SerializeField] Material stanceMaterial, flightMaterial;
-
-        MeshRenderer mesh;
-
-        void Awake()
-        {
-            mesh = GetComponentInChildren<MeshRenderer>();
-        }
-
-        void Update()
-        {
-            mesh.material = contact ? stanceMaterial : flightMaterial;
-        }
-    }
-
     [RequireComponent(typeof(HierarchyRecorder))]
     public class Dynamatica : MonoBehaviour
     {
@@ -39,6 +18,9 @@ namespace Dynamatica.Unity.Components
         public Path path;
         public bool optimizeGaits;
 
+        [Header("Terrain")]
+        [SerializeField] TerrainBuilder terrainBuilder;
+
         public Session session { get; private set; }
         public Model model { get; private set; }
         public State state { get; private set; } = new State();
@@ -46,6 +28,7 @@ namespace Dynamatica.Unity.Components
         EndEffector[] ee;
         float timer = 0;
 
+        Terrain terrain;
         HierarchyRecorder recorder;
 
         void Awake()
@@ -62,10 +45,17 @@ namespace Dynamatica.Unity.Components
                 EditorApplication.isPlaying = false;
             }
 
+            if (terrainBuilder)
+            {
+                terrain = terrainBuilder.terrain;
+                var tracker = GetComponentInChildren<TerrainTracker>();
+                if (tracker) tracker.terrain = terrain;
+            }
+
             ResetStance();
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (timer > path.duration)
             {
@@ -98,6 +88,13 @@ namespace Dynamatica.Unity.Components
             }
         }
 
+        void OnGUI()
+        {
+            if (GUILayout.Button("Reset")) ResetStance();
+            if (GUILayout.Button("Optimize")) Optimize();
+            if (GUILayout.Button("Replay")) timer = 0;
+        }
+
         public void ResetStance()
         {
             Reset();
@@ -107,10 +104,11 @@ namespace Dynamatica.Unity.Components
         public void Optimize()
         {
             Reset();
-
             session.SetParams(MakeParams());
             session.SetOptions(MakeOptions());
             session.SetDuration(path.duration);
+
+            if (terrain != null) session.SetTerrain(terrain);
 
             foreach (var pathPoint in path.pathPoints)
                 session.PushPathPoint(pathPoint);

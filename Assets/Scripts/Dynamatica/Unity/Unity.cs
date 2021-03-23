@@ -21,7 +21,7 @@ namespace Dynamatica.Unity
             model.mass = model_.mass;
             model.eeCount = model_.eeCount;
 
-            var query = from id in Enumerable.Range(0, 4)
+            var query = from id in Enumerable.Range(0, model.eeCount)
                         let array = model_.nominalStance.Skip(id * 3).Take(3).ToArray()
                         select array.ToLinear();
             model.nominalStance = query.ToArray();

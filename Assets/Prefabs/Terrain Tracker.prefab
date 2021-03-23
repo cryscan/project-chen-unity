@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1896168832384167648}
   - component: {fileID: 1896168832384167651}
   m_Layer: 0
-  m_Name: Terrain Follower
+  m_Name: Terrain Tracker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,10 +41,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1896168832384167650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c0af6b4dd2dc9a899575faea2dbb4b5, type: 3}
+  m_Script: {fileID: 11500000, guid: fcfa76d74dfaf515c9fbb89fb7767b4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainBuilder: {fileID: 0}
   base: {fileID: 2114342045314904249}
 --- !u!1 &3877274939726231649
 GameObject:

@@ -26,8 +26,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402675004964278507}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.2, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.6, z: 0.4}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.4, y: 0.2, z: 0.2}
   m_Children: []
   m_Father: {fileID: 402675006695849207}
   m_RootOrder: 0
@@ -125,21 +125,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 402675005259790787}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50404d74cfea38938bd5df08d38d9715, type: 3}
+  m_Script: {fileID: 11500000, guid: d05569743a40fde289dc08bebeaeddac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terrainBuilder: {fileID: 0}
   robot: 0
   body: {fileID: 402675006695849207}
-  eeParent: {fileID: 402675005505786229}
-  terrainFollower: {fileID: 6690007737975714259}
-  stanceMaterial: {fileID: 2100000, guid: 740385691a1082c91b5004272a74657a, type: 2}
-  flightMaterial: {fileID: 2100000, guid: 24c9c4e1d332b3fd6aacbb62448db450, type: 2}
+  path: {fileID: 0}
   optimizeGaits: 0
-  pathPoints: []
-  target: {fileID: 0}
-  duration: 2.4
-  gaits: 
+  terrainBuilder: {fileID: 0}
 --- !u!114 &1201950680085977023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -584,7 +577,7 @@ PrefabInstance:
     - target: {fileID: 1896168832384167650, guid: 4b83f8a76eae4c2ddad8148ee99fd2a9,
         type: 3}
       propertyPath: m_Name
-      value: Terrain Follower
+      value: Terrain Tracker
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b83f8a76eae4c2ddad8148ee99fd2a9, type: 3}
@@ -594,15 +587,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5082071481312403248}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6690007737975714259 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1896168832384167651, guid: 4b83f8a76eae4c2ddad8148ee99fd2a9,
-    type: 3}
-  m_PrefabInstance: {fileID: 5082071481312403248}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c0af6b4dd2dc9a899575faea2dbb4b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
