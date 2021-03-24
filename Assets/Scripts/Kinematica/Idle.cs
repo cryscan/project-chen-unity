@@ -1,6 +1,9 @@
 using System;
 using Unity.Kinematica;
+
+#if UNITY_EDITOR
 using Unity.Kinematica.Editor;
+#endif
 
 namespace BipedLocomotion
 {

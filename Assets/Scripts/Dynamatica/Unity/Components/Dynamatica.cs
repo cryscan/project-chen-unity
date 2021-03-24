@@ -46,7 +46,10 @@ namespace Dynamatica.Unity.Components
             if (!(path?.valid ?? false))
             {
                 Debug.LogError($"[Dynamatica] Path must not be null or invalid");
+
+#if UNITY_EDITOR
                 EditorApplication.isPlaying = false;
+#endif
             }
 
             if (terrainBuilder)
