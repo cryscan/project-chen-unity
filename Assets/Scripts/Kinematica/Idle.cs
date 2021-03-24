@@ -10,6 +10,7 @@ namespace BipedLocomotion
         public static Idle Default => new Idle();
     }
 
+#if UNITY_EDITOR
     [Serializable]
     [Tag("Idle", "#4850d2")]
     internal struct IdleTag : Payload<Idle>
@@ -19,4 +20,5 @@ namespace BipedLocomotion
             return Idle.Default;
         }
     }
+#endif
 }

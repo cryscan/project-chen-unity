@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 namespace Infrastructure.Editor
 {
     public class AvatarMaker
@@ -37,3 +38,4 @@ namespace Infrastructure.Editor
         }
     }
 }
+#endif

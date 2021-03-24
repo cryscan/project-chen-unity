@@ -10,6 +10,7 @@ namespace BipedLocomotion
         public static Locomotion Default => new Locomotion();
     }
 
+#if UNITY_EDITOR
     [Serializable]
     [Tag("Locomotion", "#4850d2")]
     public struct LocomotionTag : Payload<Locomotion>
@@ -19,4 +20,5 @@ namespace BipedLocomotion
             return Locomotion.Default;
         }
     }
+#endif
 }
