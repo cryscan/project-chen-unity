@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,6 +22,13 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         Time.timeScale = timeScale;
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+            SceneManager.LoadScene(0);
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+            SceneManager.LoadScene(1);
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+            SceneManager.LoadScene(2);
 
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();

@@ -94,9 +94,11 @@ namespace Dynamatica.Unity.Components
 
         void OnGUI()
         {
+            optimizeGaits = GUILayout.Toggle(optimizeGaits, "Optimize Gaits");
             if (GUILayout.Button("Reset")) ResetStance();
             if (GUILayout.Button("Optimize")) Optimize();
             if (GUILayout.Button("Replay")) timer = 0;
+            GUILayout.Space(20);
         }
 
         public void ResetStance()
