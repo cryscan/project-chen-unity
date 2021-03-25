@@ -125,39 +125,6 @@ MonoBehaviour:
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
-    - m_PreBoundaryClipGuid:
-        val0: 0
-        val1: 0
-        val2: 0
-        val3: 0
-      m_PostBoundaryClipGuid:
-        val0: 0
-        val1: 0
-        val2: 0
-        val3: 0
-      m_PreBoundaryClip: {fileID: 0}
-      m_PostBoundaryClip: {fileID: 0}
-      m_AnimationClipReference: {fileID: 0}
-      m_AnimationClipGuid:
-        val0: 181882594
-        val1: -2130128703
-        val2: -191334071
-        val3: -935407657
-      m_CachedClipVersion: 3
-      m_CachedClipName: recorded_clip
-      m_CachedClipDuration: 7.266667
-      m_CachedSampleRate: 30
-      m_RetargetSourceAvatar: {fileID: 0}
-      tags:
-      - startTime: 0
-        duration: 7.1666665
-        payload:
-          serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        name: 
-      markers: []
-      m_Asset: {fileID: 11400000}
     destinationAvatar: {fileID: 9000000, guid: c9001660ce9f077439b8d5cc72386171, type: 3}
     metrics:
     - name: Default
