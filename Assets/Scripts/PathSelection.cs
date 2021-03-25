@@ -17,19 +17,25 @@ public class PathSelection : MonoBehaviour
         dynamatica = FindObjectOfType<Dynamatica.Unity.Components.Dynamatica>();
         paths = FindObjectsOfType<Dynamatica.Unity.Components.Path>();
         names = paths.Select(x => x.name).ToArray();
+
+        SetupPath();
     }
 
     void Update()
     {
-        path = paths[index];
-        dynamatica.path = path;
-
+        SetupPath();
         foreach (var path in paths) path.gameObject.SetActive(path == this.path);
     }
 
     void OnGUI()
     {
         GUILayout.Space(120);
-        index = GUILayout.SelectionGrid(index, names, 4);
+        index = GUILayout.SelectionGrid(this.index, names, 2);
+    }
+
+    void SetupPath()
+    {
+        path = paths[index];
+        dynamatica.path = path;
     }
 }

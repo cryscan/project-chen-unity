@@ -8,10 +8,13 @@ using Dynamatica.Runtime;
 namespace Dynamatica.Unity.Components
 {
     [RequireComponent(typeof(HierarchyRecorder))]
+    [RequireComponent(typeof(Animator))]
     public class Dynamatica : MonoBehaviour
     {
         [Header("Model")]
         public Robot robot;
+
+        [SerializeField] Transform root;
         [SerializeField] Transform body;
 
         [Header("Trajectory")]
@@ -34,11 +37,13 @@ namespace Dynamatica.Unity.Components
 
         Terrain terrain;
         HierarchyRecorder recorder;
+        Animator animator;
 
         void Awake()
         {
             ee = GetComponentsInChildren<EndEffector>();
             recorder = GetComponent<HierarchyRecorder>();
+            animator = GetComponent<Animator>();
         }
 
         void Start()
@@ -59,6 +64,8 @@ namespace Dynamatica.Unity.Components
                 if (tracker) tracker.terrain = terrain;
             }
 
+            recorder.BindTransform(gameObject);
+
             ResetStance();
         }
 
@@ -77,20 +84,21 @@ namespace Dynamatica.Unity.Components
                 var position = Vector3.zero;
                 foreach (var vector in state.eeMotions) position += vector;
                 position /= model.eeCount;
+                position.y = 0;
 
-                transform.position = position;
-                transform.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);
+                root.position = position;
+                root.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);
 
                 body.position = state.baseLinearPosition;
                 body.rotation = Quaternion.Euler(state.baseAngularPosition);
 
                 for (int id = 0; id < model.eeCount; ++id)
-                {
+                {// transform
                     ee[id].transform.position = state.eeMotions[id];
                     ee[id].force = state.eeForces[id];
                 }
 
-                recorder.Record();
+                if (!recorder.recording) recorder.Record();
                 timer += Time.deltaTime;
             }
         }
@@ -99,6 +107,7 @@ namespace Dynamatica.Unity.Components
         {
             optimizeGaits = GUILayout.Toggle(optimizeGaits, "Optimize Gaits");
             if (GUILayout.Button("Reset")) ResetStance();
+            if (GUILayout.Button("Init Stance")) InitStance();
             if (GUILayout.Button("Optimize")) Optimize();
             if (GUILayout.Button("Replay")) timer = 0;
             GUILayout.Space(20);
@@ -145,12 +154,13 @@ namespace Dynamatica.Unity.Components
             var position = start.linear;
             var rotation = Quaternion.Euler(start.angular);
 
-            transform.SetPositionAndRotation(position, rotation);
+            root.SetPositionAndRotation(position, rotation);
+            body.SetPositionAndRotation(position, rotation);
 
             var stanceHeight = Enumerable.Average(model.nominalStance.Select(v => -v.y));
-            body.localPosition = new Vector3(0, stanceHeight, 0);
+            body.Translate(0, stanceHeight, 0);
 
-            state.baseLinearPosition = body.transform.position;
+            state.baseLinearPosition = body.position;
             state.baseLinearVelocity = Vector3.zero;
             state.baseAngularPosition = start.angular;
             state.baseAngularVelocity = Vector3.zero;
@@ -158,7 +168,6 @@ namespace Dynamatica.Unity.Components
             for (int id = 0; id < model.eeCount; ++id)
             {
                 position = model.nominalStance[id];
-                position.y += stanceHeight;
                 ee[id].transform.localPosition = position;
             }
         }

@@ -11,7 +11,9 @@ namespace Dynamatica.Unity.Components
     public class HierarchyRecorder : MonoBehaviour
     {
         public AnimationClip clip;
-        [SerializeField] bool recording = false;
+
+        [SerializeField] bool _recording = false;
+        public bool recording { get => _recording; }
 
 #if UNITY_EDITOR
         GameObjectRecorder recorder;
@@ -21,7 +23,7 @@ namespace Dynamatica.Unity.Components
         {
 #if UNITY_EDITOR
             recorder = new GameObjectRecorder(gameObject);
-            recorder.BindComponentsOfType<Transform>(gameObject, true);
+            recorder.BindComponentsOfType<Animator>(gameObject, false);
             recorder.BindComponentsOfType<EndEffector>(gameObject, true);
 #endif
         }
@@ -29,19 +31,30 @@ namespace Dynamatica.Unity.Components
         void LateUpdate()
         {
             if (!clip) return;
-            if (!recording) return;
+            if (!_recording) return;
 
 #if UNITY_EDITOR
             recorder.TakeSnapshot(Time.deltaTime);
 #endif
         }
 
-        public void Record() => recording = true;
+        public void BindTransform(GameObject gameObject)
+        {
+#if UNITY_EDITOR
+            recorder.BindComponentsOfType<Transform>(gameObject, true);
+#endif
+        }
+
+        public void Record()
+        {
+            if (clip) clip.ClearCurves();
+            _recording = true;
+        }
 
         public void EndRecording()
         {
-            if (!recording) return;
-            recording = false;
+            if (!_recording) return;
+            _recording = false;
 
 #if UNITY_EDITOR
             if (clip) recorder.SaveToClip(clip);

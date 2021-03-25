@@ -1,22 +1,6 @@
 <Binary>
   <AnimationRig>
-    <Joint name="Biped" parent="-1">
-      <Position x="0" y="0" z="0" />
-      <Rotation x="0" y="0" z="0" w="1" />
-    </Joint>
-    <Joint name="Body" parent="0">
-      <Position x="0" y="0.6" z="0" />
-      <Rotation x="0" y="0" z="0" w="1" />
-    </Joint>
-    <Joint name="End Effectors" parent="0">
-      <Position x="0" y="0" z="0" />
-      <Rotation x="0" y="0" z="0" w="1" />
-    </Joint>
-    <Joint name="End Effector" parent="2">
-      <Position x="0" y="0" z="0" />
-      <Rotation x="0" y="0" z="0" w="1" />
-    </Joint>
-    <Joint name="End Effector (1)" parent="2">
+    <Joint name="animation_Robot_002" parent="-1">
       <Position x="0" y="0" z="0" />
       <Rotation x="0" y="0" z="0" w="1" />
     </Joint>
@@ -24,78 +8,101 @@
       <Position x="0" y="0" z="0" />
       <Rotation x="0" y="0" z="0" w="1" />
     </Joint>
+    <Joint name="Body" parent="1">
+      <Position x="0" y="0.65" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="Cube" parent="2">
+      <Position x="0" y="0" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="LB" parent="2">
+      <Position x="-0.2" y="-0.65" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="Sphere" parent="4">
+      <Position x="0" y="0" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="LF" parent="2">
+      <Position x="0" y="-0.6" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="Sphere_3" parent="6">
+      <Position x="0" y="0" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="RB" parent="2">
+      <Position x="0.2" y="-0.65" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="Sphere_1" parent="8">
+      <Position x="0" y="0" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="RF" parent="2">
+      <Position x="0" y="-0.6" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
+    <Joint name="Sphere_2" parent="10">
+      <Position x="0" y="0" z="0" />
+      <Rotation x="0" y="0" z="0" w="1" />
+    </Joint>
   </AnimationRig>
   <Types>
-    <Type name="Idle" size="1" />
     <Type name="Locomotion" size="1" />
+    <Type name="Idle" size="1" />
   </Types>
   <Traits>
-    <Trait index="0" type="Idle" payload="00" />
-    <Trait index="1" type="Locomotion" payload="00" />
+    <Trait index="0" type="Locomotion" payload="00" />
+    <Trait index="1" type="Idle" payload="00" />
   </Traits>
   <Segments>
-    <Segment index="0" name="Idle" tagIndex="0" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="0" numIntervals="2">
-      <Source firstFrame="0" numFrames="281" />
-      <Destination firstFrame="0" numFrames="141" />
+    <Segment index="0" name="recorded_clip" tagIndex="0" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="0" numIntervals="1">
+      <Source firstFrame="0" numFrames="221" />
+      <Destination firstFrame="0" numFrames="221" />
     </Segment>
-    <Segment index="1" name="Run 1" tagIndex="2" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="2" numIntervals="1">
-      <Source firstFrame="0" numFrames="1774" />
-      <Destination firstFrame="141" numFrames="887" />
+    <Segment index="1" name="recorded_clip" tagIndex="2" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="1" numIntervals="1">
+      <Source firstFrame="0" numFrames="915" />
+      <Destination firstFrame="221" numFrames="915" />
     </Segment>
-    <Segment index="2" name="Run 2" tagIndex="3" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="3" numIntervals="1">
-      <Source firstFrame="0" numFrames="634" />
-      <Destination firstFrame="1028" numFrames="317" />
+    <Segment index="2" name="recorded_clip" tagIndex="3" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="2" numIntervals="1">
+      <Source firstFrame="0" numFrames="450" />
+      <Destination firstFrame="1136" numFrames="450" />
     </Segment>
-    <Segment index="3" name="Run 3" tagIndex="4" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="4" numIntervals="1">
-      <Source firstFrame="0" numFrames="754" />
-      <Destination firstFrame="1345" numFrames="377" />
-    </Segment>
-    <Segment index="4" name="Run 4" tagIndex="5" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="5" numIntervals="1">
-      <Source firstFrame="0" numFrames="432" />
-      <Destination firstFrame="1722" numFrames="216" />
-    </Segment>
-    <Segment index="5" name="Run 5" tagIndex="6" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="6" numIntervals="1">
-      <Source firstFrame="0" numFrames="634" />
-      <Destination firstFrame="1938" numFrames="317" />
+    <Segment index="3" name="recorded_clip" tagIndex="4" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="3" numIntervals="1">
+      <Source firstFrame="0" numFrames="215" />
+      <Destination firstFrame="1586" numFrames="215" />
     </Segment>
   </Segments>
   <Tags>
-    <Tag index="0" trait="0" segment="0" firstFrame="0" numFrames="141" />
-    <Tag index="1" trait="1" segment="0" firstFrame="0" numFrames="140" />
-    <Tag index="2" trait="1" segment="1" firstFrame="0" numFrames="887" />
-    <Tag index="3" trait="1" segment="2" firstFrame="0" numFrames="317" />
-    <Tag index="4" trait="1" segment="3" firstFrame="0" numFrames="377" />
-    <Tag index="5" trait="1" segment="4" firstFrame="0" numFrames="216" />
-    <Tag index="6" trait="1" segment="5" firstFrame="0" numFrames="317" />
+    <Tag index="0" trait="0" segment="0" firstFrame="0" numFrames="221" />
+    <Tag index="1" trait="1" segment="0" firstFrame="0" numFrames="221" />
+    <Tag index="2" trait="0" segment="1" firstFrame="0" numFrames="915" />
+    <Tag index="3" trait="0" segment="2" firstFrame="0" numFrames="450" />
+    <Tag index="4" trait="0" segment="3" firstFrame="0" numFrames="215" />
   </Tags>
   <Markers />
   <Intervals>
-    <Interval index="0" segment="0" firstFrame="0" numFrames="140" tagList="0" codeBook="0" />
-    <Interval index="1" segment="0" firstFrame="140" numFrames="1" tagList="1" codeBook="0" />
-    <Interval index="2" segment="1" firstFrame="0" numFrames="887" tagList="2" codeBook="1" />
-    <Interval index="3" segment="2" firstFrame="0" numFrames="317" tagList="3" codeBook="1" />
-    <Interval index="4" segment="3" firstFrame="0" numFrames="377" tagList="4" codeBook="1" />
-    <Interval index="5" segment="4" firstFrame="0" numFrames="216" tagList="5" codeBook="1" />
-    <Interval index="6" segment="5" firstFrame="0" numFrames="317" tagList="6" codeBook="1" />
+    <Interval index="0" segment="0" firstFrame="0" numFrames="221" tagList="0" codeBook="0" />
+    <Interval index="1" segment="1" firstFrame="0" numFrames="915" tagList="1" codeBook="0" />
+    <Interval index="2" segment="2" firstFrame="0" numFrames="450" tagList="2" codeBook="0" />
+    <Interval index="3" segment="3" firstFrame="0" numFrames="215" tagList="3" codeBook="0" />
   </Intervals>
   <TagLists>
     <TagList index="0" indices="0;1;" />
-    <TagList index="1" indices="0;" />
-    <TagList index="2" indices="2;" />
-    <TagList index="3" indices="3;" />
-    <TagList index="4" indices="4;" />
-    <TagList index="5" indices="5;" />
-    <TagList index="6" indices="6;" />
+    <TagList index="1" indices="2;" />
+    <TagList index="2" indices="3;" />
+    <TagList index="3" indices="4;" />
   </TagLists>
   <Metrics>
     <Metric index="0" poseTimeSpan="0.06666667">
-      <Joint name="End Effector (1)" index="4" />
-      <Joint name="End Effector" index="3" />
-      <Joint name="Body" index="1" />
+      <Joint name="Body" index="2" />
+      <Joint name="LB" index="4" />
+      <Joint name="RB" index="8" />
     </Metric>
   </Metrics>
   <CodeBooks>
     <CodeBook index="0" metric="0" trait="0" />
-    <CodeBook index="1" metric="0" trait="1" />
   </CodeBooks>
 </Binary>

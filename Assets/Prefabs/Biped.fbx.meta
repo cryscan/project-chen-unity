@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: d2bbd598af768da6f89eb8fecf1b5c1f
+guid: e08c090070c6504358a7636a226563b3
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable: []
@@ -86,7 +86,7 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     globalScale: 1
-    rootMotionBoneName: Root
+    rootMotionBoneName: Robot
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
@@ -97,6 +97,6 @@ ModelImporter:
   avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   additionalBone: 0
-  userData: ClipVersion=2,
+  userData: ClipVersion=22,
   assetBundleName: 
   assetBundleVariant: 
