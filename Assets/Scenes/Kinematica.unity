@@ -612,6 +612,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5135253659360760777, guid: c9001660ce9f077439b8d5cc72386171,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 24c9c4e1d332b3fd6aacbb62448db450, type: 2}
     - target: {fileID: -3760401999932544017, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_IsActive
@@ -622,6 +627,16 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -685674313504459590, guid: c9001660ce9f077439b8d5cc72386171,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 911151d2ba32a2d3ba91b1bcf341970d, type: 2}
+    - target: {fileID: -281716415103866616, guid: c9001660ce9f077439b8d5cc72386171,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 24c9c4e1d332b3fd6aacbb62448db450, type: 2}
     - target: {fileID: 919132149155446097, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_Name
@@ -649,8 +664,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   desiredSpeedSlow: 1.5
   desiredSpeedFast: 2
-  velocityPercentage: 1
-  forwardPercentage: 1
+  velocityPercentage: 0.1
+  forwardPercentage: 0.1
 --- !u!114 &1667829400
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,6 @@
 <Binary>
   <AnimationRig>
-    <Joint name="animation_Robot_002" parent="-1">
+    <Joint name="animation_Robot_001" parent="-1">
       <Position x="0" y="0" z="0" />
       <Rotation x="0" y="0" z="0" w="1" />
     </Joint>
@@ -58,35 +58,28 @@
     <Trait index="1" type="Idle" payload="00" />
   </Traits>
   <Segments>
-    <Segment index="0" name="recorded_clip" tagIndex="0" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="0" numIntervals="1">
-      <Source firstFrame="0" numFrames="221" />
-      <Destination firstFrame="0" numFrames="221" />
+    <Segment index="0" name="Run" tagIndex="0" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="0" numIntervals="1">
+      <Source firstFrame="0" numFrames="2045" />
+      <Destination firstFrame="0" numFrames="2045" />
     </Segment>
-    <Segment index="1" name="recorded_clip" tagIndex="2" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="1" numIntervals="1">
-      <Source firstFrame="0" numFrames="915" />
-      <Destination firstFrame="221" numFrames="915" />
-    </Segment>
-    <Segment index="2" name="recorded_clip" tagIndex="3" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="2" numIntervals="1">
-      <Source firstFrame="0" numFrames="450" />
-      <Destination firstFrame="1136" numFrames="450" />
+    <Segment index="1" name="Idle 1" tagIndex="1" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="1" numIntervals="1">
+      <Source firstFrame="0" numFrames="89" />
+      <Destination firstFrame="2045" numFrames="89" />
     </Segment>
   </Segments>
   <Tags>
-    <Tag index="0" trait="0" segment="0" firstFrame="0" numFrames="221" />
-    <Tag index="1" trait="1" segment="0" firstFrame="0" numFrames="221" />
-    <Tag index="2" trait="0" segment="1" firstFrame="0" numFrames="915" />
-    <Tag index="3" trait="0" segment="2" firstFrame="0" numFrames="450" />
+    <Tag index="0" trait="0" segment="0" firstFrame="0" numFrames="2045" />
+    <Tag index="1" trait="0" segment="1" firstFrame="0" numFrames="89" />
+    <Tag index="2" trait="1" segment="1" firstFrame="0" numFrames="89" />
   </Tags>
   <Markers />
   <Intervals>
-    <Interval index="0" segment="0" firstFrame="0" numFrames="221" tagList="0" codeBook="0" />
-    <Interval index="1" segment="1" firstFrame="0" numFrames="915" tagList="1" codeBook="0" />
-    <Interval index="2" segment="2" firstFrame="0" numFrames="450" tagList="2" codeBook="0" />
+    <Interval index="0" segment="0" firstFrame="0" numFrames="2045" tagList="0" codeBook="0" />
+    <Interval index="1" segment="1" firstFrame="0" numFrames="89" tagList="1" codeBook="0" />
   </Intervals>
   <TagLists>
-    <TagList index="0" indices="0;1;" />
-    <TagList index="1" indices="2;" />
-    <TagList index="2" indices="3;" />
+    <TagList index="0" indices="0;" />
+    <TagList index="1" indices="1;2;" />
   </TagLists>
   <Metrics>
     <Metric index="0" poseTimeSpan="0.06666667">

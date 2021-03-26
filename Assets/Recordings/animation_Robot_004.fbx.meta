@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 70053946a6b3e6438ae5a53fa27a6cb7
+guid: fdbdc0b6c375729e3ac3561a1f06dfbc
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
@@ -38,8 +38,8 @@ ModelImporter:
       name: recorded_clip
       takeName: recorded_clip
       internalID: 0
-      firstFrame: 0
-      lastFrame: 1635
+      firstFrame: 37
+      lastFrame: 224
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
