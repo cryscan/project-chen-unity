@@ -106,18 +106,18 @@ MonoBehaviour:
       m_PostBoundaryClip: {fileID: 0}
       m_AnimationClipReference: {fileID: 0}
       m_AnimationClipGuid:
-        val0: -1296823077
-        val1: 33673507
-        val2: 1027939625
-        val3: 637432492
+        val0: -1906608111
+        val1: 1977038566
+        val2: 601174440
+        val3: -2008059213
       m_CachedClipVersion: 0
       m_CachedClipName: Run 2
-      m_CachedClipDuration: 52.666668
+      m_CachedClipDuration: 75
       m_CachedSampleRate: 30
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
-      - startTime: 0
-        duration: 52.600002
+      - startTime: 6.6666665
+        duration: 68.333336
         payload:
           serializedData: '{}'
           assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
@@ -140,7 +140,7 @@ MonoBehaviour:
       - RB
       trajectorySampleRatio: 0.3333
       trajectorySampleRange: -1
-      trajectoryDisplacements: 0
+      trajectoryDisplacements: 1
       numAttempts: 1
       numIterations: 25
       minimumNumberSamples: 32
