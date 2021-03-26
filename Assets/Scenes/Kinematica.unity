@@ -331,7 +331,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 75
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -357,7 +357,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 990773626}
   m_LocalRotation: {x: 0.17364816, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: 0, y: 0, z: -8}
+  m_LocalPosition: {x: 0, y: 0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -410,7 +410,7 @@ MonoBehaviour:
   targetTransform: {fileID: 1667829402}
   smoothFactor: 0.5
   degreesPerSecond: 180
-  maximumYawAngle: 45
+  maximumYawAngle: 85
   minimumHeight: 0.2
   heightOffset: 0
 --- !u!1 &1006191942
@@ -662,8 +662,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8076676f3ef6969fc8114a2570521501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  desiredSpeedSlow: 1.5
-  desiredSpeedFast: 3
+  desiredSpeedSlow: 2
+  desiredSpeedFast: 2
   velocityPercentage: 0.1
   forwardPercentage: 0.1
 --- !u!114 &1667829400

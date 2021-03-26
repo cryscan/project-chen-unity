@@ -140,7 +140,7 @@ MonoBehaviour:
       - RB
       trajectorySampleRatio: 0.3333
       trajectorySampleRange: -1
-      trajectoryDisplacements: 1
+      trajectoryDisplacements: 0
       numAttempts: 1
       numIterations: 25
       minimumNumberSamples: 32
