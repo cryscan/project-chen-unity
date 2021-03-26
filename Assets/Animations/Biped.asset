@@ -17,41 +17,8 @@ MonoBehaviour:
   timeHorizon: 1
   sampleRate: 30
   m_Data:
-    syncedWithBinary: 1
+    syncedWithBinary: 0
     animationLibrary:
-    - m_PreBoundaryClipGuid:
-        val0: 0
-        val1: 0
-        val2: 0
-        val3: 0
-      m_PostBoundaryClipGuid:
-        val0: 0
-        val1: 0
-        val2: 0
-        val3: 0
-      m_PreBoundaryClip: {fileID: 0}
-      m_PostBoundaryClip: {fileID: 0}
-      m_AnimationClipReference: {fileID: 0}
-      m_AnimationClipGuid:
-        val0: 1046681444
-        val1: -1778050689
-        val2: 1259884971
-        val3: -125493369
-      m_CachedClipVersion: 0
-      m_CachedClipName: Run 1
-      m_CachedClipDuration: 68.7
-      m_CachedSampleRate: 30
-      m_RetargetSourceAvatar: {fileID: 0}
-      tags:
-      - startTime: 0
-        duration: 68.166664
-        payload:
-          serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-        name: 
-      markers: []
-      m_Asset: {fileID: 11400000}
     - m_PreBoundaryClipGuid:
         val0: 1529571485
         val1: -569012885
@@ -106,18 +73,51 @@ MonoBehaviour:
       m_PostBoundaryClip: {fileID: 0}
       m_AnimationClipReference: {fileID: 0}
       m_AnimationClipGuid:
-        val0: -1906608111
-        val1: 1977038566
-        val2: 601174440
-        val3: -2008059213
+        val0: -1865853148
+        val1: 932515254
+        val2: -1730840246
+        val3: 1070054418
       m_CachedClipVersion: 0
-      m_CachedClipName: Run 2
-      m_CachedClipDuration: 75
+      m_CachedClipName: Run 3
+      m_CachedClipDuration: 90.23333
       m_CachedSampleRate: 30
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
-      - startTime: 6.6666665
-        duration: 68.333336
+      - startTime: 0
+        duration: 90.23333
+        payload:
+          serializedData: '{}'
+          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
+            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+        name: 
+      markers: []
+      m_Asset: {fileID: 11400000}
+    - m_PreBoundaryClipGuid:
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
+      m_PostBoundaryClipGuid:
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
+      m_PreBoundaryClip: {fileID: 0}
+      m_PostBoundaryClip: {fileID: 0}
+      m_AnimationClipReference: {fileID: 0}
+      m_AnimationClipGuid:
+        val0: 1046681444
+        val1: -1778050689
+        val2: 1259884971
+        val3: -125493369
+      m_CachedClipVersion: 0
+      m_CachedClipName: Run 1
+      m_CachedClipDuration: 68.7
+      m_CachedSampleRate: 30
+      m_RetargetSourceAvatar: {fileID: 0}
+      tags:
+      - startTime: 31.666666
+        duration: 15.000002
         payload:
           serializedData: '{}'
           assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
