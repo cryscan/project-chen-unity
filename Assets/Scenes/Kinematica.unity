@@ -663,7 +663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   desiredSpeedSlow: 1.5
-  desiredSpeedFast: 2
+  desiredSpeedFast: 3
   velocityPercentage: 0.1
   forwardPercentage: 0.1
 --- !u!114 &1667829400
