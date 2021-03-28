@@ -70,23 +70,37 @@
       <Source firstFrame="950" numFrames="450" />
       <Destination firstFrame="2796" numFrames="450" />
     </Segment>
+    <Segment index="3" name="Start Stop 1" tagIndex="4" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="3" numIntervals="1">
+      <Source firstFrame="0" numFrames="126" />
+      <Destination firstFrame="3246" numFrames="126" />
+    </Segment>
+    <Segment index="4" name="Start Stop 2" tagIndex="5" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="4" numIntervals="1">
+      <Source firstFrame="0" numFrames="126" />
+      <Destination firstFrame="3372" numFrames="126" />
+    </Segment>
   </Segments>
   <Tags>
     <Tag index="0" trait="0" segment="0" firstFrame="0" numFrames="89" />
     <Tag index="1" trait="1" segment="0" firstFrame="0" numFrames="89" />
     <Tag index="2" trait="0" segment="1" firstFrame="0" numFrames="2707" />
     <Tag index="3" trait="0" segment="2" firstFrame="0" numFrames="450" />
+    <Tag index="4" trait="0" segment="3" firstFrame="0" numFrames="126" />
+    <Tag index="5" trait="0" segment="4" firstFrame="0" numFrames="126" />
   </Tags>
   <Markers />
   <Intervals>
     <Interval index="0" segment="0" firstFrame="0" numFrames="89" tagList="0" codeBook="0" />
     <Interval index="1" segment="1" firstFrame="0" numFrames="2707" tagList="1" codeBook="0" />
     <Interval index="2" segment="2" firstFrame="0" numFrames="450" tagList="2" codeBook="0" />
+    <Interval index="3" segment="3" firstFrame="0" numFrames="126" tagList="3" codeBook="0" />
+    <Interval index="4" segment="4" firstFrame="0" numFrames="126" tagList="4" codeBook="0" />
   </Intervals>
   <TagLists>
     <TagList index="0" indices="0;1;" />
     <TagList index="1" indices="2;" />
     <TagList index="2" indices="3;" />
+    <TagList index="3" indices="4;" />
+    <TagList index="4" indices="5;" />
   </TagLists>
   <Metrics>
     <Metric index="0" poseTimeSpan="0.06666667">
