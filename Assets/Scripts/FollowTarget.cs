@@ -10,6 +10,7 @@ public class FollowTarget : MonoBehaviour
     [SerializeField] Transform target;
     [SerializeField] Transform source;
     [SerializeField] Vector3 offest;
+    [SerializeField] Vector3 scale = new Vector3(1, 1, 1);
 
     Vector3 position;
     Quaternion rotation;
@@ -28,7 +29,11 @@ public class FollowTarget : MonoBehaviour
                 target.position = source.position + offest;
                 break;
             case Space.Local:
-                target.localPosition = source.localPosition + offest;
+                var position = source.localPosition + offest;
+                position.x *= scale.x;
+                position.y *= scale.y;
+                position.z *= scale.z;
+                target.localPosition = position;
                 break;
         }
         // target.rotation = rotation * source.rotation * Quaternion.Inverse(rotation);
