@@ -17,7 +17,7 @@ MonoBehaviour:
   timeHorizon: 1
   sampleRate: 30
   m_Data:
-    syncedWithBinary: 0
+    syncedWithBinary: 1
     animationLibrary:
     - m_PreBoundaryClipGuid:
         val0: 1529571485
@@ -150,7 +150,7 @@ MonoBehaviour:
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
       - startTime: 0
-        duration: 4.733333
+        duration: 4.2
         payload:
           serializedData: '{}'
           assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
@@ -183,7 +183,7 @@ MonoBehaviour:
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
       - startTime: 0
-        duration: 4.5666666
+        duration: 4.2
         payload:
           serializedData: '{}'
           assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
