@@ -27,6 +27,7 @@ public class FollowTarget : MonoBehaviour
         {
             case Space.World:
                 target.position = source.position + offest;
+                target.rotation = source.rotation * rotation;
                 break;
             case Space.Local:
                 var position = source.localPosition + offest;
@@ -34,9 +35,9 @@ public class FollowTarget : MonoBehaviour
                 position.y *= scale.y;
                 position.z *= scale.z;
                 target.localPosition = position;
+                target.localRotation = source.localRotation * rotation;
                 break;
         }
         // target.rotation = rotation * source.rotation * Quaternion.Inverse(rotation);
-        target.rotation = source.rotation * rotation;
     }
 }
