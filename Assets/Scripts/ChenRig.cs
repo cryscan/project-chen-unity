@@ -23,6 +23,7 @@ public class ChenRig : MonoBehaviour
 
     [SerializeField] Rig rig;
     [SerializeField] Robot robot;
+    [SerializeField] Transform root;
 
     [SerializeField] float footHeightOffset = 0;
     [SerializeField] float footHeightScale = 1;
@@ -53,38 +54,27 @@ public class ChenRig : MonoBehaviour
         if (velocity.magnitude == 0) hipHeight = hipHeight.Fallout(stanceHipHeight, 10);
         else hipHeight = hipHeight.Fallout(runningHipHeight, 10);
 
-        var delta = hipHeight - nominalHeight;
         var position = robot.body.localPosition;
-        position.y += delta;
-        var level = position.y;
+        position.y += hipHeight - nominalHeight;
         rig.hip.localPosition = position;
 
-        var translation = new Vector3(-robot.body.position.x, 0, -robot.body.position.z);
-        var rotation = Quaternion.Euler(0, -robot.body.rotation.eulerAngles.y, 0);
+        float level = 0;
 
-        position = rotation * (robot.footLeft.position + translation);
+        position = root.InverseTransformPoint(robot.footLeft.position);
+        position.y = footHeightScale * (position.y - level) + footHeightOffset;
         rig.footLeft.position = position;
 
-        position = rotation * (robot.footRight.position + translation);
+        position = root.InverseTransformPoint(robot.footRight.position);
+        position.y = footHeightScale * (position.y - level) + footHeightOffset;
         rig.footRight.position = position;
 
         var acceleration = (velocity - this.velocity) / Time.deltaTime;
         this.velocity = velocity;
         this.acceleration = this.acceleration.Fallout(acceleration, 5).Fallout(Vector3.zero, 1);
-        Debug.DrawRay(-translation, this.acceleration, Color.red);
+        Debug.DrawRay(root.position, this.acceleration, Color.red);
 
-        acceleration = rotation * this.acceleration;
-        rotation = Quaternion.Euler(torsoTiltScale * new Vector3(acceleration.z, 0, -acceleration.x)) * torsoRotation;
+        acceleration = root.InverseTransformDirection(this.acceleration);
+        var rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
         rig.torso.localRotation = rig.torso.localRotation.Fallout(rotation, 10);
-
-        // position.y = -level + footHeightScale * (position.y + level) - delta;
-        // rig.footLeft.localPosition = robot.footLeft.localPosition;
-        // position.y = -level + footHeightScale * (position.y + level) - delta;
-        // rig.footLeft.Translate(new Vector3(0, footHeightOffset, 0), Space.World);
-
-        // rig.footRight.localPosition = robot.footRight.localPosition;
-        // rig.footRight.Translate(new Vector3(0, footHeightOffset, 0), Space.World);
-        // position.y = -level + footHeightScale * (position.y + level) - delta;
-        // rig.footRight.position = position;
     }
 }
