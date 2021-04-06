@@ -1,27 +1,22 @@
-using System;
 using Unity.Kinematica;
 
 #if UNITY_EDITOR
+using System;
 using Unity.Kinematica.Editor;
-#endif
 
-namespace BipedLocomotion
+[Serializable]
+[Tag("Idle", "#0ab266")]
+internal struct IdleTag : Payload<Idle>
 {
-    [Trait]
-    public struct Idle
+    public Idle Build(PayloadBuilder builder)
     {
-        public static Idle Default => new Idle();
+        return Idle.Default;
     }
-
-#if UNITY_EDITOR
-    [Serializable]
-    [Tag("Idle", "#4850d2")]
-    internal struct IdleTag : Payload<Idle>
-    {
-        public Idle Build(PayloadBuilder builder)
-        {
-            return Idle.Default;
-        }
-    }
+}
 #endif
+
+[Trait]
+public struct Idle
+{
+    public static Idle Default => new Idle();
 }
