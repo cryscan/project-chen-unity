@@ -1,12 +1,12 @@
 using Unity.Kinematica;
 using Unity.Mathematics;
 
-public interface Ability
+public interface IAbility
 {
     // Called once per frame for each ability to update the synthesizers trajectory.
     // The resulting ability reference indicates which ability gains
     // ownership of the policy.
-    Ability OnUpdate(float deltaTime);
+    IAbility OnUpdate(float deltaTime);
 
     // Called from another ability to indicate that a predicted future
     // root transform makes contact with the environment (subject to the
@@ -21,4 +21,9 @@ public interface Ability
     // ability want to handle this situation (and will subsequently gain
     // control over the policy).
     bool OnDrop(ref MotionSynthesizer synthesizer, float deltaTime);
+}
+
+public interface IAbilityAnimatorMove
+{
+    void OnAbilityAnimatorMove();
 }

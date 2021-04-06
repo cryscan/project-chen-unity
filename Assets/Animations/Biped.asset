@@ -44,18 +44,18 @@ MonoBehaviour:
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
       - startTime: 0
-        duration: 2.9666667
+        duration: 3.0333333
         payload:
           serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          assemblyQualifiedTypeName: LocomotionTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
         name: 
       - startTime: 0
-        duration: 2.9666667
+        duration: 3.0333333
         payload:
           serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.IdleTag, Assembly-CSharp, Version=0.0.0.0,
-            Culture=neutral, PublicKeyToken=null
+          assemblyQualifiedTypeName: IdleTag, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+            PublicKeyToken=null
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
@@ -87,8 +87,8 @@ MonoBehaviour:
         duration: 90.23333
         payload:
           serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          assemblyQualifiedTypeName: LocomotionTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
@@ -117,11 +117,11 @@ MonoBehaviour:
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
       - startTime: 31.666666
-        duration: 15.000002
+        duration: 15
         payload:
           serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          assemblyQualifiedTypeName: LocomotionTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
@@ -150,11 +150,11 @@ MonoBehaviour:
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
       - startTime: 0
-        duration: 4.2
+        duration: 4.1666665
         payload:
           serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          assemblyQualifiedTypeName: LocomotionTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
@@ -183,11 +183,11 @@ MonoBehaviour:
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
       - startTime: 0
-        duration: 4.2
+        duration: 4.1666665
         payload:
           serializedData: '{}'
-          assemblyQualifiedTypeName: BipedLocomotion.LocomotionTag, Assembly-CSharp,
-            Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          assemblyQualifiedTypeName: LocomotionTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
@@ -198,6 +198,9 @@ MonoBehaviour:
         m_TagTypeNames:
         - BipedLocomotion.IdleTag
         - BipedLocomotion.LocomotionTag
+        - IdleTag
+        - LocomotionTag
+        - ParkourTag
       numPoses: 2
       poseSampleRatio: 0.3333
       joints:
