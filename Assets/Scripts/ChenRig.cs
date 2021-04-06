@@ -12,7 +12,7 @@ public class ChenRig : MonoBehaviour
         public Transform chest;
         public Transform footLeft, footRight;
         public Transform handLeft, handRight;
-        public Transform handDirectionLeft, handDirectionRight;
+        public Transform pivotLeft, pivotRight;
     }
 
     [System.Serializable]
@@ -22,6 +22,8 @@ public class ChenRig : MonoBehaviour
         public Transform body;
         public Transform footLeft, footRight;
     }
+
+    enum Side { Left, Right }
 
     [SerializeField] Rig rig;
     [SerializeField] Robot robot;
@@ -90,43 +92,12 @@ public class ChenRig : MonoBehaviour
         float level = 0;
         float delta = 0;
         float chestAngle = 0;
-        Vector3 direction;
-        Vector3 centerfugal;
 
-        // Simulate arm inertia.
-        var deltaRootPosition = root.position - rootPosition;
-        var deltaRootAngle = root.eulerAngles.y * Mathf.Deg2Rad - rootAngle;
+        MoveLimb(Side.Left, robot.footLeft.position, level, rig.footLeft, rig.handRight, rig.pivotRight, out delta);
+        chestAngle -= delta;
 
-        rootPosition = root.position;
-        rootAngle = root.eulerAngles.y * Mathf.Deg2Rad;
-
-        position = root.InverseTransformPoint(robot.footLeft.position);
-        position.y = footHeightScale * (position.y - level) + footHeightOffset;
-        rig.footLeft.position = position;
-
-        delta = position.z - nominalStance;
-        chestAngle = -delta;
-        direction = armScale.z * delta * rig.handDirectionRight.forward + armScale.y * delta * delta * rig.handDirectionRight.up;
-        centerfugal = armScale.x * Mathf.Abs(acceleration.x) * (rig.handDirectionRight.right + rig.handDirectionRight.up / 2);
-        position = rig.handDirectionRight.position;
-        rig.handRight.position = rig.handRight.position.Fallout(position + direction, 10).Fallout(position + centerfugal, 1);
-
-        rotation = Quaternion.Euler(0, 0, -180 + handAngleScale * Mathf.Abs(acceleration.x));
-        rig.handRight.localRotation = rig.handRight.localRotation.Fallout(rotation, 10);
-
-        position = root.InverseTransformPoint(robot.footRight.position);
-        position.y = footHeightScale * (position.y - level) + footHeightOffset;
-        rig.footRight.position = position;
-
-        delta = position.z - nominalStance;
+        MoveLimb(Side.Right, robot.footRight.position, level, rig.footRight, rig.handLeft, rig.pivotLeft, out delta);
         chestAngle += delta;
-        direction = armScale.z * delta * rig.handDirectionLeft.forward + armScale.y * delta * delta * rig.handDirectionLeft.up;
-        centerfugal = armScale.x * Mathf.Abs(acceleration.x) * (-rig.handDirectionLeft.right + rig.handDirectionLeft.up / 2);
-        position = rig.handDirectionLeft.position;
-        rig.handLeft.position = rig.handLeft.position.Fallout(position + direction, 10).Fallout(position + centerfugal, 1);
-
-        rotation = Quaternion.Euler(0, 0, 180 - handAngleScale * Mathf.Abs(acceleration.x));
-        rig.handLeft.localRotation = rig.handLeft.localRotation.Fallout(rotation, 10);
 
         // Shoulder tilt.
         chestAngle *= shoulderTiltScale;
@@ -135,10 +106,29 @@ public class ChenRig : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (rig.handDirectionLeft && rig.handDirectionRight)
+        if (rig.pivotLeft && rig.pivotRight)
         {
-            Gizmos.DrawRay(rig.handDirectionLeft.position, rig.handDirectionLeft.forward);
-            Gizmos.DrawRay(rig.handDirectionRight.position, rig.handDirectionRight.forward);
+            Gizmos.DrawRay(rig.pivotLeft.position, rig.pivotLeft.forward);
+            Gizmos.DrawRay(rig.pivotRight.position, rig.pivotRight.forward);
         }
+    }
+
+    void MoveLimb(Side side, Vector3 footPosition, float level, Transform foot, Transform hand, Transform pivot, out float delta)
+    {
+        var position = root.InverseTransformPoint(footPosition);
+        position.y = footHeightScale * (position.y - level) + footHeightOffset;
+        foot.position = position;
+
+        // For left foot, we are dealing with right hand, so take positive value.
+        var sign = side == Side.Left ? 1 : -1;
+
+        delta = position.z - nominalStance;
+        var acceleration = root.InverseTransformDirection(this.acceleration);
+        var direction = armScale.z * delta * pivot.forward + armScale.y * delta * delta * Vector3.up;
+        var centerfugal = armScale.x * Mathf.Abs(acceleration.x) * sign * pivot.right;
+        hand.position = hand.position.Fallout(pivot.position + direction, 10).Fallout(pivot.position + centerfugal, 1);
+
+        var rotation = Quaternion.Euler(0, 0, sign * (-180 + handAngleScale * Mathf.Abs(acceleration.x)));
+        hand.localRotation = hand.localRotation.Fallout(rotation, 10);
     }
 }
