@@ -191,6 +191,72 @@ MonoBehaviour:
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
+    - m_PreBoundaryClipGuid:
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
+      m_PostBoundaryClipGuid:
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
+      m_PreBoundaryClip: {fileID: 0}
+      m_PostBoundaryClip: {fileID: 0}
+      m_AnimationClipReference: {fileID: 0}
+      m_AnimationClipGuid:
+        val0: 1098514096
+        val1: 1909763767
+        val2: -1424554760
+        val3: 965960083
+      m_CachedClipVersion: 0
+      m_CachedClipName: Wall Run L
+      m_CachedClipDuration: 7.0666666
+      m_CachedSampleRate: 30
+      m_RetargetSourceAvatar: {fileID: 0}
+      tags:
+      - startTime: 0
+        duration: 7.0666666
+        payload:
+          serializedData: '{"type":0}'
+          assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        name: 
+      markers: []
+      m_Asset: {fileID: 11400000}
+    - m_PreBoundaryClipGuid:
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
+      m_PostBoundaryClipGuid:
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
+      m_PreBoundaryClip: {fileID: 0}
+      m_PostBoundaryClip: {fileID: 0}
+      m_AnimationClipReference: {fileID: 0}
+      m_AnimationClipGuid:
+        val0: 2054588106
+        val1: -1951184229
+        val2: -939844839
+        val3: -467403478
+      m_CachedClipVersion: 0
+      m_CachedClipName: Wall Run R
+      m_CachedClipDuration: 6.366667
+      m_CachedSampleRate: 30
+      m_RetargetSourceAvatar: {fileID: 0}
+      tags:
+      - startTime: 0
+        duration: 6.366667
+        payload:
+          serializedData: '{"type":0}'
+          assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        name: 
+      markers: []
+      m_Asset: {fileID: 11400000}
     destinationAvatar: {fileID: 9000000, guid: c9001660ce9f077439b8d5cc72386171, type: 3}
     metrics:
     - name: Default

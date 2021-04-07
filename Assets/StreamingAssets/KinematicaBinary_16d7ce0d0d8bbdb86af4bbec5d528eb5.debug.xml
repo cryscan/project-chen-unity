@@ -52,10 +52,18 @@
   <Types>
     <Type name="Locomotion" size="1" />
     <Type name="Idle" size="1" />
+    <Type name="Parkour" size="4">
+      <Field name="Parkour+Type" />
+    </Type>
+    <Type name="Parkour+Type" size="4">
+      <Field name="Int32" />
+    </Type>
+    <Type name="Int32" size="4" />
   </Types>
   <Traits>
     <Trait index="0" type="Locomotion" payload="00" />
     <Trait index="1" type="Idle" payload="00" />
+    <Trait index="2" type="Parkour" payload="00000000" />
   </Traits>
   <Segments>
     <Segment index="0" name="Idle 1" tagIndex="0" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="0" numIntervals="1">
@@ -78,6 +86,14 @@
       <Source firstFrame="0" numFrames="125" />
       <Destination firstFrame="3373" numFrames="125" />
     </Segment>
+    <Segment index="5" name="Wall Run L" tagIndex="6" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="5" numIntervals="1">
+      <Source firstFrame="0" numFrames="212" />
+      <Destination firstFrame="3498" numFrames="212" />
+    </Segment>
+    <Segment index="6" name="Wall Run R" tagIndex="7" numTags="1" markerIndex="-1" numMarkers="0" intervalIndex="6" numIntervals="1">
+      <Source firstFrame="0" numFrames="191" />
+      <Destination firstFrame="3710" numFrames="191" />
+    </Segment>
   </Segments>
   <Tags>
     <Tag index="0" trait="0" segment="0" firstFrame="0" numFrames="91" />
@@ -86,6 +102,8 @@
     <Tag index="3" trait="0" segment="2" firstFrame="0" numFrames="450" />
     <Tag index="4" trait="0" segment="3" firstFrame="0" numFrames="125" />
     <Tag index="5" trait="0" segment="4" firstFrame="0" numFrames="125" />
+    <Tag index="6" trait="2" segment="5" firstFrame="0" numFrames="212" />
+    <Tag index="7" trait="2" segment="6" firstFrame="0" numFrames="191" />
   </Tags>
   <Markers />
   <Intervals>
@@ -94,6 +112,8 @@
     <Interval index="2" segment="2" firstFrame="0" numFrames="450" tagList="2" codeBook="0" />
     <Interval index="3" segment="3" firstFrame="0" numFrames="125" tagList="3" codeBook="0" />
     <Interval index="4" segment="4" firstFrame="0" numFrames="125" tagList="4" codeBook="0" />
+    <Interval index="5" segment="5" firstFrame="0" numFrames="212" tagList="5" codeBook="1" />
+    <Interval index="6" segment="6" firstFrame="0" numFrames="191" tagList="6" codeBook="1" />
   </Intervals>
   <TagLists>
     <TagList index="0" indices="0;1;" />
@@ -101,6 +121,8 @@
     <TagList index="2" indices="3;" />
     <TagList index="3" indices="4;" />
     <TagList index="4" indices="5;" />
+    <TagList index="5" indices="6;" />
+    <TagList index="6" indices="7;" />
   </TagLists>
   <Metrics>
     <Metric index="0" poseTimeSpan="0.06666667">
@@ -111,5 +133,6 @@
   </Metrics>
   <CodeBooks>
     <CodeBook index="0" metric="0" trait="0" />
+    <CodeBook index="1" metric="0" trait="2" />
   </CodeBooks>
 </Binary>
