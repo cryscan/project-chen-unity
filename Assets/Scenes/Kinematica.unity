@@ -2394,13 +2394,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b7cca9f9e9d04f14abfb76205f6d6d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  desiredSpeed: 2
+  desiredSpeed: 2.25
   velocityPercentage: 0.1
   forwardPercentage: 0.1
-  minSpeed: 1
+  responsiveness: 0.6
+  brakingSpeed: 1
   correctTranslationPercentage: 0
   correctRotationPercentage: 0
-  correctMotionStartSpeed: 1
+  correctMotionStartSpeed: 0.4
   correctMotionEndSpeed: 2
 --- !u!114 &1667829400
 MonoBehaviour:
