@@ -30,11 +30,11 @@ public struct Parkour
 {
     public enum Type
     {
-        Wall = 8,
-        Ledge = 9,
-        Table = 10,
-        Platform = 11,
-        DropDown = 12
+        Wall = 9,
+        Ledge = 10,
+        Table = 11,
+        Platform = 12,
+        DropDown = 13
     }
 
     public Type type;

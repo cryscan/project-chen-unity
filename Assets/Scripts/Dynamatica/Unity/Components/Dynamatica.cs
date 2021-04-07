@@ -22,6 +22,8 @@ namespace Dynamatica.Unity.Components
 
         [Header("Terrain")]
         [SerializeField] TerrainBuilder terrainBuilder;
+        [SerializeField] bool groundSnap = false;
+        [SerializeField] LayerMask groundLayer;
 
         [Header("Optimization")]
         [SerializeField] int maxIter = 0;
@@ -82,9 +84,16 @@ namespace Dynamatica.Unity.Components
                 state = session.GetState(timer);
 
                 var position = Vector3.zero;
-                foreach (var vector in state.eeMotions) position += vector;
+                for (int i = 0; i < model.eeCount; ++i) position += state.eeMotions[i];
                 position /= model.eeCount;
-                position.y = 0;
+
+                if (groundSnap)
+                {
+                    var ray = new Ray(position, Vector3.down);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit, 100, groundLayer)) position = hit.point;
+                }
+                else position.y = 0;
 
                 root.position = position;
                 root.rotation = Quaternion.Euler(0, state.baseAngularPosition.y, 0);

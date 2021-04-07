@@ -15,6 +15,8 @@ public struct LocomotionJob : IJob
     public Trajectory trajectory;
 
     public bool idle;
+    public float responsiveness;
+    public float minTrajectoryDeviation;
 
     ref MotionSynthesizer Synthesizer => ref synthesizer.Ref;
 
@@ -25,7 +27,7 @@ public struct LocomotionJob : IJob
             return;
         }
 
-        Synthesizer.MatchPoseAndTrajectory(locomotionCandidates, Synthesizer.Time, trajectory);
+        Synthesizer.MatchPoseAndTrajectory(locomotionCandidates, Synthesizer.Time, trajectory, MatchOptions.None, responsiveness, minTrajectoryDeviation);
     }
 }
 
@@ -45,6 +47,14 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
     [Tooltip("How fast or slow the desired forward direction is supposed to be reached.")]
     [Range(0.0f, 1.0f)]
     public float forwardPercentage = 0.1f;
+
+    [Tooltip("Relative weighting for pose and trajectory matching.")]
+    [Range(0.0f, 1.0f)]
+    public float responsiveness = 0.6f;
+
+    [Tooltip("Speed in meters per second at which the character is considered to be braking (assuming player release the stick).")]
+    [Range(0.0f, 10.0f)]
+    public float brakingSpeed = 0.4f;
 
     [Header("Motion correction")]
     [Tooltip("How much root motion distance should be corrected to match desired trajectory.")]
@@ -74,6 +84,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
 
     [Snapshot] float3 movementDirection = Missing.forward;
     [Snapshot] float moveIntensity = 0.0f;
+    [Snapshot] bool braking;
 
     [Snapshot] float3 rootVelocity = float3.zero;
 
@@ -114,7 +125,18 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
 
     public IAbility OnUpdate(float deltaTime)
     {
+        ref var synthesizer = ref kinematica.Synthesizer.Ref;
+
         float desiredSpeed = moveIntensity * desiredLinearSpeed;
+        float minTrajectoryDeviation = 0.03f;
+        bool idle = moveIntensity == 0;
+        var currentSpeed = math.length(synthesizer.CurrentVelocity);
+
+        if (idle)
+        {
+            if (!braking && currentSpeed < brakingSpeed) braking = true;
+            else braking = false;
+        }
 
         var prediction = TrajectoryPrediction.CreateFromDirection(ref kinematica.Synthesizer.Ref,
             movementDirection,
@@ -124,8 +146,6 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             forwardPercentage);
 
         controller.Snapshot();
-
-        ref var synthesizer = ref kinematica.Synthesizer.Ref;
         var transform = prediction.Transform;
         var worldRootTransform = synthesizer.WorldRootTransform;
         var sampleTime = Missing.recip(synthesizer.Binary.SampleRate);
@@ -151,6 +171,13 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
 
                 AffineTransform contactTransform = new AffineTransform(contactPoint, q);
 
+                var direction = worldRootTransform.transformDirection(Missing.zaxis(transform.q));
+                var projectedSpeed = math.length(direction - Missing.project(direction, contactNormal)) * desiredSpeed;
+
+                Debug.DrawRay(controller.Position, contactNormal, Color.black);
+
+                if (projectedSpeed < brakingSpeed) break;
+
                 if (contactAbility == null)
                 {
                     foreach (var ability in abilities)
@@ -163,6 +190,13 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
                     }
                 }
                 canTransite = false;
+            }
+            else if (closure.isColliding && !canTransite)
+            {
+                var contactNormal = worldRootTransform.inverse().transformDirection(closure.colliderContactNormal);
+                var direction = Missing.zaxis(transform.q);
+                var correctDirection = direction - Missing.project(direction, contactNormal);
+                transform.q = math.mul(Missing.forRotation(direction, correctDirection), transform.q);
             }
             else if (!closure.isGrounded)
             {
@@ -183,6 +217,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             prediction.Transform = transform;
 
             Debug.DrawRay(controller.Position, Vector3.up, Color.green);
+            Debug.DrawRay(controller.Position, worldRootTransform.transformDirection(Missing.zaxis(transform.q)), Color.blue);
         }
 
         controller.Rewind();
@@ -193,7 +228,9 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             idleCandidates = idleCandidates,
             locomotionCandidates = locomotionCandidates,
             trajectory = trajectory,
-            idle = moveIntensity == 0.0f
+            idle = idle,
+            responsiveness = responsiveness,
+            minTrajectoryDeviation = minTrajectoryDeviation,
         };
 
         kinematica.AddJobDependency(job.Schedule());
