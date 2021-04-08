@@ -16,6 +16,7 @@ namespace Dynamatica.Unity.Components
 
         [SerializeField] Transform root;
         [SerializeField] Transform body;
+        [SerializeField] float footHeightScale = 1;
 
         [Header("Trajectory")]
         public Path path;
@@ -102,8 +103,11 @@ namespace Dynamatica.Unity.Components
                 body.rotation = Quaternion.Euler(state.baseAngularPosition);
 
                 for (int id = 0; id < model.eeCount; ++id)
-                {// transform
-                    ee[id].transform.position = state.eeMotions[id];
+                {
+                    position = state.eeMotions[id];
+                    if (!groundSnap) position.y *= footHeightScale;
+
+                    ee[id].transform.position = position;
                     ee[id].force = state.eeForces[id];
                 }
 

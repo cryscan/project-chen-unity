@@ -23,7 +23,7 @@ public class AbilityRunner : Kinematica
 
     new void Update()
     {
-        if (currentAbility != null) currentAbility.OnUpdate(_deltaTime);
+        if (currentAbility != null) currentAbility = currentAbility.OnUpdate(_deltaTime);
         else
         {
             foreach (var ability in abilities)

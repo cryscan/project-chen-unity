@@ -22,7 +22,7 @@ public struct LocomotionJob : IJob
 
     public void Execute()
     {
-        if (idle && Synthesizer.MatchPose(idleCandidates, Synthesizer.Time, MatchOptions.DontMatchIfCandidateIsPlaying | MatchOptions.LoopSegment, 0.1f))
+        if (idle && Synthesizer.MatchPose(idleCandidates, Synthesizer.Time, MatchOptions.DontMatchIfCandidateIsPlaying | MatchOptions.LoopSegment, 0.25f))
         {
             return;
         }
@@ -127,15 +127,25 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
     {
         ref var synthesizer = ref kinematica.Synthesizer.Ref;
 
+        controller.collisionEnabled = true;
+        controller.groundSnap = true;
+        controller.resolveGroundPenetration = true;
+        controller.gravityEnabled = true;
+
         float desiredSpeed = moveIntensity * desiredLinearSpeed;
-        float minTrajectoryDeviation = 0.03f;
-        bool idle = moveIntensity == 0;
         var currentSpeed = math.length(synthesizer.CurrentVelocity);
+
+        float minTrajectoryDeviation = 0.05f;
+        bool idle = moveIntensity == 0;
 
         if (idle)
         {
             if (!braking && currentSpeed < brakingSpeed) braking = true;
             else braking = false;
+        }
+        else if (currentSpeed < brakingSpeed)
+        {
+            minTrajectoryDeviation = 0.08f;
         }
 
         var prediction = TrajectoryPrediction.CreateFromDirection(ref kinematica.Synthesizer.Ref,

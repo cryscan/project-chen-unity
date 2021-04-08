@@ -79,9 +79,7 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
     public IAbility OnUpdate(float deltaTime)
     {
-        bool active = anchoredTransition.isValid;
-
-        var controller = GetComponent<MovementController>();
+        bool active = anchoredTransition.valid;
 
         controller.collisionEnabled = !active;
         controller.groundSnap = !active;
@@ -229,10 +227,7 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
             NativeArray<OBB> obbs = GetBoundsFromContactPoints(ref binary, contactTransform, value, contactThreshold);
 
-            //
             // Display all relevant box colliders
-            //
-
             int numObbs = obbs.Length;
             for (int i = 0; i < numObbs; ++i)
             {

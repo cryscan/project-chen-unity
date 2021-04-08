@@ -71,11 +71,11 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
     public TimeIndex targetTimeIndex;
 
     public BlittableBool rootAdjust;
-    public bool isValid;
+    public bool valid;
 
     public static AnchoredTransitionTask Invalid => new AnchoredTransitionTask()
     {
-        isValid = false
+        valid = false
     };
 
     public enum State
@@ -616,14 +616,14 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
             targetTimeIndex = TimeIndex.Invalid,
             rootAdjust = rootAdjust,
             state = State.Initializing,
-            isValid = true
+            valid = true
         };
     }
 
     public void WriteToStream(Buffer buffer)
     {
-        buffer.Write(isValid);
-        if (!isValid)
+        buffer.Write(valid);
+        if (!valid)
         {
             return;
         }
@@ -649,8 +649,8 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
     public void ReadFromStream(Buffer buffer)
     {
-        isValid = buffer.ReadBoolean();
-        if (!isValid)
+        valid = buffer.ReadBoolean();
+        if (!valid)
         {
             return;
         }
@@ -676,7 +676,7 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
     public void Dispose()
     {
-        if (isValid)
+        if (valid)
         {
             poses.Dispose();
         }
