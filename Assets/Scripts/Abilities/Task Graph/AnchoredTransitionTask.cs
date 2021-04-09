@@ -56,6 +56,7 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
     public SamplingTime samplingTime;
 
     public AffineTransform contactTransform;
+    public float3 movementDirection;
 
     public float maximumLinearError;
     public float maximumAngularError;
@@ -359,7 +360,19 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
                         float clampedDot = math.clamp(dot, -1.0f, 1.0f);
                         float angularError = math.acos(clampedDot);
 
-                        if (angularError <= maximumAngularError)
+                        float sourceError = 0, targetError = 0;
+                        if (math.length(movementDirection) > 0)
+                        {
+                            dot = math.dot(sourceForward, movementDirection);
+                            clampedDot = math.clamp(dot, -1.0f, 1.0f);
+                            sourceError = math.acos(clampedDot);
+
+                            dot = math.dot(targetForward, movementDirection);
+                            clampedDot = math.clamp(dot, -1.0f, 1.0f);
+                            targetError = math.acos(clampedDot);
+                        }
+
+                        if (angularError <= maximumAngularError && sourceError <= maximumAngularError && targetError <= maximumAngularError)
                         {
                             var codeBookIndex =
                                 binary.GetCodeBookAt(sourceCandidates[k].timeIndex);
@@ -603,12 +616,13 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
         return MarkerIndex.Invalid;
     }
 
-    public static AnchoredTransitionTask Create(ref MotionSynthesizer synthesizer, PoseSet poses, AffineTransform contactTransform, float maximumLinearError, float maximumAngularError, bool rootAdjust = true)
+    public static AnchoredTransitionTask Create(ref MotionSynthesizer synthesizer, PoseSet poses, AffineTransform contactTransform, float3 movementDirection, float maximumLinearError, float maximumAngularError, bool rootAdjust = true)
     {
         return new AnchoredTransitionTask
         {
             synthesizer = MemoryRef<MotionSynthesizer>.Create(ref synthesizer),
             poses = poses,
+            movementDirection = movementDirection,
             contactTransform = contactTransform,
             maximumLinearError = maximumLinearError,
             maximumAngularError = maximumAngularError,

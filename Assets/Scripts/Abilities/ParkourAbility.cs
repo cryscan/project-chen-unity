@@ -39,6 +39,8 @@ public class ParkourAbility : SnapshotProvider, IAbility
     public struct FrameCapture
     {
         public bool jumpButton;
+        public float3 movementDirection;
+        public float moveIntensity;
     }
 
     [Snapshot]
@@ -74,6 +76,7 @@ public class ParkourAbility : SnapshotProvider, IAbility
         if (!rewind)
         {
             capture.jumpButton = Input.GetButton("A Button");
+            Utility.GetInputMove(ref capture.movementDirection, ref capture.moveIntensity);
         }
     }
 
@@ -199,13 +202,10 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
         ref Binary binary = ref synthesizer.Binary;
 
-        var sequence = GetPoseSequence(ref binary, contactTransform,
-                type, contactThreshold);
+        var sequence = GetPoseSequence(ref binary, contactTransform, type, contactThreshold);
 
         anchoredTransition.Dispose();
-        anchoredTransition = AnchoredTransitionTask.Create(ref synthesizer,
-                sequence, contactTransform, maximumLinearError,
-                    maximumAngularError);
+        anchoredTransition = AnchoredTransitionTask.Create(ref synthesizer, sequence, contactTransform, capture.movementDirection, maximumLinearError, maximumAngularError);
 
         return true;
     }

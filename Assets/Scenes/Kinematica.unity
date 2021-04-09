@@ -2326,7 +2326,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5720886
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
@@ -2336,7 +2336,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.8201918
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
@@ -2361,7 +2361,7 @@ PrefabInstance:
     - target: {fileID: -6194249945622714859, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -5135253659360760777, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
@@ -2396,12 +2396,12 @@ PrefabInstance:
     - target: {fileID: 3856163347571915683, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8939471988424379870, guid: c9001660ce9f077439b8d5cc72386171,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9001660ce9f077439b8d5cc72386171, type: 3}
@@ -2516,8 +2516,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   contactThreshold: 1
-  maximumLinearError: 0.5
-  maximumAngularError: 45
+  maximumLinearError: 0.1
+  maximumAngularError: 1
   enableDebugging: 1
   debugIndex: 0
   debugPoseIndex: 0
