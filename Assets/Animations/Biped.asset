@@ -17,7 +17,7 @@ MonoBehaviour:
   timeHorizon: 1
   sampleRate: 30
   m_Data:
-    syncedWithBinary: 1
+    syncedWithBinary: 0
     animationLibrary:
     - m_PreBoundaryClipGuid:
         val0: 1529571485
@@ -196,7 +196,7 @@ MonoBehaviour:
       markers:
       - timeInSeconds: 2.3333333
         payload:
-          serializedData: '{"position":{"x":-0.30000001192092898,"y":0.0,"z":0.30000001192092898},"rotation":{"x":0.0,"y":-0.8710638880729675,"z":0.0,"w":-0.49116966128349306}}'
+          serializedData: '{"position":{"x":0.30000001192092898,"y":0.0,"z":0.30000001192092898},"rotation":{"x":0.0,"y":-0.8710638880729675,"z":0.0,"w":-0.49116966128349306}}'
           assemblyQualifiedTypeName: AnchorMarker, Assembly-CSharp, Version=0.0.0.0,
             Culture=neutral, PublicKeyToken=null
       - timeInSeconds: 2.3333333
