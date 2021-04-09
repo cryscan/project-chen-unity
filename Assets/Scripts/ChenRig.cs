@@ -35,9 +35,6 @@ public class ChenRig : MonoBehaviour
     [SerializeField] float torsoTiltScale = 1;
     [SerializeField] float shoulderTiltScale = 1;
 
-    [SerializeField] float footHeightOffset = 0;
-    [SerializeField] float footHeightScale = 1;
-
     [SerializeField] Vector3 armScale = new Vector3(1, 1, 1);
     [SerializeField] float handAngleScale = 1;
 
@@ -116,7 +113,6 @@ public class ChenRig : MonoBehaviour
     void MoveLimb(Side side, Vector3 footPosition, float level, Transform foot, Transform hand, Transform pivot, out float delta)
     {
         var position = root.InverseTransformPoint(footPosition);
-        position.y = footHeightScale * (position.y - level) + footHeightOffset;
         foot.position = position;
 
         // For left foot, we are dealing with right hand, so take positive value.
@@ -131,4 +127,6 @@ public class ChenRig : MonoBehaviour
         var rotation = Quaternion.Euler(0, 0, sign * (-180 + handAngleScale * Mathf.Abs(acceleration.x)));
         hand.localRotation = hand.localRotation.Fallout(rotation, 10);
     }
+
+
 }

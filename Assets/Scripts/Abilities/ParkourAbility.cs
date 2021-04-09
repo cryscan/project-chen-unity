@@ -39,6 +39,8 @@ public class ParkourAbility : SnapshotProvider, IAbility
     public struct FrameCapture
     {
         public bool jumpButton;
+        public float3 movementDirection;
+        public float moveIntensity;
     }
 
     [Snapshot]
@@ -74,14 +76,13 @@ public class ParkourAbility : SnapshotProvider, IAbility
         if (!rewind)
         {
             capture.jumpButton = Input.GetButton("A Button");
+            Utility.GetInputMove(ref capture.movementDirection, ref capture.moveIntensity);
         }
     }
 
     public IAbility OnUpdate(float deltaTime)
     {
-        bool active = anchoredTransition.isValid;
-
-        var controller = GetComponent<MovementController>();
+        bool active = anchoredTransition.valid;
 
         controller.collisionEnabled = !active;
         controller.groundSnap = !active;
@@ -201,13 +202,10 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
         ref Binary binary = ref synthesizer.Binary;
 
-        var sequence = GetPoseSequence(ref binary, contactTransform,
-                type, contactThreshold);
+        var sequence = GetPoseSequence(ref binary, contactTransform, type, contactThreshold);
 
         anchoredTransition.Dispose();
-        anchoredTransition = AnchoredTransitionTask.Create(ref synthesizer,
-                sequence, contactTransform, maximumLinearError,
-                    maximumAngularError);
+        anchoredTransition = AnchoredTransitionTask.Create(ref synthesizer, sequence, contactTransform, capture.movementDirection, maximumLinearError, maximumAngularError);
 
         return true;
     }
@@ -229,10 +227,7 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
             NativeArray<OBB> obbs = GetBoundsFromContactPoints(ref binary, contactTransform, value, contactThreshold);
 
-            //
             // Display all relevant box colliders
-            //
-
             int numObbs = obbs.Length;
             for (int i = 0; i < numObbs; ++i)
             {

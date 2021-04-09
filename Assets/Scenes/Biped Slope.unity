@@ -1379,9 +1379,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a7569fef8eef6f11b2c981b14301abe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  speed: 3.5
   minDuration: 1.2
-  stepFrequency: 1.5
+  stepFrequency: 1.8
   nominalGait: 9
 --- !u!4 &1021631824
 Transform:
