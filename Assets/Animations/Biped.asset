@@ -158,7 +158,7 @@ MonoBehaviour:
             Culture=neutral, PublicKeyToken=null
       - timeInSeconds: 1.8333334
         payload:
-          serializedData: '{"position":{"x":0.0,"y":0.0,"z":0.30000001192092898},"rotation":{"x":0.0,"y":0.5641769170761108,"z":0.0,"w":0.8256539106369019}}'
+          serializedData: '{"position":{"x":0.0,"y":0.0,"z":0.6000000238418579},"rotation":{"x":0.0,"y":0.5641769170761108,"z":0.0,"w":0.8256539106369019}}'
           assemblyQualifiedTypeName: AnchorMarker, Assembly-CSharp, Version=0.0.0.0,
             Culture=neutral, PublicKeyToken=null
       m_Asset: {fileID: 11400000}
@@ -266,20 +266,20 @@ MonoBehaviour:
             Culture=neutral, PublicKeyToken=null
       - timeInSeconds: 1.7333333
         payload:
-          serializedData: '{"position":{"x":0.0,"y":0.0,"z":0.30000001192092898},"rotation":{"x":0.0,"y":-0.5701941847801209,"z":0.0,"w":0.8215098977088928}}'
+          serializedData: '{"position":{"x":0.0,"y":0.0,"z":0.6000000238418579},"rotation":{"x":0.0,"y":-0.5701941847801209,"z":0.0,"w":0.8215098977088928}}'
           assemblyQualifiedTypeName: AnchorMarker, Assembly-CSharp, Version=0.0.0.0,
             Culture=neutral, PublicKeyToken=null
       m_Asset: {fileID: 11400000}
     - m_PreBoundaryClipGuid:
-        val0: 1529571485
-        val1: -569012885
-        val2: 395926187
-        val3: 1582499599
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
       m_PostBoundaryClipGuid:
-        val0: 1529571485
-        val1: -569012885
-        val2: 395926187
-        val3: 1582499599
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
       m_PreBoundaryClip: {fileID: 0}
       m_PostBoundaryClip: {fileID: 0}
       m_AnimationClipReference: {fileID: 0}
