@@ -97,7 +97,7 @@
     <Trait index="7" type="Contact" payload="6e90b3be0052e63ba7468b3ea66336bf000080b2c07063bb3564363f" />
     <Trait index="8" type="Contact" payload="408e3a3d006ad63aca41863e7ca335bf0000000000bb02bbaba3353f" />
     <Trait index="9" type="Escape" payload="00" />
-    <Trait index="10" type="Anchor" payload="00000000000000009a99993e000000000e5e533f00000000e76d10bf" />
+    <Trait index="10" type="Anchor" payload="00000000000000009a99193f000000000e5e53bf00000000e56d103f" />
     <Trait index="11" type="Contact" payload="8e8b4cbe0000000064348db7000000000a0a353f000000000a0a353f" />
     <Trait index="12" type="Contact" payload="6721553e000000b40fdc073a00000000ddbc353f00000000ddbc353f" />
     <Trait index="13" type="Contact" payload="e70b40be000080335fa7fab9000000007bc1363f000000007bc1363f" />
@@ -106,7 +106,7 @@
     <Trait index="16" type="Contact" payload="ec888a3e004481baa8a00fbe00000000f245fa3e00000000a95f613f" />
     <Trait index="17" type="Contact" payload="b8fd4abe0058613a102e5abed90f36bf00000000001347bb4610363f" />
     <Trait index="18" type="Contact" payload="d2025f3e00db2f3b17f363bef15c35bf0000000000eb9bba025d353f" />
-    <Trait index="19" type="Anchor" payload="00000000000000009a99993e000000007a4e523f000000003ff8113f" />
+    <Trait index="19" type="Anchor" payload="00000000000000009a99193f000000807a4e52bf0000000041f811bf" />
     <Trait index="20" type="Locomotion" payload="00" />
     <Trait index="21" type="Idle" payload="00" />
     <Trait index="22" type="Parkour" payload="09000000" />

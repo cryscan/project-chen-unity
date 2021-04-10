@@ -158,7 +158,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
         controller.Snapshot();
         var transform = prediction.Transform;
         var worldRootTransform = synthesizer.WorldRootTransform;
-        var sampleTime = Missing.recip(synthesizer.Binary.SampleRate);
+        var inverseSampleRate = Missing.recip(synthesizer.Binary.SampleRate);
 
         bool canTransite = true;
         IAbility contactAbility = null;
@@ -168,7 +168,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             transform = prediction.Advance;
 
             controller.MoveTo(worldRootTransform.transform(transform.t));
-            controller.Tick(sampleTime);
+            controller.Tick(inverseSampleRate);
 
             ref var closure = ref controller.current;
             if (closure.isColliding && canTransite)
@@ -179,13 +179,11 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
                 float3 contactNormal = closure.colliderContactNormal;
                 quaternion q = math.mul(transform.q, Missing.forRotation(Missing.zaxis(transform.q), contactNormal));
 
+                Debug.DrawRay(contactPoint, contactNormal, Color.black);
                 AffineTransform contactTransform = new AffineTransform(contactPoint, q);
 
                 var direction = worldRootTransform.transformDirection(Missing.zaxis(transform.q));
                 var projectedSpeed = math.length(direction - Missing.project(direction, contactNormal)) * desiredSpeed;
-
-                Debug.DrawRay(controller.Position, contactNormal, Color.black);
-
                 if (projectedSpeed < brakingSpeed) break;
 
                 if (contactAbility == null)
@@ -227,7 +225,6 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             prediction.Transform = transform;
 
             Debug.DrawRay(controller.Position, Vector3.up, Color.green);
-            Debug.DrawRay(controller.Position, worldRootTransform.transformDirection(Missing.zaxis(transform.q)), Color.blue);
         }
 
         controller.Rewind();

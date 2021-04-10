@@ -328,9 +328,10 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
                                 int numFramesUntilTransition = sourceTimeIndex.frameIndex - samplingTime.frameIndex;
                                 float timeInSecondsUntilTransition = numFramesUntilTransition * inverseSampleRate;
-                                int numFramesUntilContact = numTargetCandidates - j;
 
+                                int numFramesUntilContact = numTargetCandidates - j;
                                 timeInSecondsUntilContact = numFramesUntilContact * inverseSampleRate;
+
                                 timeInSecondsTotal = timeInSecondsUntilTransition + timeInSecondsUntilContact;
                                 timeInSecondsSoFar = 0.0f;
                             }
@@ -442,6 +443,10 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
         AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
         AffineTransform anchorWorldSpaceTransform = contactTransform * anchorTransform;
         AffineTransform worldRootTransform = anchorWorldSpaceTransform * binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex);
+
+        var anchorDirection = Missing.zaxis(anchorWorldSpaceTransform.q);
+        if (Vector3.Angle(anchorDirection, movementDirection) > 45)
+            return new NativeArray<TargetCandidate>(0, Allocator.Temp);
 
         var candidates = new NativeArray<TargetCandidate>(contactMarker.frameIndex, Allocator.Temp);
 
