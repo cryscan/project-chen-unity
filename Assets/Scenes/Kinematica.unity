@@ -2517,7 +2517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contactThreshold: 1
   maximumLinearError: 0.1
-  maximumAngularError: 1
+  maximumAngularError: 5
   enableDebugging: 1
   debugIndex: 0
   debugPoseIndex: 0

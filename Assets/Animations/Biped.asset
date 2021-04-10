@@ -271,15 +271,15 @@ MonoBehaviour:
             Culture=neutral, PublicKeyToken=null
       m_Asset: {fileID: 11400000}
     - m_PreBoundaryClipGuid:
-        val0: 1529571485
-        val1: -569012885
-        val2: 395926187
-        val3: 1582499599
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
       m_PostBoundaryClipGuid:
-        val0: 1529571485
-        val1: -569012885
-        val2: 395926187
-        val3: 1582499599
+        val0: 0
+        val1: 0
+        val2: 0
+        val3: 0
       m_PreBoundaryClip: {fileID: 0}
       m_PostBoundaryClip: {fileID: 0}
       m_AnimationClipReference: {fileID: 0}

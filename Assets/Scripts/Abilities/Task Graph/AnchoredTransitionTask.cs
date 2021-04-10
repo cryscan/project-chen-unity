@@ -49,8 +49,6 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
     public PoseSet poses;
 
-
-
     NativeArray<PoseSequence> sequences => poses.sequences;
 
     public SamplingTime samplingTime;
@@ -109,8 +107,6 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
     {
         ref var synthesizer = ref this.synthesizer.Ref;
 
-
-
         if (IsState(State.Initializing))
         {
             samplingTime = synthesizer.Time;
@@ -137,43 +133,27 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
         if (!IsState(State.Complete) && !IsState(State.Failed))
         {
-            //
             // Do we still have time left before we make contact?
-            //
-
             var deltaTime = synthesizer.deltaTime;
 
             if (timeInSecondsSoFar <= timeInSecondsTotal)
             {
                 if (timeInSecondsSoFar + deltaTime >= timeInSecondsTotal)
                 {
-                    float remainingTimeInSeconds =
-                        timeInSecondsTotal - timeInSecondsSoFar;
+                    float remainingTimeInSeconds = timeInSecondsTotal - timeInSecondsSoFar;
                     Assert.IsTrue(remainingTimeInSeconds <= deltaTime);
                 }
 
-                //
                 // Calculate root movement such that we'll reach the contact transform
-                //
+                AffineTransform desiredDeltaTransform = GetTrajectoryDeltaTransform(ref synthesizer, deltaTime);
 
-                AffineTransform desiredDeltaTransform =
-                    GetTrajectoryDeltaTransform(ref synthesizer, deltaTime);
-
-                //
                 // Calculate the root movement that the synthesizer will perform this frame.
-                //
+                AffineTransform actualDeltaTransform = synthesizer.GetTrajectoryDeltaTransform(deltaTime);
 
-                AffineTransform actualDeltaTransform =
-                    synthesizer.GetTrajectoryDeltaTransform(deltaTime);
-
-                //
                 // Move the character by the inverse of the actual delta movement
                 // (such that the synthesizers' movement will have no effect) and perform
                 // the desired root movement (such that we'll reach the contact transform).
-                //
-
-                AffineTransform deltaRootTransform =
-                    actualDeltaTransform.inverse() * desiredDeltaTransform;
+                AffineTransform deltaRootTransform = actualDeltaTransform.inverse() * desiredDeltaTransform;
 
                 synthesizer.AdjustTrajectory(deltaRootTransform);
             }
@@ -194,7 +174,6 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
                 outputTime = synthesizer.DebugWriteBlittableObject(ref targetTime, true);
 
                 synthesizer.PlayAtTime(targetTime);
-
                 SetState(State.Active);
             }
         }
@@ -202,7 +181,6 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
         if (IsState(State.Active))
         {
             var samplingTime = synthesizer.Time;
-
             var frameIndex = GetEscapeFrameIndex();
 
             if (samplingTime.timeIndex.frameIndex >= frameIndex)
@@ -222,61 +200,38 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
     AffineTransform GetTrajectoryDeltaTransform(ref MotionSynthesizer synthesizer, float deltaTime)
     {
-        AffineTransform nextTrajectoryTransform =
-            GetTransformAtTime(ref synthesizer,
-                timeInSecondsSoFar + deltaTime);
-
+        AffineTransform nextTrajectoryTransform = GetTransformAtTime(ref synthesizer, timeInSecondsSoFar + deltaTime);
         return synthesizer.WorldRootTransform.inverseTimes(nextTrajectoryTransform);
     }
 
     AffineTransform GetTransformAtTime(ref MotionSynthesizer synthesizer, float sampleTimeInSeconds)
     {
-        float durationInSecondsUntilTransition =
-            timeInSecondsTotal - timeInSecondsUntilContact;
+        float durationInSecondsUntilTransition = timeInSecondsTotal - timeInSecondsUntilContact;
         Assert.IsTrue(durationInSecondsUntilTransition >= 0.0f);
 
         ref Binary binary = ref synthesizer.Binary;
 
-        float theta = math.clamp(
-            sampleTimeInSeconds / timeInSecondsTotal, 0.0f, 1.0f);
+        float theta = math.clamp(sampleTimeInSeconds / timeInSecondsTotal, 0.0f, 1.0f);
 
         if (sampleTimeInSeconds <= durationInSecondsUntilTransition)
         {
-            var deltaTimeInSeconds =
-                -durationInSecondsUntilTransition + sampleTimeInSeconds;
+            var deltaTimeInSeconds = -durationInSecondsUntilTransition + sampleTimeInSeconds;
 
-            AffineTransform deltaTransform =
-                binary.GetTrajectoryTransformBetween(
-                    SamplingTime.Create(sourceTimeIndex),
-                        deltaTimeInSeconds);
+            AffineTransform deltaTransform = binary.GetTrajectoryTransformBetween(SamplingTime.Create(sourceTimeIndex), deltaTimeInSeconds);
+            AffineTransform currentSourceRootTransform = sourceRootTransform * deltaTransform;
+            AffineTransform currentTargetRootTransform = targetRootTransform * deltaTransform;
 
-            AffineTransform currentSourceRootTransform =
-                sourceRootTransform * deltaTransform;
-
-            AffineTransform currentTargetRootTransform =
-                targetRootTransform * deltaTransform;
-
-            return Missing.lerp(currentSourceRootTransform,
-                currentTargetRootTransform, theta);
+            return Missing.lerp(currentSourceRootTransform, currentTargetRootTransform, theta);
         }
         else
         {
-            var deltaTimeInSeconds =
-                sampleTimeInSeconds - durationInSecondsUntilTransition;
+            var deltaTimeInSeconds = sampleTimeInSeconds - durationInSecondsUntilTransition;
 
-            AffineTransform deltaTransform =
-                binary.GetTrajectoryTransformBetween(
-                    SamplingTime.Create(targetTimeIndex),
-                        deltaTimeInSeconds);
+            AffineTransform deltaTransform = binary.GetTrajectoryTransformBetween(SamplingTime.Create(targetTimeIndex), deltaTimeInSeconds);
+            AffineTransform currentSourceRootTransform = sourceRootTransform * deltaTransform;
+            AffineTransform currentTargetRootTransform = targetRootTransform * deltaTransform;
 
-            AffineTransform currentSourceRootTransform =
-                sourceRootTransform * deltaTransform;
-
-            AffineTransform currentTargetRootTransform =
-                targetRootTransform * deltaTransform;
-
-            return Missing.lerp(currentSourceRootTransform,
-                currentTargetRootTransform, theta);
+            return Missing.lerp(currentSourceRootTransform, currentTargetRootTransform, theta);
         }
     }
 
@@ -285,15 +240,12 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
         Assert.IsTrue(targetTimeIndex.IsValid);
 
         ref var synthesizer = ref this.synthesizer.Ref;
-
         ref var binary = ref synthesizer.Binary;
 
         var escapeTypeIndex = binary.GetTypeIndex<Escape>();
-
         var samplingTime = synthesizer.Time;
 
-        var escapeIndex = GetMarkerOfType(
-            ref binary, samplingTime.segmentIndex, escapeTypeIndex);
+        var escapeIndex = GetMarkerOfType(ref binary, samplingTime.segmentIndex, escapeTypeIndex);
 
         if (escapeIndex.IsValid)
         {
@@ -301,56 +253,39 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
         }
 
         ref var segment = ref binary.GetSegment(samplingTime.segmentIndex);
-
         var numFrames = segment.destination.numFrames - 1;
-
         return numFrames;
     }
 
     bool FindTransition(SamplingTime samplingTime)
     {
         ref var synthesizer = ref this.synthesizer.Ref;
-
         ref var binary = ref synthesizer.Binary;
-
         float inverseSampleRate = 1.0f / binary.SampleRate;
 
-        var sourceCandidates =
-            CreateSourceCandidates(samplingTime);
-
+        var sourceCandidates = CreateSourceCandidates(samplingTime);
         var numSourceCandidates = sourceCandidates.Length;
-
         var numCandidates = sequences.Length;
-
         var minimumPoseCost = float.MaxValue;
 
         for (int i = 0; i < numCandidates; ++i)
         {
             var intervalIndex = sequences[i].intervalIndex;
+            var segmentIndex = binary.GetInterval(intervalIndex).segmentIndex;
 
-            var segmentIndex =
-                binary.GetInterval(
-                    intervalIndex).segmentIndex;
-
-            var targetCandidates =
-                CreateTargetCandidates(segmentIndex);
-
+            var targetCandidates = CreateTargetCandidates(segmentIndex);
             var numTargetCandidates = targetCandidates.Length;
 
             for (int j = 0; j < numTargetCandidates; ++j)
             {
                 var targetTransform = targetCandidates[j].worldRootTransform;
-
                 var targetForward = Missing.zaxis(targetTransform.q);
-
                 var foundTranition = false;
 
                 for (int k = 0; k < numSourceCandidates; ++k)
                 {
                     var sourceTransform = sourceCandidates[k].worldRootTransform;
-
                     var distance = sourceTransform.t - targetTransform.t;
-
                     float linearError = math.length(distance);
 
                     if (linearError <= maximumLinearError)
@@ -360,51 +295,24 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
                         float clampedDot = math.clamp(dot, -1.0f, 1.0f);
                         float angularError = math.acos(clampedDot);
 
-                        float sourceError = 0, targetError = 0;
-                        if (math.length(movementDirection) > 0)
+                        if (angularError <= maximumAngularError)
                         {
-                            dot = math.dot(sourceForward, movementDirection);
-                            clampedDot = math.clamp(dot, -1.0f, 1.0f);
-                            sourceError = math.acos(clampedDot);
-
-                            dot = math.dot(targetForward, movementDirection);
-                            clampedDot = math.clamp(dot, -1.0f, 1.0f);
-                            targetError = math.acos(clampedDot);
-                        }
-
-                        if (angularError <= maximumAngularError && sourceError <= maximumAngularError && targetError <= maximumAngularError)
-                        {
-                            var codeBookIndex =
-                                binary.GetCodeBookAt(sourceCandidates[k].timeIndex);
-
-                            var sourceFragment =
-                                binary.ReconstructPoseFragment(
-                                    SamplingTime.Create(sourceCandidates[k].timeIndex));
-
+                            var codeBookIndex = binary.GetCodeBookAt(sourceCandidates[k].timeIndex);
+                            var sourceFragment = binary.ReconstructPoseFragment(SamplingTime.Create(sourceCandidates[k].timeIndex));
                             var currentPoseCost = 0.0f;
 
                             if (sourceFragment.IsValid)
                             {
                                 ref var codeBook = ref binary.GetCodeBook(codeBookIndex);
-
                                 var metricIndex = codeBook.metricIndex;
-
                                 codeBook.poses.Normalize(sourceFragment.array);
 
                                 var timeIndex = targetCandidates[j].timeIndex;
-
-                                var targetFragment =
-                                    binary.CreatePoseFragment(metricIndex,
-                                        SamplingTime.Create(timeIndex));
-
+                                var targetFragment = binary.CreatePoseFragment(metricIndex, SamplingTime.Create(timeIndex));
                                 codeBook.poses.Normalize(targetFragment.array);
 
-                                currentPoseCost =
-                                    codeBook.poses.FeatureDeviation(
-                                        sourceFragment.array, targetFragment.array);
-
+                                currentPoseCost = codeBook.poses.FeatureDeviation(sourceFragment.array, targetFragment.array);
                                 targetFragment.Dispose();
-
                                 sourceFragment.Dispose();
                             }
 
@@ -418,21 +326,12 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
                                 sourceRootTransform = sourceTransform;
                                 targetRootTransform = targetTransform;
 
-                                int numFramesUntilTransition =
-                                    sourceTimeIndex.frameIndex - samplingTime.frameIndex;
-
-                                float timeInSecondsUntilTransition =
-                                    numFramesUntilTransition * inverseSampleRate;
-
+                                int numFramesUntilTransition = sourceTimeIndex.frameIndex - samplingTime.frameIndex;
+                                float timeInSecondsUntilTransition = numFramesUntilTransition * inverseSampleRate;
                                 int numFramesUntilContact = numTargetCandidates - j;
 
-                                timeInSecondsUntilContact =
-                                    numFramesUntilContact * inverseSampleRate;
-
-                                timeInSecondsTotal =
-                                    timeInSecondsUntilTransition +
-                                        timeInSecondsUntilContact;
-
+                                timeInSecondsUntilContact = numFramesUntilContact * inverseSampleRate;
+                                timeInSecondsTotal = timeInSecondsUntilTransition + timeInSecondsUntilContact;
                                 timeInSecondsSoFar = 0.0f;
                             }
 
@@ -475,7 +374,6 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
     public NativeArray<SourceCandidate> CreateSourceCandidates(SamplingTime samplingTime)
     {
         ref var synthesizer = ref this.synthesizer.Ref;
-
         ref var binary = ref synthesizer.Binary;
 
         float timeHorizon = binary.TimeHorizon;
@@ -483,34 +381,22 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
 
         int numCandidates = Missing.truncToInt(timeHorizon / inverseSampleRate);
 
-        AffineTransform previousTrajectoryTransform =
-            binary.GetTrajectoryTransform(samplingTime);
+        AffineTransform previousTrajectoryTransform = binary.GetTrajectoryTransform(samplingTime);
 
         var worldRootTransform = synthesizer.WorldRootTransform;
+        var candidates = new NativeArray<SourceCandidate>(numCandidates, Allocator.Temp);
 
-        var candidates =
-            new NativeArray<SourceCandidate>(
-                numCandidates, Allocator.Temp);
-
-        candidates[0] = SourceCandidate.Create(
-            worldRootTransform, samplingTime.timeIndex);
+        candidates[0] = SourceCandidate.Create(worldRootTransform, samplingTime.timeIndex);
 
         for (int i = 1; i < numCandidates; ++i)
         {
-            samplingTime = binary.Advance(
-                samplingTime, inverseSampleRate).samplingTime;
+            samplingTime = binary.Advance(samplingTime, inverseSampleRate).samplingTime;
+            AffineTransform currentTrajectoryTransform = binary.GetTrajectoryTransform(samplingTime);
 
-            AffineTransform currentTrajectoryTransform =
-                binary.GetTrajectoryTransform(samplingTime);
-
-            worldRootTransform *=
-                previousTrajectoryTransform.inverseTimes(
-                    currentTrajectoryTransform);
-
+            worldRootTransform *= previousTrajectoryTransform.inverseTimes(currentTrajectoryTransform);
             previousTrajectoryTransform = currentTrajectoryTransform;
 
-            candidates[i] = SourceCandidate.Create(
-                worldRootTransform, samplingTime.timeIndex);
+            candidates[i] = SourceCandidate.Create(worldRootTransform, samplingTime.timeIndex);
         }
 
         return candidates;
@@ -534,64 +420,42 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
     public NativeArray<TargetCandidate> CreateTargetCandidates(SegmentIndex segmentIndex)
     {
         ref var synthesizer = ref this.synthesizer.Ref;
-
         ref var binary = ref synthesizer.Binary;
 
         ref var segment = ref binary.GetSegment(segmentIndex);
-
         var anchorTypeIndex = binary.GetTypeIndex<Anchor>();
-
         var contactTypeIndex = binary.GetTypeIndex<Contact>();
 
-        var anchorIndex = GetMarkerOfType(
-            ref binary, segmentIndex, anchorTypeIndex);
+        var anchorIndex = GetMarkerOfType(ref binary, segmentIndex, anchorTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
         ref var anchorMarker = ref binary.GetMarker(anchorIndex);
 
-        var contactIndex = GetMarkerOfType(
-            ref binary, segmentIndex, contactTypeIndex);
+        var contactIndex = GetMarkerOfType(ref binary, segmentIndex, contactTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
         ref var contactMarker = ref binary.GetMarker(contactIndex);
 
         var firstFrame = segment.destination.firstFrame;
-
         int anchorFrame = firstFrame + anchorMarker.frameIndex;
 
-        AffineTransform anchorTransform =
-            binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorWorldSpaceTransform = contactTransform * anchorTransform;
+        AffineTransform worldRootTransform = anchorWorldSpaceTransform * binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex);
 
-        AffineTransform anchorWorldSpaceTransform =
-            contactTransform * anchorTransform;
+        var candidates = new NativeArray<TargetCandidate>(contactMarker.frameIndex, Allocator.Temp);
 
-        AffineTransform worldRootTransform = anchorWorldSpaceTransform *
-            binary.GetTrajectoryTransformBetween(
-                anchorFrame, -anchorMarker.frameIndex);
+        candidates[0] = TargetCandidate.Create(worldRootTransform, TimeIndex.Create(segmentIndex));
 
-        var candidates =
-            new NativeArray<TargetCandidate>(
-                contactMarker.frameIndex, Allocator.Temp);
-
-        candidates[0] = TargetCandidate.Create(
-            worldRootTransform, TimeIndex.Create(segmentIndex));
-
-        AffineTransform previousTrajectoryTransform =
-            binary.GetTrajectoryTransform(firstFrame);
+        AffineTransform previousTrajectoryTransform = binary.GetTrajectoryTransform(firstFrame);
 
         for (int i = 1; i < contactMarker.frameIndex; ++i)
         {
-            AffineTransform currentTrajectoryTransform =
-                binary.GetTrajectoryTransform(firstFrame + i);
-
-            worldRootTransform *=
-                previousTrajectoryTransform.inverseTimes(
-                    currentTrajectoryTransform);
-
+            AffineTransform currentTrajectoryTransform = binary.GetTrajectoryTransform(firstFrame + i);
+            worldRootTransform *= previousTrajectoryTransform.inverseTimes(currentTrajectoryTransform);
             previousTrajectoryTransform = currentTrajectoryTransform;
 
-            candidates[i] = TargetCandidate.Create(
-                worldRootTransform, TimeIndex.Create(segmentIndex, i));
+            candidates[i] = TargetCandidate.Create(worldRootTransform, TimeIndex.Create(segmentIndex, i));
         }
 
         return candidates;

@@ -106,7 +106,7 @@
     <Trait index="16" type="Contact" payload="ec888a3e004481baa8a00fbe00000000f245fa3e00000000a95f613f" />
     <Trait index="17" type="Contact" payload="b8fd4abe0058613a102e5abed90f36bf00000000001347bb4610363f" />
     <Trait index="18" type="Contact" payload="d2025f3e00db2f3b17f363bef15c35bf0000000000eb9bba025d353f" />
-    <Trait index="19" type="Anchor" payload="00000000000000009a99993e000000007b4e523f000000003ef8113f" />
+    <Trait index="19" type="Anchor" payload="00000000000000009a99993e000000007a4e523f000000003ff8113f" />
     <Trait index="20" type="Locomotion" payload="00" />
     <Trait index="21" type="Idle" payload="00" />
     <Trait index="22" type="Parkour" payload="09000000" />
