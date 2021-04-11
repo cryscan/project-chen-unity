@@ -15,6 +15,7 @@ public struct LocomotionJob : IJob
     public Trajectory trajectory;
 
     public bool idle;
+    public float maxPoseDerivation;
     public float responsiveness;
     public float minTrajectoryDeviation;
 
@@ -22,7 +23,7 @@ public struct LocomotionJob : IJob
 
     public void Execute()
     {
-        if (idle && Synthesizer.MatchPose(idleCandidates, Synthesizer.Time, MatchOptions.DontMatchIfCandidateIsPlaying | MatchOptions.LoopSegment, 0.25f))
+        if (idle && Synthesizer.MatchPose(idleCandidates, Synthesizer.Time, MatchOptions.DontMatchIfCandidateIsPlaying | MatchOptions.LoopSegment, maxPoseDerivation))
         {
             return;
         }
@@ -134,9 +135,10 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
 
         float desiredSpeed = moveIntensity * desiredLinearSpeed;
         var currentSpeed = math.length(synthesizer.CurrentVelocity);
-
-        float minTrajectoryDeviation = 0.05f;
         bool idle = moveIntensity == 0;
+
+        float maxPoseDerivation = 0.15f;
+        float minTrajectoryDeviation = 0.05f;
 
         if (idle)
         {
@@ -236,6 +238,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             locomotionCandidates = locomotionCandidates,
             trajectory = trajectory,
             idle = idle,
+            maxPoseDerivation = maxPoseDerivation,
             responsiveness = responsiveness,
             minTrajectoryDeviation = minTrajectoryDeviation,
         };
