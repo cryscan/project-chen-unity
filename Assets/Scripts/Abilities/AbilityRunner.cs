@@ -9,7 +9,7 @@ using Unity.SnapshotDebugger;
 public class AbilityRunner : Kinematica
 {
     IAbility[] abilities;
-    IAbility currentAbility;
+    public IAbility currentAbility { get; private set; }
 
     MovementController controller;
 

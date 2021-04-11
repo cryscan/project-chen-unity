@@ -1601,6 +1601,46 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1598222418}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1181046016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1181046013}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 295701dcf18cdfc4e9a3712cd41da09d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityRunner: {fileID: 1667829403}
+  rig:
+    hip: {fileID: 1355834703}
+    torso: {fileID: 647307285}
+    chest: {fileID: 379381879}
+    footLeft: {fileID: 734808846}
+    footRight: {fileID: 539343566}
+    handLeft: {fileID: 199438298}
+    handRight: {fileID: 296818063}
+    pivotLeft: {fileID: 1911877658}
+    pivotRight: {fileID: 1133436472}
+  robot:
+    animator: {fileID: 1667829401}
+    body: {fileID: 1520214525}
+    footLeft: {fileID: 1417474985}
+    footRight: {fileID: 1741446431}
+  root: {fileID: 731146416}
+  hip:
+    stance: 0.65
+    locomotion: 0.55
+    parkour: 0.5
+    nominal: 0
+    height: 0
+  torsoTiltScale: 6
+  shoulderTiltScale: 20
+  armSwingScale: {x: 1, y: 1, z: 1}
+  handAngleScale: 30
+  parkourCentrifugalScale: 4
 --- !u!114 &1181046017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2155,7 +2195,6 @@ GameObject:
   - component: {fileID: 1648228523}
   - component: {fileID: 1648228522}
   - component: {fileID: 1648228527}
-  - component: {fileID: 1648228524}
   m_Layer: 0
   m_Name: Rig Setup
   m_TagString: Untagged
@@ -2192,40 +2231,6 @@ Transform:
   m_Father: {fileID: 1181046015}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1648228524
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1648228521}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 295701dcf18cdfc4e9a3712cd41da09d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rig:
-    hip: {fileID: 1355834703}
-    torso: {fileID: 647307285}
-    chest: {fileID: 379381879}
-    footLeft: {fileID: 734808846}
-    footRight: {fileID: 539343566}
-    handLeft: {fileID: 199438298}
-    handRight: {fileID: 296818063}
-    pivotLeft: {fileID: 1911877658}
-    pivotRight: {fileID: 1133436472}
-  robot:
-    animator: {fileID: 1667829401}
-    body: {fileID: 1520214525}
-    footLeft: {fileID: 1417474985}
-    footRight: {fileID: 1741446431}
-  root: {fileID: 731146416}
-  stanceHipHeight: 0.65
-  runningHipHeight: 0.55
-  torsoTiltScale: 6
-  shoulderTiltScale: 20
-  armScale: {x: 0.8, y: 2, z: 1}
-  handAngleScale: 30
 --- !u!114 &1648228527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2516,7 +2521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   contactThreshold: 1
-  maximumLinearError: 0.5
+  maximumLinearError: 1
   maximumAngularError: 5
   enableDebugging: 1
   debugIndex: 0
