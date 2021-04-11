@@ -1640,7 +1640,7 @@ MonoBehaviour:
   shoulderTiltScale: 20
   armSwingScale: {x: 1, y: 1, z: 1}
   handAngleScale: 30
-  parkourCentrifugalScale: 4
+  parkourCentrifugalScale: 3
 --- !u!114 &1181046017
 MonoBehaviour:
   m_ObjectHideFlags: 0

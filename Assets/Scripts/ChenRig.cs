@@ -97,7 +97,16 @@ public class ChenRig : MonoBehaviour
         Debug.DrawRay(root.position, this.acceleration, Color.red);
 
         acceleration = root.InverseTransformDirection(this.acceleration);
-        var rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
+        Quaternion rotation;
+        if (currentAbility is ParkourAbility)
+        {
+            var up = rig.torso.rotation * Vector3.up;
+            rotation = Quaternion.FromToRotation(up, Vector3.up) * torsoRotation;
+            rotation = Quaternion.Slerp(rotation, torsoRotation, 0.5f);
+            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * rotation;
+        }
+        else
+            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
         rig.torso.localRotation = rig.torso.localRotation.Fallout(rotation, 10);
 
         // Feet placement and arms swing
