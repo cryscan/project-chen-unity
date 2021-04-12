@@ -49,6 +49,7 @@ public class ChenRig : MonoBehaviour
 
     [Header("Arm")]
     [SerializeField] Vector3 armSwingScale = new Vector3(1, 1, 1);
+    [SerializeField] float locomotionCentrifugalScale;
     [SerializeField] float parkourCentrifugalScale;
 
     [Header("Hand")]
@@ -179,7 +180,7 @@ public class ChenRig : MonoBehaviour
         if (state == State.Parkouring) centrifugalScale = parkourCentrifugalScale;
         else centrifugalScale = Mathf.Abs(acceleration.x);
 
-        var centerfugal = armSwingScale.x * centrifugalScale * sign * pivot.right;
+        var centerfugal = locomotionCentrifugalScale * centrifugalScale * sign * pivot.right;
 
         hand.position = hand.position.Fallout(pivot.position + direction, 10).Fallout(pivot.position + centerfugal, 1);
 

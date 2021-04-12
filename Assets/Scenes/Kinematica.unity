@@ -1639,6 +1639,7 @@ MonoBehaviour:
   torsoTiltScale: 6
   shoulderTiltScale: 20
   armSwingScale: {x: 1.2, y: 1, z: 1.2}
+  locomotionCentrifugalScale: 0.8
   parkourCentrifugalScale: 3
   handAngleScale: 30
   handAngleLowerLimit: -150
