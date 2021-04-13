@@ -7,7 +7,6 @@ using Dynamatica.Runtime;
 
 namespace Dynamatica.Unity.Components
 {
-    [RequireComponent(typeof(HierarchyRecorder))]
     [RequireComponent(typeof(Animator))]
     public class Dynamatica : MonoBehaviour
     {
