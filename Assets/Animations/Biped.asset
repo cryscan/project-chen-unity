@@ -327,8 +327,8 @@ MonoBehaviour:
       m_CachedSampleRate: 30
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
-      - startTime: 0
-        duration: 3.3333333
+      - startTime: 1
+        duration: 2.3333335
         payload:
           serializedData: '{"type":12}'
           assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
@@ -400,8 +400,8 @@ MonoBehaviour:
       m_CachedSampleRate: 30
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
-      - startTime: 0
-        duration: 3.3333333
+      - startTime: 1.1666666
+        duration: 2.166667
         payload:
           serializedData: '{"type":12}'
           assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
@@ -473,8 +473,8 @@ MonoBehaviour:
       m_CachedSampleRate: 30
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
-      - startTime: 2.8333333
-        duration: 2.8333337
+      - startTime: 3.3333333
+        duration: 2.3333337
         payload:
           serializedData: '{"type":13}'
           assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
