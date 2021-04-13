@@ -303,6 +303,46 @@ MonoBehaviour:
         name: 
       markers: []
       m_Asset: {fileID: 11400000}
+    - m_PreBoundaryClipGuid:
+        val0: 1529571485
+        val1: -569012885
+        val2: 395926187
+        val3: 1582499599
+      m_PostBoundaryClipGuid:
+        val0: 1529571485
+        val1: -569012885
+        val2: 395926187
+        val3: 1582499599
+      m_PreBoundaryClip: {fileID: 0}
+      m_PostBoundaryClip: {fileID: 0}
+      m_AnimationClipReference: {fileID: 0}
+      m_AnimationClipGuid:
+        val0: -400888324
+        val1: -1945731190
+        val2: 1104795674
+        val3: 1837573173
+      m_CachedClipVersion: 0
+      m_CachedClipName: Platform
+      m_CachedClipDuration: 3.6666667
+      m_CachedSampleRate: 30
+      m_RetargetSourceAvatar: {fileID: 0}
+      tags:
+      - startTime: 0.33333334
+        duration: 1.5
+        payload:
+          serializedData: '{"type":12}'
+          assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        name: 
+      - startTime: 1.8333334
+        duration: 1.1666666
+        payload:
+          serializedData: '{"type":13}'
+          assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+        name: 
+      markers: []
+      m_Asset: {fileID: 11400000}
     destinationAvatar: {fileID: 9000000, guid: c9001660ce9f077439b8d5cc72386171, type: 3}
     metrics:
     - name: Default

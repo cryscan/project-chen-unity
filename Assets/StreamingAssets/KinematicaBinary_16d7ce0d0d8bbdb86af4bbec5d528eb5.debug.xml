@@ -97,7 +97,7 @@
     <Trait index="7" type="Contact" payload="6e90b3be0052e63ba7468b3ea66336bf000080b2c07063bb3564363f" />
     <Trait index="8" type="Contact" payload="408e3a3d006ad63aca41863e7ca335bf0000000000bb02bbaba3353f" />
     <Trait index="9" type="Escape" payload="00" />
-    <Trait index="10" type="Anchor" payload="00000000000000009a99193f000000000e5e53bf00000000e56d103f" />
+    <Trait index="10" type="Anchor" payload="00000000000000009a99193f000000000e5e533f00000000e76d10bf" />
     <Trait index="11" type="Contact" payload="8e8b4cbe0000000064348db7000000000a0a353f000000000a0a353f" />
     <Trait index="12" type="Contact" payload="6721553e000000b40fdc073a00000000ddbc353f00000000ddbc353f" />
     <Trait index="13" type="Contact" payload="e70b40be000080335fa7fab9000000007bc1363f000000007bc1363f" />
@@ -106,10 +106,12 @@
     <Trait index="16" type="Contact" payload="ec888a3e004481baa8a00fbe00000000f245fa3e00000000a95f613f" />
     <Trait index="17" type="Contact" payload="b8fd4abe0058613a102e5abed90f36bf00000000001347bb4610363f" />
     <Trait index="18" type="Contact" payload="d2025f3e00db2f3b17f363bef15c35bf0000000000eb9bba025d353f" />
-    <Trait index="19" type="Anchor" payload="00000000000000009a99193f000000807a4e52bf0000000041f811bf" />
+    <Trait index="19" type="Anchor" payload="00000000000000009a99193f000000007a4e523f000000003ff8113f" />
     <Trait index="20" type="Locomotion" payload="00" />
     <Trait index="21" type="Idle" payload="00" />
     <Trait index="22" type="Parkour" payload="09000000" />
+    <Trait index="23" type="Parkour" payload="0c000000" />
+    <Trait index="24" type="Parkour" payload="0d000000" />
   </Traits>
   <Segments>
     <Segment index="0" name="Idle 1" tagIndex="0" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="0" numIntervals="1">
@@ -128,6 +130,10 @@
       <Source firstFrame="0" numFrames="2190" />
       <Destination firstFrame="424" numFrames="2190" />
     </Segment>
+    <Segment index="4" name="Platform" tagIndex="5" numTags="2" markerIndex="-1" numMarkers="0" intervalIndex="4" numIntervals="2">
+      <Source firstFrame="10" numFrames="80" />
+      <Destination firstFrame="2614" numFrames="80" />
+    </Segment>
   </Segments>
   <Tags>
     <Tag index="0" trait="20" segment="0" firstFrame="0" numFrames="91" />
@@ -135,6 +141,8 @@
     <Tag index="2" trait="22" segment="1" firstFrame="0" numFrames="170" />
     <Tag index="3" trait="22" segment="2" firstFrame="0" numFrames="163" />
     <Tag index="4" trait="20" segment="3" firstFrame="0" numFrames="2190" />
+    <Tag index="5" trait="23" segment="4" firstFrame="0" numFrames="45" />
+    <Tag index="6" trait="24" segment="4" firstFrame="45" numFrames="35" />
   </Tags>
   <Markers>
     <Marker index="0" trait="0" frameIndex="55" />
@@ -172,12 +180,16 @@
     <Interval index="1" segment="1" firstFrame="0" numFrames="170" tagList="1" codeBook="1" />
     <Interval index="2" segment="2" firstFrame="0" numFrames="163" tagList="2" codeBook="1" />
     <Interval index="3" segment="3" firstFrame="0" numFrames="2190" tagList="3" codeBook="0" />
+    <Interval index="4" segment="4" firstFrame="0" numFrames="45" tagList="4" codeBook="2" />
+    <Interval index="5" segment="4" firstFrame="45" numFrames="35" tagList="5" codeBook="3" />
   </Intervals>
   <TagLists>
     <TagList index="0" indices="0;1;" />
     <TagList index="1" indices="2;" />
     <TagList index="2" indices="3;" />
     <TagList index="3" indices="4;" />
+    <TagList index="4" indices="5;" />
+    <TagList index="5" indices="6;" />
   </TagLists>
   <Metrics>
     <Metric index="0" poseTimeSpan="0.06666667">
@@ -189,5 +201,7 @@
   <CodeBooks>
     <CodeBook index="0" metric="0" trait="20" />
     <CodeBook index="1" metric="0" trait="22" />
+    <CodeBook index="2" metric="0" trait="23" />
+    <CodeBook index="3" metric="0" trait="24" />
   </CodeBooks>
 </Binary>
