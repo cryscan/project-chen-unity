@@ -177,10 +177,10 @@ public class ChenRig : MonoBehaviour
                         - armSwingScale.x * delta * delta * sign * pivot.right;
 
         float centrifugalScale;
-        if (state == State.Parkouring) centrifugalScale = parkourCentrifugalScale;
-        else centrifugalScale = Mathf.Abs(acceleration.x);
+        if (state == State.Parkouring) centrifugalScale = parkourCentrifugalScale * Mathf.Abs(acceleration.x);
+        else centrifugalScale = locomotionCentrifugalScale * Mathf.Abs(acceleration.x);
 
-        var centerfugal = locomotionCentrifugalScale * centrifugalScale * sign * pivot.right;
+        var centerfugal = centrifugalScale * sign * pivot.right;
 
         hand.position = hand.position.Fallout(pivot.position + direction, 10).Fallout(pivot.position + centerfugal, 1);
 
