@@ -12,7 +12,7 @@ using TypeIndex = Unity.Kinematica.Binary.TypeIndex;
 using Unity.Jobs;
 using Unity.SnapshotDebugger;
 
-[BurstCompile(CompileSynchronously = true)]
+[BurstCompile]
 public struct AnchoredTransitionJob : IJob
 {
     public static JobHandle Schedule(ref AnchoredTransitionTask transition)

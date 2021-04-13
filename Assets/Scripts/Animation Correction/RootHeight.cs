@@ -11,7 +11,7 @@ namespace AnimationCorrection
 
         [SerializeField] AnimationCurve rootHeightCurve;
 
-        float timer = 0;
+        public float timer = 0;
         bool started = false;
 
         void Update()
@@ -32,9 +32,17 @@ namespace AnimationCorrection
             timer += Time.deltaTime;
         }
 
+        void OnDrawGizmos()
+        {
+            if (self.root)
+            {
+                Gizmos.DrawWireSphere(self.root.position, 0.1f);
+            }
+        }
+
         void OnGUI()
         {
-            if (!started && GUILayout.Button("Start"))
+            if (GUILayout.Button("Start"))
             {
                 animator.SetTrigger("Start");
                 timer = 0;

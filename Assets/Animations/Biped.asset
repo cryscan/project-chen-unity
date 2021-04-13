@@ -323,25 +323,58 @@ MonoBehaviour:
         val3: 1837573173
       m_CachedClipVersion: 0
       m_CachedClipName: Platform
-      m_CachedClipDuration: 3.6666667
+      m_CachedClipDuration: 5.8333335
       m_CachedSampleRate: 30
       m_RetargetSourceAvatar: {fileID: 0}
       tags:
-      - startTime: 0.33333334
-        duration: 1.5
+      - startTime: 0
+        duration: 3.3333333
         payload:
           serializedData: '{"type":12}'
           assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
             Culture=neutral, PublicKeyToken=null
         name: 
-      - startTime: 1.8333334
-        duration: 1.1666666
+      markers:
+      - timeInSeconds: 1.6666666
         payload:
-          serializedData: '{"type":13}'
-          assemblyQualifiedTypeName: ParkourTag, Assembly-CSharp, Version=0.0.0.0,
+          serializedData: '{"position":{"x":0.0,"y":0.0,"z":1.2000000476837159},"rotation":{"x":0.0,"y":-0.9623450636863709,"z":0.0,"w":-0.27183103561401369}}'
+          assemblyQualifiedTypeName: AnchorMarker, Assembly-CSharp, Version=0.0.0.0,
             Culture=neutral, PublicKeyToken=null
-        name: 
-      markers: []
+      - timeInSeconds: 1.6666666
+        payload:
+          serializedData: '{"normal":{"x":0.0,"y":1.0,"z":0.0},"jointName":"LB"}'
+          assemblyQualifiedTypeName: ContactMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+      - timeInSeconds: 1.6666666
+        payload:
+          serializedData: '{"normal":{"x":0.0,"y":1.0,"z":0.0},"jointName":"RB"}'
+          assemblyQualifiedTypeName: ContactMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+      - timeInSeconds: 2.5
+        payload:
+          serializedData: '{"normal":{"x":0.0,"y":1.0,"z":0.0},"jointName":"LB"}'
+          assemblyQualifiedTypeName: ContactMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+      - timeInSeconds: 2.5
+        payload:
+          serializedData: '{"normal":{"x":0.0,"y":1.0,"z":0.0},"jointName":"RB"}'
+          assemblyQualifiedTypeName: ContactMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+      - timeInSeconds: 3
+        payload:
+          serializedData: '{"normal":{"x":0.0,"y":1.0,"z":0.0},"jointName":"LB"}'
+          assemblyQualifiedTypeName: ContactMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+      - timeInSeconds: 3
+        payload:
+          serializedData: '{"normal":{"x":0.0,"y":1.0,"z":0.0},"jointName":"RB"}'
+          assemblyQualifiedTypeName: ContactMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+      - timeInSeconds: 3.1666667
+        payload:
+          serializedData: '{}'
+          assemblyQualifiedTypeName: EscapeMarker, Assembly-CSharp, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
       m_Asset: {fileID: 11400000}
     destinationAvatar: {fileID: 9000000, guid: c9001660ce9f077439b8d5cc72386171, type: 3}
     metrics:

@@ -446,7 +446,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &250407340
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -858,7 +858,7 @@ MonoBehaviour:
   speed: 2
   minDuration: 1.2
   stepFrequency: 1.5
-  nominalGait: 9
+  nominalGait: 11
 --- !u!4 &892151590
 Transform:
   m_ObjectHideFlags: 0
@@ -1209,7 +1209,7 @@ MonoBehaviour:
   speed: 2
   minDuration: 1.2
   stepFrequency: 1.5
-  nominalGait: 9
+  nominalGait: 7
 --- !u!4 &1021631824
 Transform:
   m_ObjectHideFlags: 0
@@ -1751,7 +1751,12 @@ PrefabInstance:
     - target: {fileID: 402675005259790785, guid: bf32dd0c69c5d88e4820d24195a73d1f,
         type: 3}
       propertyPath: maxCpuTime
-      value: 1200
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 402675005259790785, guid: bf32dd0c69c5d88e4820d24195a73d1f,
+        type: 3}
+      propertyPath: optimizeGaits
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 402675005259790785, guid: bf32dd0c69c5d88e4820d24195a73d1f,
         type: 3}
