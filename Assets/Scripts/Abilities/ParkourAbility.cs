@@ -43,6 +43,8 @@ public class ParkourAbility : SnapshotProvider, IAbility
         public float moveIntensity;
     }
 
+    public Parkour parkour;
+
     [Snapshot]
     FrameCapture capture;
 
@@ -113,12 +115,10 @@ public class ParkourAbility : SnapshotProvider, IAbility
         if (capture.jumpButton)
         {
             ref var closure = ref controller.current;
-
             var collider = closure.collider;
 
-            int layerMask = 1 << collider.gameObject.layer;
-
             var type = Parkour.Create(collider.gameObject.layer);
+            parkour = type;
 
             if (type.IsType(Parkour.Type.Wall) || type.IsType(Parkour.Type.Table))
             {
@@ -149,8 +149,6 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
     public bool OnDrop(ref MotionSynthesizer synthesizer, float deltaTime)
     {
-        MovementController controller = GetComponent<MovementController>();
-
         if (controller.previous.isGrounded && controller.previous.ground != null)
         {
             Transform ground = controller.previous.ground;
@@ -176,8 +174,7 @@ public class ParkourAbility : SnapshotProvider, IAbility
                 for (int i = 1; i < 4; ++i)
                 {
                     int j = (i + 1) % 4;
-                    AffineTransform candidateTransform =
-                        GetClosestTransform(vertices[i], vertices[j], p);
+                    AffineTransform candidateTransform = GetClosestTransform(vertices[i], vertices[j], p);
                     float distance = math.length(candidateTransform.t - p);
                     if (distance < minimumDistance)
                     {
