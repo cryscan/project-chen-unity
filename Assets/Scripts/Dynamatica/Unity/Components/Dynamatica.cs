@@ -7,7 +7,6 @@ using Dynamatica.Runtime;
 
 namespace Dynamatica.Unity.Components
 {
-    [RequireComponent(typeof(HierarchyRecorder))]
     [RequireComponent(typeof(Animator))]
     public class Dynamatica : MonoBehaviour
     {
@@ -39,13 +38,11 @@ namespace Dynamatica.Unity.Components
         float timer = 0;
 
         Terrain terrain;
-        HierarchyRecorder recorder;
         Animator animator;
 
         void Awake()
         {
             ee = GetComponentsInChildren<EndEffector>();
-            recorder = GetComponent<HierarchyRecorder>();
             animator = GetComponent<Animator>();
         }
 
@@ -67,8 +64,6 @@ namespace Dynamatica.Unity.Components
                 if (tracker) tracker.terrain = terrain;
             }
 
-            recorder.BindTransform(gameObject);
-
             ResetStance();
         }
 
@@ -76,7 +71,6 @@ namespace Dynamatica.Unity.Components
         {
             if (timer > path.duration)
             {
-                recorder.EndRecording();
                 return;
             }
 
@@ -111,7 +105,6 @@ namespace Dynamatica.Unity.Components
                     ee[id].force = state.eeForces[id];
                 }
 
-                if (!recorder.recording) recorder.Record();
                 timer += Time.deltaTime;
             }
         }

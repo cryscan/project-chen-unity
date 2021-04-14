@@ -85,7 +85,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
 
     [Snapshot] float3 movementDirection = Missing.forward;
     [Snapshot] float moveIntensity = 0.0f;
-    [Snapshot] bool braking;
+    [Snapshot] bool jumpButton;
 
     [Snapshot] float3 rootVelocity = float3.zero;
 
@@ -121,6 +121,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
     {
         base.OnEarlyUpdate(rewind);
 
+        jumpButton = Input.GetButton("A Button");
         Utility.GetInputMove(ref movementDirection, ref moveIntensity);
     }
 
@@ -140,15 +141,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
         float maxPoseDerivation = 0.15f;
         float minTrajectoryDeviation = 0.05f;
 
-        if (idle)
-        {
-            if (!braking && currentSpeed < brakingSpeed) braking = true;
-            else braking = false;
-        }
-        else if (currentSpeed < brakingSpeed)
-        {
-            minTrajectoryDeviation = 0.08f;
-        }
+        if (!idle && currentSpeed < brakingSpeed) minTrajectoryDeviation = 0.08f;
 
         var prediction = TrajectoryPrediction.CreateFromDirection(ref kinematica.Synthesizer.Ref,
             movementDirection,
@@ -184,6 +177,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
                 Debug.DrawRay(contactPoint, contactNormal, Color.black);
                 AffineTransform contactTransform = new AffineTransform(contactPoint, q);
 
+                // Truncate trajectory when facing obstacle.
                 var direction = worldRootTransform.transformDirection(Missing.zaxis(transform.q));
                 var projectedSpeed = math.length(direction - Missing.project(direction, contactNormal)) * desiredSpeed;
                 if (projectedSpeed < brakingSpeed) break;
@@ -221,6 +215,9 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
                         }
                     }
                 }
+
+                // Truncate trajectory when going to drop.
+                if (!jumpButton) break;
             }
 
             transform.t = worldRootTransform.inverseTransform(controller.Position);
