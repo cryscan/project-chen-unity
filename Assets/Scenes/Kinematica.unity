@@ -2582,7 +2582,7 @@ MonoBehaviour:
   shoulderTiltScale: 20
   armSwingScale: {x: 1.2, y: 1, z: 1.2}
   locomotionCentrifugalScale: 0.5
-  wallCentrifugalScale: 2
+  wallCentrifugalScale: 1.5
   platformCentrifugalScale: 0.2
   handAngleScale: 30
   handAngleLowerLimit: -150
@@ -2590,8 +2590,8 @@ MonoBehaviour:
   snapLayer:
     serializedVersion: 2
     m_Bits: 4096
-  snapDetectionHeight: 0.6
-  snapDetectionRange: 0.8
+  snapDetectionHeight: 0.5
+  snapDetectionRange: 0.75
 --- !u!114 &1181046017
 MonoBehaviour:
   m_ObjectHideFlags: 0

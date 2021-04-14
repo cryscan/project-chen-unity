@@ -182,7 +182,12 @@ public class ChenRig : MonoBehaviour
             rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * rotation;
         }
         else
-            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
+        {
+            float factor = 0.3f;
+            var velocityTilt = Vector3.Cross(Vector3.up, velocity);
+            var accelerationTilt = Vector3.Cross(Vector3.up, acceleration);
+            rotation = Quaternion.Euler(torsoTiltScale * (velocityTilt * factor + accelerationTilt * (1 - factor))) * torsoRotation;
+        }
         rig.torso.localRotation = rig.torso.localRotation.Fallout(rotation, 10);
     }
 
