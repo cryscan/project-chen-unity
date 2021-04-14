@@ -103,7 +103,7 @@ public class ChenRig : MonoBehaviour
         chestRotation = rig.chest.localRotation;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         UpdateVelocityAndAcceleration();
 
@@ -147,12 +147,14 @@ public class ChenRig : MonoBehaviour
     void UpdateVelocityAndAcceleration()
     {
         ref var synthesizer = ref abilityRunner.Synthesizer.Ref;
-        Vector3 velocity = synthesizer.CurrentVelocity;
+        Vector3 velocity = root.TransformVector(synthesizer.CurrentVelocity);
 
         var acceleration = (velocity - this.velocity) / Time.deltaTime;
         this.velocity = velocity;
         this.acceleration = this.acceleration.Fallout(acceleration, 5);
+
         Debug.DrawRay(root.position, this.acceleration, Color.red);
+        Debug.DrawRay(root.position, this.velocity, Color.blue);
     }
 
     void UpdateHip()
@@ -173,7 +175,9 @@ public class ChenRig : MonoBehaviour
     void UpdateTorso()
     {
         var acceleration = root.InverseTransformDirection(this.acceleration);
+        var velocity = root.InverseTransformDirection(this.velocity);
         Quaternion rotation;
+
         if (state == State.Parkouring)
         {
             var up = rig.torso.rotation * Vector3.up;
@@ -183,10 +187,9 @@ public class ChenRig : MonoBehaviour
         }
         else
         {
-            float factor = 0.3f;
-            var velocityTilt = Vector3.Cross(Vector3.up, velocity);
-            var accelerationTilt = Vector3.Cross(Vector3.up, acceleration);
-            rotation = Quaternion.Euler(torsoTiltScale * (velocityTilt * factor + accelerationTilt * (1 - factor))) * torsoRotation;
+            // var tilt = new Vector3(acceleration.x, 0, velocity.z);
+            var tilt = acceleration + velocity;
+            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, tilt)) * torsoRotation;
         }
         rig.torso.localRotation = rig.torso.localRotation.Fallout(rotation, 10);
     }
