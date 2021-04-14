@@ -42,7 +42,7 @@ namespace AnimationCorrection
 
         void OnGUI()
         {
-            if (GUILayout.Button("Start"))
+            if (GUILayout.Button("Start Root Height"))
             {
                 animator.SetTrigger("Start");
                 timer = 0;

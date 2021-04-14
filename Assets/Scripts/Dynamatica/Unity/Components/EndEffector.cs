@@ -21,7 +21,8 @@ namespace Dynamatica.Unity.Components
 
         void Update()
         {
-            mesh.material = contact ? stanceMaterial : flightMaterial;
+            if (mesh)
+                mesh.material = contact ? stanceMaterial : flightMaterial;
         }
     }
 }

@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Kinematica;
 
 public class ChenRig : MonoBehaviour
 {
+    enum State { Standing, Running, Parkouring }
+    enum Side { Left, Right }
+
     [System.Serializable]
     public struct Rig
     {
@@ -18,7 +22,6 @@ public class ChenRig : MonoBehaviour
     [System.Serializable]
     public struct Robot
     {
-        public Animator animator;
         public Transform body;
         public Transform footLeft, footRight;
     }
@@ -33,10 +36,6 @@ public class ChenRig : MonoBehaviour
         [HideInInspector] public float nominal;
         [HideInInspector] public float height;
     }
-
-    enum Side { Left, Right }
-
-    enum State { Standing, Running, Parkouring }
 
     [SerializeField] AbilityRunner abilityRunner;
     [SerializeField] Rig rig;
@@ -97,35 +96,10 @@ public class ChenRig : MonoBehaviour
 
     void Update()
     {
-        var velocity = robot.animator.velocity;
+        UpdateVelocityAndAcceleration();
 
-        // Hip height
         UpdateHip();
-
-        var position = robot.body.localPosition;
-        position.y += hip.height - hip.nominal;
-        rig.hip.localPosition = position;
-        // rig.hip.localRotation = (currentAbility is ParkourAbility) ? robot.body.localRotation : Quaternion.identity;
-        rig.hip.localRotation = robot.body.localRotation * hipRotation;
-
-        // Torso tilt
-        var acceleration = (velocity - this.velocity) / Time.deltaTime;
-        this.velocity = velocity;
-        this.acceleration = this.acceleration.Fallout(acceleration, 5);
-        Debug.DrawRay(root.position, this.acceleration, Color.red);
-
-        acceleration = root.InverseTransformDirection(this.acceleration);
-        Quaternion rotation;
-        if (state == State.Parkouring)
-        {
-            var up = rig.torso.rotation * Vector3.up;
-            rotation = Quaternion.FromToRotation(up, Vector3.up) * torsoRotation;
-            rotation = Quaternion.Slerp(rotation, torsoRotation, 0.5f);
-            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * rotation;
-        }
-        else
-            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
-        rig.torso.localRotation = rig.torso.localRotation.Fallout(rotation, 10);
+        UpdateTorso();
 
         // Feet placement and arms swing
         float level = 0;
@@ -152,6 +126,17 @@ public class ChenRig : MonoBehaviour
         }
     }
 
+    void UpdateVelocityAndAcceleration()
+    {
+        ref var synthesizer = ref abilityRunner.Synthesizer.Ref;
+        Vector3 velocity = synthesizer.CurrentVelocity;
+
+        var acceleration = (velocity - this.velocity) / Time.deltaTime;
+        this.velocity = velocity;
+        this.acceleration = this.acceleration.Fallout(acceleration, 5);
+        Debug.DrawRay(root.position, this.acceleration, Color.red);
+    }
+
     void UpdateHip()
     {
         float target = 0;
@@ -160,6 +145,27 @@ public class ChenRig : MonoBehaviour
         else if (state == State.Parkouring) target = hip.parkour;
 
         hip.height = hip.height.Fallout(target, 10);
+
+        var position = robot.body.localPosition;
+        position.y += hip.height - hip.nominal;
+        rig.hip.localPosition = position;
+        rig.hip.localRotation = robot.body.localRotation * hipRotation;
+    }
+
+    void UpdateTorso()
+    {
+        var acceleration = root.InverseTransformDirection(this.acceleration);
+        Quaternion rotation;
+        if (state == State.Parkouring)
+        {
+            var up = rig.torso.rotation * Vector3.up;
+            rotation = Quaternion.FromToRotation(up, Vector3.up) * torsoRotation;
+            rotation = Quaternion.Slerp(rotation, torsoRotation, 0.5f);
+            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * rotation;
+        }
+        else
+            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
+        rig.torso.localRotation = rig.torso.localRotation.Fallout(rotation, 10);
     }
 
     void UpdateLimb(Side side, Vector3 footPosition, float level, Transform foot, Transform hand, Transform pivot, out float delta)
