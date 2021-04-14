@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 using UnityEngine;
+
+using Unity.Kinematica;
+using Unity.Mathematics;
 
 public class Climber : MonoBehaviour
 {
@@ -16,12 +20,26 @@ public class Climber : MonoBehaviour
 
     [SerializeField] Model model;
     [SerializeField] LayerMask layer;
+    [SerializeField] AnimationCurve limbCurve;
 
     Vector3[] stance;
+    bool limbMoving = false;
+
+    float3 movementDirection;
+    float moveIntensity;
 
     void Start()
     {
         stance = model.limbs.Select(x => x.localPosition).ToArray();
+    }
+
+    void Update()
+    {
+        Utility.GetInputMove(ref movementDirection, ref moveIntensity);
+    }
+
+    void FixedUpdate()
+    {
     }
 
     bool MatchSurface(Vector3 position, Vector3 direction, float range, out Vector3 point, out Vector3 normal)
@@ -41,5 +59,24 @@ public class Climber : MonoBehaviour
             normal = Vector3.zero;
             return false;
         }
+    }
+
+    IEnumerator PerformMove(Transform limb, Vector3 target)
+    {
+        limbMoving = true;
+        float timer = 0;
+
+        var position = limb.position;
+        var totalTime = limbCurve.keys.Last().time;
+
+        while (timer < totalTime)
+        {
+            var factor = limbCurve.Evaluate(timer);
+            limb.position = Vector3.Lerp(position, target, factor);
+
+            yield return null;
+        }
+
+        limbMoving = false;
     }
 }
