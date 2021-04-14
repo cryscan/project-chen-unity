@@ -5,7 +5,7 @@ using Unity.Kinematica;
 
 public class ChenRig : MonoBehaviour
 {
-    enum State { Standing, Running, Parkouring }
+    enum State { Standing, Running, Parkouring, Climbing }
     enum Side { Left, Right }
 
     [System.Serializable]
