@@ -101,7 +101,7 @@ public class ChenRig : MonoBehaviour
         chestRotation = rig.chest.localRotation;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         UpdateVelocityAndAcceleration();
 
