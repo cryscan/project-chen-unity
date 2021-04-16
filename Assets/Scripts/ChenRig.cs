@@ -8,7 +8,7 @@ using Unity.Mathematics;
 public class ChenRig : MonoBehaviour
 {
     enum State { Standing, Running, Parkouring, Climbing }
-    enum Side { Left, Right }
+    enum Side { Left = 1, Right = -1 }
 
     [System.Serializable]
     public struct Rig
@@ -58,8 +58,7 @@ public class ChenRig : MonoBehaviour
     [Header("Arm")]
     [SerializeField] Vector3 armSwingScale = new Vector3(1, 1, 1);
     [SerializeField] float locomotionCentrifugalScale;
-    [SerializeField] float wallCentrifugalScale;
-    [SerializeField] float platformCentrifugalScale;
+    [SerializeField] float parkourCentrifugalScale;
 
     [Header("Hand")]
     [SerializeField] float handAngleScale = 1;
@@ -67,9 +66,8 @@ public class ChenRig : MonoBehaviour
     [Range(-180, 0)]
     [SerializeField] float handAngleLowerLimit, handAngleUpperLimit;
 
-    [SerializeField] LayerMask snapLayer;
-    [SerializeField] float snapDetectionHeight = 0.6f;
-    [SerializeField] float snapDetectionRange = 1;
+    [SerializeField] Bounds grabBounds;
+    [SerializeField] LayerMask grabLayer;
 
     float nominalStance;
 
@@ -115,8 +113,8 @@ public class ChenRig : MonoBehaviour
         float delta = 0;
         float chestAngle = 0;
 
-        var snapLeft = SnapHand(rig.handLeft);
-        var snapRight = SnapHand(rig.handRight);
+        var snapLeft = SnapHand(Side.Left, rig.handLeft);
+        var snapRight = SnapHand(Side.Right, rig.handRight);
 
         UpdateLimb(Side.Left, robot.footLeft.position, level, rig.footLeft, rig.handRight, rig.pivotRight, snapRight, out delta);
         chestAngle -= delta;
@@ -142,6 +140,15 @@ public class ChenRig : MonoBehaviour
             Gizmos.DrawRay(rig.pivotLeft.position, rig.pivotLeft.forward);
             Gizmos.DrawRay(rig.pivotRight.position, rig.pivotRight.forward);
         }
+
+        Gizmos.matrix = root.localToWorldMatrix * rig.chest.localToWorldMatrix;
+
+        var center = grabBounds.center;
+        var size = grabBounds.size;
+        Gizmos.DrawWireCube(center, size);
+
+        center.x = -center.x;
+        Gizmos.DrawWireCube(center, size);
     }
 
     void UpdateVelocityAndAcceleration()
@@ -200,7 +207,7 @@ public class ChenRig : MonoBehaviour
         foot.position = position;
 
         // For left foot, we are dealing with right hand, so take positive value.
-        var sign = side == Side.Left ? 1 : -1;
+        var sign = (int)side;
 
         delta = position.z - nominalStance;
         var acceleration = root.InverseTransformDirection(this.acceleration);
@@ -209,13 +216,7 @@ public class ChenRig : MonoBehaviour
                         - armSwingScale.x * delta * delta * sign * pivot.right;
 
         float centrifugalScale;
-        if (state == State.Parkouring)
-        {
-            centrifugalScale = 0;
-            var ability = abilityRunner.currentAbility as ParkourAbility;
-            if (ability.parkour.IsType(Parkour.Type.Wall)) centrifugalScale = wallCentrifugalScale * Mathf.Abs(acceleration.x);
-            else if (ability.parkour.IsType(Parkour.Type.Platform)) centrifugalScale = platformCentrifugalScale * acceleration.magnitude;
-        }
+        if (state == State.Parkouring) centrifugalScale = parkourCentrifugalScale * Mathf.Abs(acceleration.x);
         else centrifugalScale = locomotionCentrifugalScale * Mathf.Abs(acceleration.x);
 
         var centerfugal = centrifugalScale * sign * pivot.right;
@@ -229,15 +230,17 @@ public class ChenRig : MonoBehaviour
         }
     }
 
-    bool SnapHand(Transform hand, out Vector3 point, out Vector3 direction)
+    bool SnapHand(Side side, Transform hand, out Vector3 point, out Vector3 direction)
     {
-        var sphereCenter = root.TransformPoint(new Vector3(0, snapDetectionHeight, snapDetectionRange / 2));
-        var colliders = Physics.OverlapSphere(sphereCenter, snapDetectionRange / 2, snapLayer);
+        Ray ray = new Ray(root.position, root.forward);
+        RaycastHit hit;
 
-        if (colliders.Length > 0 && colliders[0] is BoxCollider)
+        Debug.DrawRay(root.position, root.forward, Color.black);
+
+        if (Physics.Raycast(ray, out hit, 5, grabLayer) && hit.collider is BoxCollider)
         {
             // Get the upper platform.
-            var collider = colliders[0] as BoxCollider;
+            var collider = hit.collider as BoxCollider;
             var vertices = new Vector3[4];
 
             Vector3 center = collider.center;
@@ -269,7 +272,12 @@ public class ChenRig : MonoBehaviour
             point = contactTransform.t;
             direction = Missing.zaxis(contactTransform.q);
 
-            return true;
+            center = grabBounds.center;
+            center.x *= (int)side;
+            Bounds bounds = new Bounds(center, grabBounds.size);
+
+            var localPoint = rig.chest.InverseTransformPoint(root.InverseTransformPoint(point));
+            return bounds.Contains(localPoint);
         }
         else
         {
@@ -278,10 +286,10 @@ public class ChenRig : MonoBehaviour
         }
     }
 
-    Snap SnapHand(Transform hand)
+    Snap SnapHand(Side side, Transform hand)
     {
         Snap snap = new Snap();
-        snap.valid = SnapHand(hand, out snap.point, out snap.direction);
+        snap.valid = SnapHand(side, hand, out snap.point, out snap.direction);
         return snap;
     }
 

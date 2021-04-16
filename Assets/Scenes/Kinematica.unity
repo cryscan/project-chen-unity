@@ -2607,16 +2607,16 @@ MonoBehaviour:
   shoulderTiltScale: 20
   armSwingScale: {x: 1.2, y: 1, z: 1.2}
   locomotionCentrifugalScale: 0.5
-  wallCentrifugalScale: 1
-  platformCentrifugalScale: 0.2
+  parkourCentrifugalScale: 0.5
   handAngleScale: 30
   handAngleLowerLimit: -150
   handAngleUpperLimit: 0
-  snapLayer:
+  grabBounds:
+    m_Center: {x: -0.4, y: 0.4, z: 0.2}
+    m_Extent: {x: 0.4, y: 0.8, z: 0.5}
+  grabLayer:
     serializedVersion: 2
     m_Bits: 4096
-  snapDetectionHeight: 0.5
-  snapDetectionRange: 0.75
 --- !u!114 &1181046017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4194,7 +4194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contactThreshold: 1
   maximumLinearError: 1
-  maximumAngularError: 45
+  maximumAngularError: 5
   enableDebugging: 1
   debugIndex: 0
   debugPoseIndex: 0
