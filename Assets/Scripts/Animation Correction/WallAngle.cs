@@ -1,37 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AnimationCorrection
 {
     public class WallAngle : MonoBehaviour
     {
-        [SerializeField] Transform wall;
         [SerializeField] Animator animator;
-        [SerializeField] AnimationCurve wallAngleCurve;
+        [SerializeField] Transform[] anchors;
+        [SerializeField] AnimationCurve[] anchorAngleCurves;
 
-        bool started = false;
         float timer = 0;
+        bool started => AnimationCorrectionManager.instance.started;
 
         void Update()
         {
             if (!started) return;
 
-            var rotation = new Vector3();
-            rotation.x = wallAngleCurve.Evaluate(timer);
-            wall.rotation = Quaternion.Euler(rotation);
+            for (int i = 0; i < anchors.Length; ++i)
+            {
+                var curve = anchorAngleCurves[i];
+                if (timer > curve.keys.Last().time) continue;
+
+                var rotation = new Vector3();
+                rotation.x = anchorAngleCurves[i].Evaluate(timer);
+                anchors[i].rotation = Quaternion.Euler(rotation);
+            }
 
             timer += Time.deltaTime;
-        }
-
-        void OnGUI()
-        {
-            if (GUILayout.Button("Start Wall Angle"))
-            {
-                animator.SetTrigger("Start");
-                started = true;
-                timer = 0;
-            }
         }
     }
 }
