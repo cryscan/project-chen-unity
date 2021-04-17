@@ -45,11 +45,9 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
     public Parkour parkour;
 
-    [Snapshot]
-    FrameCapture capture;
+    [Snapshot] FrameCapture capture;
 
-    [Snapshot]
-    AnchoredTransitionTask anchoredTransition;
+    [Snapshot] AnchoredTransitionTask anchoredTransition;
 
     Kinematica kinematica;
     MovementController controller;

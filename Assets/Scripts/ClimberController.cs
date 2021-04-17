@@ -14,8 +14,8 @@ public class ClimberController : MonoBehaviour
     public float outerRaysOffset = 2f;
     public float innerRaysOffset = 25f;
 
-    Vector3 position;
-    Vector3 velocity;
+    public Vector3 position { get; private set; }
+    public Vector3 velocity { get; private set; }
 
     static bool GetClosestPoint(Vector3 position, Vector3 forward, Vector3 up, float halfRange, float eccentricity, float innerOffset, float outerOffset, int rayCount, LayerMask layer, out Vector3 point, out Vector3 normal)
     {
@@ -41,7 +41,7 @@ public class ClimberController : MonoBehaviour
             RaycastHit hit;
             Vector3 projection = Vector3.ProjectOnPlane(dir, up);
             Ray ray = new Ray(position - (dir + projection) * halfRange + projection.normalized * innerOffset / 100f, dir);
-            Debug.DrawRay(ray.origin, ray.direction);
+            // Debug.DrawRay(ray.origin, ray.direction);
 
             if (Physics.SphereCast(ray, 0.01f, out hit, 2f * halfRange, layer))
             {
@@ -53,7 +53,7 @@ public class ClimberController : MonoBehaviour
             else grounded = false;
 
             ray = new Ray(position - (dir + projection) * halfRange + projection.normalized * outerOffset / 100f, dir);
-            Debug.DrawRay(ray.origin, ray.direction, Color.green);
+            // Debug.DrawRay(ray.origin, ray.direction, Color.green);
 
             if (Physics.SphereCast(ray, 0.01f, out hit, 2f * halfRange, layer))
             {
@@ -106,5 +106,12 @@ public class ClimberController : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, 0.5f);
+    }
+
+    public void Move(Vector3 position, Quaternion rotation)
+    {
+        transform.SetPositionAndRotation(position, rotation);
+        this.position = position;
+        this.velocity = Vector3.zero;
     }
 }

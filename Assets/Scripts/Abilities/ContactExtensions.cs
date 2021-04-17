@@ -429,7 +429,7 @@ internal static class TagExtensions
         {
             if (ms_EnvironmentCollisionMask < 0)
             {
-                string[] layerNames = new string[] { "Default", "Ground", "Wall", "Ledge", "Platform", "Table" };
+                string[] layerNames = new string[] { "Default", "Ground", "Wall", "Ledge", "Platform", "Table", "Climb" };
                 ms_EnvironmentCollisionMask = LayerMask.GetMask(layerNames);
             }
 

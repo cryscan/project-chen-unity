@@ -29,6 +29,15 @@ public class ChenRig : MonoBehaviour
     }
 
     [System.Serializable]
+    public struct Climber
+    {
+        public Transform root;
+        public Transform body;
+        public Transform handLeft, handRight;
+        public Transform footLeft, footRight;
+    }
+
+    [System.Serializable]
     public struct Hip
     {
         public float stance;
@@ -47,8 +56,11 @@ public class ChenRig : MonoBehaviour
     }
 
     [SerializeField] AbilityRunner abilityRunner;
+
     [SerializeField] Rig rig;
     [SerializeField] Robot robot;
+    [SerializeField] Climber climber;
+
     [SerializeField] Transform root;
     [SerializeField] Hip hip;
 
@@ -78,6 +90,8 @@ public class ChenRig : MonoBehaviour
     Quaternion torsoRotation;
     Quaternion chestRotation;
 
+    Quaternion climberRotation;
+
     State state
     {
         get
@@ -99,37 +113,60 @@ public class ChenRig : MonoBehaviour
         hipRotation = rig.hip.localRotation;
         torsoRotation = rig.torso.localRotation;
         chestRotation = rig.chest.localRotation;
+
+        climberRotation = climber.root.rotation;
     }
 
     void Update()
     {
         UpdateVelocityAndAcceleration();
 
-        UpdateHip();
-        UpdateTorso();
-
-        // Feet placement and arms swing
-        float level = 0;
-        float delta = 0;
-        float chestAngle = 0;
-
-        var snapLeft = SnapHand(Side.Left, rig.handLeft);
-        var snapRight = SnapHand(Side.Right, rig.handRight);
-
-        UpdateLimb(Side.Left, robot.footLeft.position, level, rig.footLeft, rig.handRight, rig.pivotRight, snapRight, out delta);
-        chestAngle -= delta;
-
-        UpdateLimb(Side.Right, robot.footRight.position, level, rig.footRight, rig.handLeft, rig.pivotLeft, snapLeft, out delta);
-        chestAngle += delta;
-
-        // Shoulder tilt.
-        chestAngle *= shoulderTiltScale;
-        rig.chest.localRotation = Quaternion.Euler(0, chestAngle, 0) * chestRotation;
-
-        if (state == State.Parkouring)
+        if (state == State.Climbing)
         {
-            UpdateSnapHand(Side.Left, rig.handLeft, snapLeft);
-            UpdateSnapHand(Side.Right, rig.handRight, snapRight);
+            root.position = climber.root.position;
+            root.rotation = climber.root.rotation * Quaternion.Inverse(climberRotation);
+
+            rig.hip.localPosition = climberRotation * climber.body.localPosition;
+            rig.hip.localRotation = climber.body.localRotation;
+
+            rig.torso.localRotation = torsoRotation;
+
+            rig.handLeft.position = root.InverseTransformPoint(climber.handLeft.position);
+            rig.handRight.position = root.InverseTransformPoint(climber.handRight.position);
+            rig.footLeft.position = root.InverseTransformPoint(climber.footLeft.position);
+            rig.footRight.position = root.InverseTransformPoint(climber.footRight.position);
+
+            rig.handLeft.rotation = Quaternion.Euler(0, 90, 30);
+            rig.handRight.rotation = Quaternion.Euler(0, -90, -30);
+        }
+        else
+        {
+            UpdateHip();
+            UpdateTorso();
+
+            // Feet placement and arms swing
+            float level = 0;
+            float delta = 0;
+            float chestAngle = 0;
+
+            var snapLeft = SnapHand(Side.Left, rig.handLeft);
+            var snapRight = SnapHand(Side.Right, rig.handRight);
+
+            UpdateLimb(Side.Left, robot.footLeft.position, level, rig.footLeft, rig.handRight, rig.pivotRight, snapRight, out delta);
+            chestAngle -= delta;
+
+            UpdateLimb(Side.Right, robot.footRight.position, level, rig.footRight, rig.handLeft, rig.pivotLeft, snapLeft, out delta);
+            chestAngle += delta;
+
+            // Shoulder tilt.
+            chestAngle *= shoulderTiltScale;
+            rig.chest.localRotation = Quaternion.Euler(0, chestAngle, 0) * chestRotation;
+
+            if (state == State.Parkouring)
+            {
+                UpdateSnapHand(Side.Left, rig.handLeft, snapLeft);
+                UpdateSnapHand(Side.Right, rig.handRight, snapRight);
+            }
         }
     }
 
@@ -140,6 +177,11 @@ public class ChenRig : MonoBehaviour
             Gizmos.DrawRay(rig.pivotLeft.position, rig.pivotLeft.forward);
             Gizmos.DrawRay(rig.pivotRight.position, rig.pivotRight.forward);
         }
+
+        Gizmos.DrawSphere(rig.handLeft.position, 0.1f);
+        Gizmos.DrawSphere(rig.handRight.position, 0.1f);
+        Gizmos.DrawSphere(rig.footLeft.position, 0.1f);
+        Gizmos.DrawSphere(rig.footRight.position, 0.1f);
 
         Gizmos.matrix = root.localToWorldMatrix * rig.chest.localToWorldMatrix;
 
