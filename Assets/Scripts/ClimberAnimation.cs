@@ -20,6 +20,8 @@ public class ClimberAnimation : MonoBehaviour
     [SerializeField] AnimationCurve limbCurve;
     [SerializeField] float stepHeight;
 
+    [SerializeField] float damp = 10;
+
     Vector3 bodyStance;
     Quaternion bodyRotation;
 
@@ -63,14 +65,22 @@ public class ClimberAnimation : MonoBehaviour
 
         var position = model.limbs.Select(x => x.position).Aggregate((acc, x) => acc + x) / limbCount;
         position += transform.TransformVector(bodyStance);
-        model.body.position = model.body.position.Fallout(position, 10);
+        model.body.position = model.body.position.Fallout(position, damp);
+    }
 
+    void LateUpdate()
+    {
         if (model.limbs.Length > 3)
         {
             var v1 = model.limbs[0].position - model.limbs[3].position;
             var v2 = model.limbs[1].position - model.limbs[2].position;
             var normal = Vector3.Cross(v1, v2).normalized;
-            model.body.localRotation = Quaternion.FromToRotation(transform.up, normal) * bodyRotation;
+            var rotation = Quaternion.FromToRotation(transform.up, normal) * bodyRotation;
+            model.body.localRotation = model.body.localRotation.Fallout(rotation, damp);
+
+            Debug.DrawRay(model.body.position, v1, Color.cyan);
+            Debug.DrawRay(model.body.position, v2, Color.cyan);
+            Debug.DrawRay(model.body.position, normal, Color.cyan);
         }
     }
 

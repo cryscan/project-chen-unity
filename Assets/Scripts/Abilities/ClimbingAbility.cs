@@ -62,7 +62,7 @@ public class ClimbingAbility : SnapshotProvider, IAbility
 
         if (!rewind)
         {
-            capture.mountButton = Input.GetButton("B Button");
+            capture.mountButton = Input.GetButton("A Button");
         }
     }
 
