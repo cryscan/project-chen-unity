@@ -43,13 +43,8 @@ public class ParkourAbility : SnapshotProvider, IAbility
         public float moveIntensity;
     }
 
-    public Parkour parkour;
-
-    [Snapshot]
-    FrameCapture capture;
-
-    [Snapshot]
-    AnchoredTransitionTask anchoredTransition;
+    [Snapshot] FrameCapture capture;
+    [Snapshot] AnchoredTransitionTask anchoredTransition;
 
     Kinematica kinematica;
     MovementController controller;
@@ -95,7 +90,7 @@ public class ParkourAbility : SnapshotProvider, IAbility
         {
             ref var synthesizer = ref kinematica.Synthesizer.Ref;
 
-            if (!anchoredTransition.IsState(AnchoredTransitionTask.State.Complete) && !anchoredTransition.IsState(AnchoredTransitionTask.State.Failed))
+            if (!anchoredTransition.IsComplete() && !anchoredTransition.IsFailed())
             {
                 anchoredTransition.synthesizer = MemoryRef<MotionSynthesizer>.Create(ref synthesizer);
                 kinematica.AddJobDependency(AnchoredTransitionJob.Schedule(ref anchoredTransition));
@@ -118,7 +113,6 @@ public class ParkourAbility : SnapshotProvider, IAbility
             var collider = closure.collider;
 
             var type = Parkour.Create(collider.gameObject.layer);
-            parkour = type;
 
             if (type.IsType(Parkour.Type.Wall) || type.IsType(Parkour.Type.Table))
             {
@@ -206,7 +200,6 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
         return true;
     }
-
 
     void OnContactDebug(ref MotionSynthesizer synthesizer, AffineTransform contactTransform, Parkour type)
     {

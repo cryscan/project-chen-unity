@@ -83,11 +83,16 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
     PoseSet locomotionCandidates;
     Trajectory trajectory;
 
-    [Snapshot] float3 movementDirection = Missing.forward;
-    [Snapshot] float moveIntensity = 0.0f;
-    [Snapshot] bool jumpButton;
+    public struct FrameCapture
+    {
+        public float3 movementDirection;
+        public float moveIntensity;
+        public bool jumpButton;
 
-    [Snapshot] float3 rootVelocity = float3.zero;
+        public float3 rootVelocity;
+    }
+
+    [Snapshot] FrameCapture capture;
 
     float desiredLinearSpeed => desiredSpeed;
 
@@ -121,8 +126,8 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
     {
         base.OnEarlyUpdate(rewind);
 
-        jumpButton = Input.GetButton("A Button");
-        Utility.GetInputMove(ref movementDirection, ref moveIntensity);
+        capture.jumpButton = Input.GetButton("A Button");
+        Utility.GetInputMove(ref capture.movementDirection, ref capture.moveIntensity);
     }
 
     public IAbility OnUpdate(float deltaTime)
@@ -134,9 +139,9 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
         controller.resolveGroundPenetration = true;
         controller.gravityEnabled = true;
 
-        float desiredSpeed = moveIntensity * desiredLinearSpeed;
+        float desiredSpeed = capture.moveIntensity * desiredLinearSpeed;
         var currentSpeed = math.length(synthesizer.CurrentVelocity);
-        bool idle = moveIntensity == 0;
+        bool idle = capture.moveIntensity == 0;
 
         float maxPoseDerivation = 0.15f;
         float minTrajectoryDeviation = 0.05f;
@@ -144,7 +149,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
         if (!idle && currentSpeed < brakingSpeed) minTrajectoryDeviation = 0.08f;
 
         var prediction = TrajectoryPrediction.CreateFromDirection(ref kinematica.Synthesizer.Ref,
-            movementDirection,
+            capture.movementDirection,
             desiredSpeed,
             trajectory,
             velocityPercentage,
@@ -217,7 +222,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
                 }
 
                 // Truncate trajectory when going to drop.
-                if (!jumpButton) break;
+                if (!capture.jumpButton) break;
             }
 
             transform.t = worldRootTransform.inverseTransform(controller.Position);
@@ -269,9 +274,7 @@ public class LocomotionAbility : SnapshotProvider, IAbility, IAbilityAnimatorMov
             synthesizer.SetWorldTransform(AffineTransform.Create(rootTransform.t, rootTransform.q), true);
 
             if (synthesizer.deltaTime >= 0.0f)
-            {
-                rootVelocity = rootMotion.t / synthesizer.deltaTime;
-            }
+                capture.rootVelocity = rootMotion.t / synthesizer.deltaTime;
         }
     }
 

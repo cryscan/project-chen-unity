@@ -12,7 +12,7 @@ namespace AnimationCorrection
         [SerializeField] AnimationCurve rootHeightCurve;
 
         public float timer = 0;
-        bool started = false;
+        bool started => AnimationCorrectionManager.instance.started;
 
         void Update()
         {
@@ -37,16 +37,6 @@ namespace AnimationCorrection
             if (self.root)
             {
                 Gizmos.DrawWireSphere(self.root.position, 0.1f);
-            }
-        }
-
-        void OnGUI()
-        {
-            if (GUILayout.Button("Start Root Height"))
-            {
-                animator.SetTrigger("Start");
-                timer = 0;
-                started = true;
             }
         }
 

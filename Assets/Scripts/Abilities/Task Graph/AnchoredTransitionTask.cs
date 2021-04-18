@@ -98,10 +98,8 @@ public struct AnchoredTransitionTask : System.IDisposable, IDebugObject, Seriali
         return this.state == state;
     }
 
-    public bool IsComplete()
-    {
-        return IsState(State.Complete);
-    }
+    public bool IsComplete() => IsState(State.Complete);
+    public bool IsFailed() => IsState(State.Failed);
 
     public bool Execute()
     {
