@@ -8,10 +8,7 @@ internal static class TagExtensions
 {
     public static bool IsAxis(Collider collider, AffineTransform contactTransform, float3 axis)
     {
-        float3 localNormal = Missing.rotateVector(
-            Missing.conjugate(collider.transform.rotation),
-                Missing.zaxis(contactTransform.q));
-
+        float3 localNormal = Missing.rotateVector(Missing.conjugate(collider.transform.rotation), Missing.zaxis(contactTransform.q));
         return math.abs(math.dot(localNormal, axis)) >= 0.95f;
     }
 
@@ -28,32 +25,28 @@ internal static class TagExtensions
         return new AffineTransform(closestPoint, q);
     }
 
-    public static QueryResult GetPoseSequence<T>(ref Binary binary, AffineTransform contactTransform, T value, float contactThreshold) where T : struct
+    public static QueryResult GetPoseSequence<T>(ref Binary binary, AffineTransform contactTransform, T value, float contactThreshold, bool checkGeometry = true) where T : struct
     {
         var queryResult = QueryResult.Create();
 
-        NativeArray<OBB> obbs =
-            GetBoundsFromContactPoints(ref binary,
-                contactTransform, value, contactThreshold);
+        NativeArray<OBB> obbs = GetBoundsFromContactPoints(ref binary, contactTransform, value, contactThreshold);
 
         var tagTraitIndex = binary.GetTraitIndex(value);
-
         int numIntervals = binary.numIntervals;
 
         for (int i = 0; i < numIntervals; ++i)
         {
             ref var interval = ref binary.GetInterval(i);
-
             if (binary.Contains(interval.tagListIndex, tagTraitIndex))
             {
                 ref var segment = ref binary.GetSegment(interval.segmentIndex);
 
-                if (IsSegmentEndValidPosition(ref binary, interval.segmentIndex, contactTransform, contactThreshold))
+                if (checkGeometry)
                 {
-                    queryResult.Add(i,
-                        interval.firstFrame,
-                            interval.numFrames);
+                    if (IsSegmentEndValidPosition(ref binary, interval.segmentIndex, contactTransform, contactThreshold))
+                        queryResult.Add(i, interval.firstFrame, interval.numFrames);
                 }
+                else queryResult.Add(i, interval.firstFrame, interval.numFrames);
             }
         }
 
@@ -64,18 +57,11 @@ internal static class TagExtensions
 
     public static NativeArray<OBB> GetBoundsFromContactPoints<T>(ref Binary binary, AffineTransform contactTransform, T value, float contactThreshold) where T : struct
     {
-        Bounds bounds =
-            GetBoundsForContactPoints(
-                ref binary, value);
-
-        float3 extents =
-            Missing.Convert(bounds.extents) +
-                new float3(contactThreshold);
-
+        Bounds bounds = GetBoundsForContactPoints(ref binary, value);
+        float3 extents = Missing.Convert(bounds.extents) + new float3(contactThreshold);
         float3 position = contactTransform.transform(bounds.center);
 
         Collider[] colliders = Physics.OverlapBox(position, extents, contactTransform.q);
-
         int numColliders = GetNumBoxColliders(colliders);
 
         NativeArray<OBB> obbs = new NativeArray<OBB>(numColliders, Allocator.Temp);
@@ -114,19 +100,12 @@ internal static class TagExtensions
 
     public static Bounds GetBoundsForContactPoints<T>(ref Binary binary, T value) where T : struct
     {
-        NativeArray<float3> contactPoints =
-            GetContactPoints(ref binary, value);
-
+        NativeArray<float3> contactPoints = GetContactPoints(ref binary, value);
         Bounds bounds = new Bounds();
-
-        bounds.SetMinMax(
-            new float3(float.MaxValue),
-                new float3(float.MinValue));
+        bounds.SetMinMax(new float3(float.MaxValue), new float3(float.MinValue));
 
         for (int i = 0; i < contactPoints.Length; ++i)
-        {
             bounds.Encapsulate(contactPoints[i]);
-        }
 
         contactPoints.Dispose();
 
@@ -136,7 +115,6 @@ internal static class TagExtensions
     public static Binary.MarkerIndex GetMarkerOfType(ref Binary binary, Binary.SegmentIndex segmentIndex, Binary.TypeIndex typeIndex)
     {
         ref var segment = ref binary.GetSegment(segmentIndex);
-
         var numMarkers = segment.numMarkers;
 
         for (int i = 0; i < numMarkers; ++i)
@@ -144,9 +122,7 @@ internal static class TagExtensions
             var markerIndex = segment.markerIndex + i;
 
             if (binary.IsType(markerIndex, typeIndex))
-            {
                 return markerIndex;
-            }
         }
 
         return Binary.MarkerIndex.Invalid;
@@ -157,9 +133,7 @@ internal static class TagExtensions
         int numContacts = 0;
 
         var tagTraitIndex = binary.GetTraitIndex(value);
-
         var contactTypeIndex = binary.GetTypeIndex<Contact>();
-
         var anchorTypeIndex = binary.GetTypeIndex<Anchor>();
 
         for (int i = 0; i < binary.numTags; ++i)
@@ -169,7 +143,6 @@ internal static class TagExtensions
             if (tag.traitIndex == tagTraitIndex)
             {
                 var segmentIndex = tag.segmentIndex;
-
                 ref var segment = ref binary.GetSegment(segmentIndex);
 
                 var numMarkers = segment.numMarkers;
@@ -179,9 +152,7 @@ internal static class TagExtensions
                     var markerIndex = segment.markerIndex + j;
 
                     if (binary.IsType(markerIndex, contactTypeIndex))
-                    {
                         numContacts++;
-                    }
                 }
             }
         }
@@ -197,26 +168,18 @@ internal static class TagExtensions
             if (tag.traitIndex == tagTraitIndex)
             {
                 var segmentIndex = tag.segmentIndex;
-
                 ref var segment = ref binary.GetSegment(segmentIndex);
 
-                var anchorIndex = GetMarkerOfType(
-                    ref binary, segmentIndex, anchorTypeIndex);
+                var anchorIndex = GetMarkerOfType(ref binary, segmentIndex, anchorTypeIndex);
                 Assert.IsTrue(anchorIndex.IsValid);
 
-                ref Binary.Marker anchorMarker =
-                    ref binary.GetMarker(anchorIndex);
-
-                AffineTransform anchorTransform =
-                    binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+                ref Binary.Marker anchorMarker = ref binary.GetMarker(anchorIndex);
+                AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
 
                 var firstFrame = segment.destination.firstFrame;
-
                 int anchorFrame = firstFrame + anchorMarker.frameIndex;
 
-                AffineTransform referenceTransform = anchorTransform *
-                    binary.GetTrajectoryTransformBetween(
-                        anchorFrame, -anchorMarker.frameIndex);
+                AffineTransform referenceTransform = anchorTransform * binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex);
 
                 for (int j = 0; j < segment.numMarkers; ++j)
                 {
@@ -224,16 +187,9 @@ internal static class TagExtensions
 
                     if (binary.IsType(markerIndex, contactTypeIndex))
                     {
-                        ref Binary.Marker marker =
-                            ref binary.GetMarker(markerIndex);
-
-                        AffineTransform rootTransformAtContact = referenceTransform *
-                            binary.GetTrajectoryTransformBetween(firstFrame, marker.frameIndex);
-
-                        AffineTransform contactTransform =
-                            rootTransformAtContact * binary.GetPayload<Contact>(
-                                marker.traitIndex).transform;
-
+                        ref Binary.Marker marker = ref binary.GetMarker(markerIndex);
+                        AffineTransform rootTransformAtContact = referenceTransform * binary.GetTrajectoryTransformBetween(firstFrame, marker.frameIndex);
+                        AffineTransform contactTransform = rootTransformAtContact * binary.GetPayload<Contact>(marker.traitIndex).transform;
                         contactPoints[writeIndex++] = contactTransform.t;
                     }
                 }
@@ -442,36 +398,27 @@ internal static class TagExtensions
         ref var segment = ref binary.GetSegment(segmentIndex);
 
         var anchorTypeIndex = binary.GetTypeIndex<Anchor>();
-
         var escapeTypeIndex = binary.GetTypeIndex<Escape>();
 
-        var anchorIndex = GetMarkerOfType(
-            ref binary, segmentIndex, anchorTypeIndex);
+        var anchorIndex = GetMarkerOfType(ref binary, segmentIndex, anchorTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
         ref var anchorMarker = ref binary.GetMarker(anchorIndex);
 
-        var escapeIndex = GetMarkerOfType(
-            ref binary, segmentIndex, escapeTypeIndex);
+        var escapeIndex = GetMarkerOfType(ref binary, segmentIndex, escapeTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
         ref var escapeMarker = ref binary.GetMarker(escapeIndex);
 
         var firstFrame = segment.destination.firstFrame;
-
         int anchorFrame = firstFrame + anchorMarker.frameIndex;
 
-        AffineTransform anchorTransform =
-            binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
-
-        AffineTransform anchorWorldSpaceTransform =
-            contactTransform * anchorTransform;
+        AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorWorldSpaceTransform = contactTransform * anchorTransform;
 
         AffineTransform worldRootTransform = anchorWorldSpaceTransform *
-            binary.GetTrajectoryTransformBetween(
-                anchorFrame, -anchorMarker.frameIndex) *
-            binary.GetTrajectoryTransformBetween(
-                firstFrame, escapeMarker.frameIndex);
+            binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex) *
+            binary.GetTrajectoryTransformBetween(firstFrame, escapeMarker.frameIndex);
 
         float collisionRadius = 0.2f;
 
@@ -487,30 +434,22 @@ internal static class TagExtensions
     public static void DebugDrawContacts(ref Binary binary, ref Binary.Tag tag, AffineTransform trajectoryContactTransform, NativeArray<OBB> obbs, float contactThreshold)
     {
         var segmentIndex = tag.segmentIndex;
-
         ref var segment = ref binary.GetSegment(segmentIndex);
 
         var anchorTypeIndex = binary.GetTypeIndex<Anchor>();
-
         var contactTypeIndex = binary.GetTypeIndex<Contact>();
 
-        var anchorIndex = GetMarkerOfType(
-            ref binary, segmentIndex, anchorTypeIndex);
+        var anchorIndex = GetMarkerOfType(ref binary, segmentIndex, anchorTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
-        ref Binary.Marker anchorMarker =
-            ref binary.GetMarker(anchorIndex);
+        ref Binary.Marker anchorMarker = ref binary.GetMarker(anchorIndex);
 
         var firstFrame = segment.destination.firstFrame;
-
         int anchorFrame = firstFrame + anchorMarker.frameIndex;
 
-        AffineTransform anchorTransform =
-            binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
 
-        AffineTransform referenceTransform = anchorTransform *
-            binary.GetTrajectoryTransformBetween(
-                anchorFrame, -anchorMarker.frameIndex);
+        AffineTransform referenceTransform = anchorTransform * binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex);
 
         for (int i = 0; i < segment.numMarkers; ++i)
         {
@@ -518,27 +457,16 @@ internal static class TagExtensions
 
             if (binary.IsType(markerIndex, contactTypeIndex))
             {
-                ref Binary.Marker contactMarker =
-                    ref binary.GetMarker(markerIndex);
+                ref Binary.Marker contactMarker = ref binary.GetMarker(markerIndex);
+                AffineTransform rootTransformAtContact = referenceTransform * binary.GetTrajectoryTransformBetween(firstFrame, contactMarker.frameIndex);
+                AffineTransform contactTransform = binary.GetPayload<Contact>(contactMarker.traitIndex).transform;
+                AffineTransform contactWorldSpaceTransform = rootTransformAtContact * contactTransform;
 
-                AffineTransform rootTransformAtContact = referenceTransform *
-                    binary.GetTrajectoryTransformBetween(
-                        firstFrame, contactMarker.frameIndex);
-
-                AffineTransform contactTransform =
-                    binary.GetPayload<Contact>(
-                        contactMarker.traitIndex).transform;
-
-                AffineTransform contactWorldSpaceTransform =
-                    rootTransformAtContact * contactTransform;
-
-                bool contactPointInContact =
-                    SphereObbsInterset(contactWorldSpaceTransform.t, contactThreshold, obbs);
+                bool contactPointInContact = SphereObbsInterset(contactWorldSpaceTransform.t, contactThreshold, obbs);
 
                 Color color = contactPointInContact ? Color.green : Color.red;
 
-                AffineTransform worldSpaceContactTransform =
-                    trajectoryContactTransform * contactWorldSpaceTransform;
+                AffineTransform worldSpaceContactTransform = trajectoryContactTransform * contactWorldSpaceTransform;
 
                 DebugDraw(worldSpaceContactTransform.t, 0.25f, color);
             }
@@ -548,75 +476,45 @@ internal static class TagExtensions
     public static void DebugDrawPoseAndTrajectory(ref Binary binary, ref Binary.Tag tag, AffineTransform contactTransform, int poseIndex)
     {
         var segmentIndex = tag.segmentIndex;
-
         ref var segment = ref binary.GetSegment(segmentIndex);
 
         var anchorTypeIndex = binary.GetTypeIndex<Anchor>();
-
-        var anchorIndex = GetMarkerOfType(
-            ref binary, segmentIndex, anchorTypeIndex);
+        var anchorIndex = GetMarkerOfType(ref binary, segmentIndex, anchorTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
-        ref Binary.Marker anchorMarker =
-            ref binary.GetMarker(anchorIndex);
+        ref Binary.Marker anchorMarker = ref binary.GetMarker(anchorIndex);
 
         var firstFrame = segment.destination.firstFrame;
-
         int anchorFrame = firstFrame + anchorMarker.frameIndex;
 
-        AffineTransform anchorTransform =
-            binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorWorldSpaceTransform = contactTransform * anchorTransform;
+        AffineTransform referenceTransform = anchorWorldSpaceTransform * binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex);
 
-        AffineTransform anchorWorldSpaceTransform =
-            contactTransform * anchorTransform;
+        binary.DebugDrawTrajectory(referenceTransform, firstFrame, segment.destination.numFrames, Color.yellow);
 
-        AffineTransform referenceTransform = anchorWorldSpaceTransform *
-            binary.GetTrajectoryTransformBetween(
-                anchorFrame, -anchorMarker.frameIndex);
-
-        binary.DebugDrawTrajectory(referenceTransform,
-            firstFrame, segment.destination.numFrames, Color.yellow);
-
-        referenceTransform *=
-            binary.GetTrajectoryTransformBetween(
-                firstFrame, poseIndex);
-
-        binary.DebugDrawPoseWorldSpace(referenceTransform,
-            firstFrame + poseIndex, Color.magenta);
-
+        referenceTransform *= binary.GetTrajectoryTransformBetween(firstFrame, poseIndex);
+        binary.DebugDrawPoseWorldSpace(referenceTransform, firstFrame + poseIndex, Color.magenta);
         Binary.DebugDrawTransform(referenceTransform, 0.2f);
     }
 
     public static void DebugDrawTrajectory(ref Binary binary, ref Binary.Tag tag, AffineTransform contactTransform)
     {
         var segmentIndex = tag.segmentIndex;
-
         ref var segment = ref binary.GetSegment(segmentIndex);
 
         var anchorTypeIndex = binary.GetTypeIndex<Anchor>();
-
-        var anchorIndex = GetMarkerOfType(
-            ref binary, segmentIndex, anchorTypeIndex);
+        var anchorIndex = GetMarkerOfType(ref binary, segmentIndex, anchorTypeIndex);
         Assert.IsTrue(anchorIndex.IsValid);
 
-        ref Binary.Marker anchorMarker =
-            ref binary.GetMarker(anchorIndex);
+        ref Binary.Marker anchorMarker = ref binary.GetMarker(anchorIndex);
 
         var firstFrame = segment.destination.firstFrame;
-
         int anchorFrame = firstFrame + anchorMarker.frameIndex;
 
-        AffineTransform anchorTransform =
-            binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
-
-        AffineTransform anchorWorldSpaceTransform =
-            contactTransform * anchorTransform;
-
-        AffineTransform referenceTransform = anchorWorldSpaceTransform *
-            binary.GetTrajectoryTransformBetween(
-                anchorFrame, -anchorMarker.frameIndex);
-
-        binary.DebugDrawTrajectory(referenceTransform,
-            firstFrame, tag.numFrames, Color.yellow);
+        AffineTransform anchorTransform = binary.GetPayload<Anchor>(anchorMarker.traitIndex).transform;
+        AffineTransform anchorWorldSpaceTransform = contactTransform * anchorTransform;
+        AffineTransform referenceTransform = anchorWorldSpaceTransform * binary.GetTrajectoryTransformBetween(anchorFrame, -anchorMarker.frameIndex);
+        binary.DebugDrawTrajectory(referenceTransform, firstFrame, tag.numFrames, Color.yellow);
     }
 }

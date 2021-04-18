@@ -4524,6 +4524,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   climber: {fileID: 1554650986}
+  contactThreshold: 1
+  maximumLinearError: 1
+  maximumAngularError: 5
+  enableDebugging: 1
+  debugIndex: 0
+  debugPoseIndex: 0
 --- !u!4 &1667829402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c9001660ce9f077439b8d5cc72386171,

@@ -8,28 +8,59 @@ using UnityEngine;
 using SnapshotProvider = Unity.SnapshotDebugger.SnapshotProvider;
 using Unity.SnapshotDebugger;
 
+using static TagExtensions;
+
 [RequireComponent(typeof(AbilityRunner))]
 [RequireComponent(typeof(MovementController))]
 public class ClimbingAbility : SnapshotProvider, IAbility
 {
-    enum Layer { Climb = 13 }
+    public ClimberAnimation climber;
+
+    [Header("Transition settings")]
+    [Tooltip("Distance in meters for performing movement validity checks.")]
+    [Range(0.0f, 1.0f)]
+    public float contactThreshold;
+
+    [Tooltip("Maximum linear error for transition poses.")]
+    [Range(0.0f, 1.0f)]
+    public float maximumLinearError;
+
+    [Tooltip("Maximum angular error for transition poses.")]
+    [Range(0.0f, 180.0f)]
+    public float maximumAngularError;
+
+    [Header("Debug settings")]
+    [Tooltip("Enables debug display for this ability.")]
+    public bool enableDebugging;
+
+    [Tooltip("Determines the movement to debug.")]
+    public int debugIndex;
+
+    [Tooltip("Controls the pose debug display.")]
+    [Range(0, 100)]
+    public int debugPoseIndex;
 
     public struct FrameCapture
     {
         public bool mountButton;
+        public float3 movementDirection;
+        public float moveIntensity;
     }
 
-    public ClimberAnimation climber;
+    public enum State
+    {
+        Mounting,
+        Climbing,
+    }
+
+    public State state { get; private set; } = State.Mounting;
     Quaternion climberRotation;
 
     [Snapshot] FrameCapture capture;
+    [Snapshot] AnchoredTransitionTask anchoredTransition;
 
-    PoseSet idleCandidates;
-    PoseSet locomotionCandidates;
-    Trajectory trajectory;
-
-    MovementController controller;
     Kinematica kinematica;
+    MovementController controller;
 
     public override void OnEnable()
     {
@@ -37,23 +68,15 @@ public class ClimbingAbility : SnapshotProvider, IAbility
 
         climberRotation = climber.transform.rotation;
 
-        controller = GetComponent<MovementController>();
         kinematica = GetComponent<Kinematica>();
+        controller = GetComponent<MovementController>();
 
         ref var synthesizer = ref kinematica.Synthesizer.Ref;
-
-        idleCandidates = synthesizer.Query.Where("Idle", Locomotion.Default).And(Idle.Default);
-        locomotionCandidates = synthesizer.Query.Where("Locomotion", Locomotion.Default).Except(Idle.Default);
-        trajectory = synthesizer.CreateTrajectory(Allocator.Persistent);
     }
 
     public override void OnDisable()
     {
         base.OnDisable();
-
-        idleCandidates.Dispose();
-        locomotionCandidates.Dispose();
-        trajectory.Dispose();
     }
 
     public override void OnEarlyUpdate(bool rewind)
@@ -63,59 +86,77 @@ public class ClimbingAbility : SnapshotProvider, IAbility
         if (!rewind)
         {
             capture.mountButton = Input.GetButton("A Button");
+            Utility.GetInputMove(ref capture.movementDirection, ref capture.moveIntensity);
         }
     }
 
     public IAbility OnUpdate(float deltaTime)
     {
-        // controller.collisionEnabled = false;
+        controller.collisionEnabled = false;
         controller.groundSnap = false;
         controller.resolveGroundPenetration = false;
         controller.gravityEnabled = false;
 
-        /*
-        if (capture.mountButton)
-        {
-            LocomotionJob job = new LocomotionJob()
-            {
-                synthesizer = kinematica.Synthesizer,
-                idleCandidates = idleCandidates,
-                locomotionCandidates = locomotionCandidates,
-                trajectory = trajectory,
-                idle = true,
-                maxPoseDerivation = 0.15f,
-                responsiveness = 0.6f,
-                minTrajectoryDeviation = 0.05f,
-            };
-
-            kinematica.AddJobDependency(job.Schedule());
-
-            return this;
-        }
-        */
-
+        var active = anchoredTransition.valid;
         ref var synthesizer = ref kinematica.Synthesizer.Ref;
-        var position = climber.transform.position + climber.transform.up;
-        var rotation = climber.transform.rotation * Quaternion.Inverse(climberRotation);
-        AffineTransform transform = new AffineTransform(position, rotation);
-        synthesizer.SetWorldTransform(transform);
 
-        return capture.mountButton ? this : null;
+        if (active)
+        {
+            if (!anchoredTransition.IsComplete() && !anchoredTransition.IsFailed())
+            {
+                anchoredTransition.synthesizer = MemoryRef<MotionSynthesizer>.Create(ref synthesizer);
+                kinematica.AddJobDependency(AnchoredTransitionJob.Schedule(ref anchoredTransition));
+
+                return this;
+            }
+            else if (anchoredTransition.IsComplete())
+            {
+                ref var closure = ref controller.current;
+                var position = closure.colliderContactPoint;
+                var rotation = Quaternion.LookRotation(climber.transform.forward, closure.colliderContactNormal);
+                climber.Move(position, rotation);
+            }
+
+            anchoredTransition.Dispose();
+            anchoredTransition = AnchoredTransitionTask.Invalid;
+            return anchoredTransition.IsComplete() ? this : null;
+        }
+        else
+        {
+            state = State.Climbing;
+
+            var position = climber.transform.position + climber.transform.up;
+            var rotation = climber.transform.rotation * Quaternion.Inverse(climberRotation);
+            AffineTransform transform = new AffineTransform(position, rotation);
+            synthesizer.SetWorldTransform(transform);
+
+            return capture.mountButton ? this : null;
+        }
     }
 
     public bool OnContact(ref MotionSynthesizer synthesizer, AffineTransform contactTransform, float deltaTime)
     {
         if (capture.mountButton)
         {
-            ref var closure = ref controller.current;
-            var collider = closure.collider as BoxCollider;
-            if (collider != null && collider.gameObject.layer == (int)Layer.Climb)
+            var collider = controller.current.collider;
+            var type = Parkour.Create(collider.gameObject.layer);
+            if (type.IsType(Parkour.Type.Climb))
             {
-                var position = closure.colliderContactPoint;
-                var rotation = Quaternion.LookRotation(climber.transform.forward, closure.colliderContactNormal);
-                climber.Move(position, rotation);
+                if (IsAxis(collider, contactTransform, Missing.forward) ||
+                    IsAxis(collider, contactTransform, Missing.right))
+                {
+                    OnContactDebug(ref synthesizer, contactTransform, type);
 
-                return true;
+                    ref Binary binary = ref synthesizer.Binary;
+
+                    var sequence = GetPoseSequence(ref binary, contactTransform, type, contactThreshold, false);
+
+                    anchoredTransition.Dispose();
+                    anchoredTransition = AnchoredTransitionTask.Create(ref synthesizer, sequence, contactTransform, capture.movementDirection, maximumLinearError, maximumAngularError);
+
+                    state = State.Mounting;
+                    return true;
+                }
             }
         }
 
@@ -125,5 +166,61 @@ public class ClimbingAbility : SnapshotProvider, IAbility
     public bool OnDrop(ref MotionSynthesizer synthesizer, float deltaTime)
     {
         return false;
+    }
+
+    void OnContactDebug(ref MotionSynthesizer synthesizer, AffineTransform contactTransform, Parkour type)
+    {
+        if (enableDebugging)
+        {
+            DisplayTransition(ref synthesizer, contactTransform, type, contactThreshold);
+        }
+    }
+
+    void DisplayTransition<T>(ref MotionSynthesizer synthesizer, AffineTransform contactTransform, T value, float contactThreshold) where T : struct
+    {
+        if (enableDebugging)
+        {
+            ref Binary binary = ref synthesizer.Binary;
+
+            NativeArray<OBB> obbs = GetBoundsFromContactPoints(ref binary, contactTransform, value, contactThreshold);
+
+            // Display all relevant box colliders
+            int numObbs = obbs.Length;
+            for (int i = 0; i < numObbs; ++i)
+            {
+                OBB obb = obbs[i];
+                obb.transform = contactTransform * obb.transform;
+                DebugDraw(obb, Color.cyan);
+            }
+
+            var tagTraitIndex = binary.GetTraitIndex(value);
+
+            int numTags = binary.numTags;
+
+            int validIndex = 0;
+
+            for (int i = 0; i < numTags; ++i)
+            {
+                ref Binary.Tag tag = ref binary.GetTag(i);
+
+                if (tag.traitIndex == tagTraitIndex)
+                {
+                    if (validIndex == debugIndex)
+                    {
+                        DebugDrawContacts(ref binary, ref tag,
+                            contactTransform, obbs, contactThreshold);
+
+                        DebugDrawPoseAndTrajectory(ref binary, ref tag,
+                            contactTransform, debugPoseIndex);
+
+                        return;
+                    }
+
+                    validIndex++;
+                }
+            }
+
+            obbs.Dispose();
+        }
     }
 }

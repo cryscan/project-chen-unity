@@ -34,7 +34,8 @@ public struct Parkour
         Ledge = 10,
         Table = 11,
         Platform = 12,
-        DropDown = 13
+        Climb = 13,
+        DropDown = 14
     }
 
     public Type type;

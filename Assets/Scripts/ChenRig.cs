@@ -122,7 +122,7 @@ public class ChenRig : MonoBehaviour
     {
         UpdateVelocityAndAcceleration();
 
-        if (state == State.Climbing)
+        if (state == State.Climbing && (abilityRunner.currentAbility as ClimbingAbility).state == ClimbingAbility.State.Climbing)
         {
             root.position = climber.root.position;
             root.rotation = climber.root.rotation * Quaternion.Inverse(climberRotation);
