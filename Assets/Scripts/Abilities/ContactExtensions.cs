@@ -473,7 +473,7 @@ internal static class TagExtensions
             binary.GetTrajectoryTransformBetween(
                 firstFrame, escapeMarker.frameIndex);
 
-        float collisionRadius = 0.1f;
+        float collisionRadius = 0.5f;
 
         // check character isn't inside geometry
         bool bValidPosition = !Physics.CheckSphere(worldRootTransform.t + new float3(0.0f, 2.0f * collisionRadius, 0.0f), collisionRadius, EnvironmentCollisionMask);
