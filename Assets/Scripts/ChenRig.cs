@@ -353,17 +353,17 @@ public class ChenRig : MonoBehaviour
 
         AffineTransform targetRootTransform = new AffineTransform(climber.root.position, climber.root.rotation * Quaternion.Inverse(climberRotation));
         root.position = targetRootTransform.t;
-        root.rotation = targetRootTransform.q;
+        root.rotation = root.rotation.Fallout(targetRootTransform.q, 100);
 
         rig.hip.localPosition = climberRotation * climber.body.localPosition;
-        rig.hip.localRotation = climber.body.localRotation;
+        rig.hip.localRotation = rig.hip.rotation.Fallout(climber.body.localRotation, damp);
 
         rig.torso.localRotation = torsoRotation;
 
-        rig.handLeft.position = rig.handLeft.position.Fallout(targetRootTransform.inverseTransform(climber.handLeft.position), damp);
-        rig.handRight.position = rig.handRight.position.Fallout(targetRootTransform.inverseTransform(climber.handRight.position), damp);
-        rig.footLeft.position = rig.footLeft.position.Fallout(targetRootTransform.inverseTransform(climber.footLeft.position), damp);
-        rig.footRight.position = rig.footRight.position.Fallout(targetRootTransform.inverseTransform(climber.footRight.position), damp);
+        rig.handLeft.position = rig.handLeft.position.Fallout(root.InverseTransformPoint(climber.handLeft.position), damp);
+        rig.handRight.position = rig.handRight.position.Fallout(root.InverseTransformPoint(climber.handRight.position), damp);
+        rig.footLeft.position = rig.footLeft.position.Fallout(root.InverseTransformPoint(climber.footLeft.position), damp);
+        rig.footRight.position = rig.footRight.position.Fallout(root.InverseTransformPoint(climber.footRight.position), damp);
 
         rig.handLeft.rotation = Quaternion.Euler(0, 90, 30);
         rig.handRight.rotation = Quaternion.Euler(0, -90, -30);
