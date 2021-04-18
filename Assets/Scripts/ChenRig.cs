@@ -16,6 +16,7 @@ public class ChenRig : MonoBehaviour
         public Transform hip;
         public Transform torso;
         public Transform chest;
+        public Transform shoulder;
         public Transform footLeft, footRight;
         public Transform handLeft, handRight;
         public Transform pivotLeft, pivotRight;
@@ -164,6 +165,9 @@ public class ChenRig : MonoBehaviour
 
             if (state == State.Parkouring)
             {
+                var rotation = Quaternion.FromToRotation(rig.shoulder.up, Vector3.up) * chestRotation;
+                rig.chest.localRotation = rig.chest.localRotation.Fallout(rotation, 10);
+
                 UpdateSnapHand(Side.Left, rig.handLeft, snapLeft);
                 UpdateSnapHand(Side.Right, rig.handRight, snapRight);
             }
@@ -229,10 +233,10 @@ public class ChenRig : MonoBehaviour
 
         if (state == State.Parkouring)
         {
-            var up = rig.torso.rotation * Vector3.up;
-            rotation = Quaternion.FromToRotation(up, Vector3.up) * torsoRotation;
-            rotation = Quaternion.Slerp(rotation, torsoRotation, 0.5f);
-            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * rotation;
+            var up = rig.torso.up;
+            // rotation = Quaternion.FromToRotation(up, Vector3.up) * torsoRotation;
+            // rotation = Quaternion.Slerp(rotation, torsoRotation, 0.5f);
+            rotation = Quaternion.Euler(torsoTiltScale * Vector3.Cross(Vector3.up, acceleration)) * torsoRotation;
         }
         else
         {
@@ -251,6 +255,7 @@ public class ChenRig : MonoBehaviour
         // For left foot, we are dealing with right hand, so take positive value.
         var sign = (int)side;
 
+        position = rig.hip.InverseTransformPoint(position);
         delta = position.z - nominalStance;
         var acceleration = root.InverseTransformDirection(this.acceleration);
         var direction = armSwingScale.z * delta * pivot.forward
@@ -274,12 +279,10 @@ public class ChenRig : MonoBehaviour
 
     bool SnapHand(Side side, Transform hand, out Vector3 point, out Vector3 direction)
     {
-        Ray ray = new Ray(root.position, root.forward);
         RaycastHit hit;
+        Debug.DrawRay(root.position, root.forward, Color.white);
 
-        Debug.DrawRay(root.position, root.forward, Color.black);
-
-        if (Physics.Raycast(ray, out hit, 5, grabLayer) && hit.collider is BoxCollider)
+        if (Physics.SphereCast(root.position - 5 * root.forward, 0.1f, root.forward, out hit, 10, grabLayer) && hit.collider is BoxCollider)
         {
             // Get the upper platform.
             var collider = hit.collider as BoxCollider;
