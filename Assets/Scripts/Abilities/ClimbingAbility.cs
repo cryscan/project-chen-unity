@@ -15,6 +15,7 @@ using static TagExtensions;
 public class ClimbingAbility : SnapshotProvider, IAbility
 {
     public ClimberAnimation climber;
+    public Vector3 offset;
 
     [Header("Transition settings")]
     [Tooltip("Distance in meters for performing movement validity checks.")]
@@ -53,11 +54,13 @@ public class ClimbingAbility : SnapshotProvider, IAbility
         Climbing,
     }
 
-    public State state { get; private set; } = State.Mounting;
+    public State state => _state;
     Quaternion climberRotation;
 
     [Snapshot] FrameCapture capture;
     [Snapshot] AnchoredTransitionTask anchoredTransition;
+    [Snapshot] State _state = State.Mounting;
+    [Snapshot] float timer = 0;
 
     Kinematica kinematica;
     MovementController controller;
@@ -102,36 +105,43 @@ public class ClimbingAbility : SnapshotProvider, IAbility
 
         if (active)
         {
+            _state = State.Mounting;
             if (!anchoredTransition.IsComplete() && !anchoredTransition.IsFailed())
             {
                 anchoredTransition.synthesizer = MemoryRef<MotionSynthesizer>.Create(ref synthesizer);
                 kinematica.AddJobDependency(AnchoredTransitionJob.Schedule(ref anchoredTransition));
 
+                timer += Time.deltaTime;
                 return this;
-            }
-            else if (anchoredTransition.IsComplete())
-            {
-                ref var closure = ref controller.current;
-                var position = closure.colliderContactPoint;
-                var rotation = Quaternion.LookRotation(climber.transform.forward, closure.colliderContactNormal);
-                climber.Move(position, rotation);
             }
 
             anchoredTransition.Dispose();
             anchoredTransition = AnchoredTransitionTask.Invalid;
-            return anchoredTransition.IsComplete() ? this : null;
-        }
-        else
-        {
-            state = State.Climbing;
 
-            var position = climber.transform.position + climber.transform.up;
-            var rotation = climber.transform.rotation * Quaternion.Inverse(climberRotation);
-            AffineTransform transform = new AffineTransform(position, rotation);
-            synthesizer.SetWorldTransform(transform);
+            return this;
+        }
+        else if (timer > 0.5f)
+        {
+            if (state == State.Mounting)
+            {
+                ref var closure = ref controller.current;
+                var position = synthesizer.WorldRootTransform.t + synthesizer.WorldRootTransform.transformDirection(offset);
+                var rotation = Quaternion.LookRotation(climber.transform.forward, -Missing.zaxis(synthesizer.WorldRootTransform.q));
+                climber.Move(position, rotation);
+            }
+            {
+                _state = State.Climbing;
+
+                var position = climber.transform.position - Quaternion.LookRotation(climber.transform.up, Vector3.up) * offset;
+                var rotation = climber.transform.rotation * Quaternion.Inverse(climberRotation);
+                AffineTransform transform = new AffineTransform(position, rotation);
+                synthesizer.SetWorldTransform(transform);
+            }
 
             return capture.mountButton ? this : null;
         }
+
+        return null;
     }
 
     public bool OnContact(ref MotionSynthesizer synthesizer, AffineTransform contactTransform, float deltaTime)
@@ -154,7 +164,8 @@ public class ClimbingAbility : SnapshotProvider, IAbility
                     anchoredTransition.Dispose();
                     anchoredTransition = AnchoredTransitionTask.Create(ref synthesizer, sequence, contactTransform, capture.movementDirection, maximumLinearError, maximumAngularError);
 
-                    state = State.Mounting;
+                    _state = State.Mounting;
+                    timer = 0;
                     return true;
                 }
             }

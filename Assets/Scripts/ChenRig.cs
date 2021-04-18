@@ -79,8 +79,8 @@ public class ChenRig : MonoBehaviour
     [Range(-180, 0)]
     [SerializeField] float handAngleLowerLimit, handAngleUpperLimit;
 
-    [SerializeField] Bounds grabBounds;
-    [SerializeField] LayerMask grabLayer;
+    [SerializeField] Bounds handSnapBounds;
+    [SerializeField] LayerMask handSnapLayer;
 
     float nominalStance;
 
@@ -92,6 +92,7 @@ public class ChenRig : MonoBehaviour
     Quaternion chestRotation;
 
     Quaternion climberRotation;
+    float climbingTimer = 0;
 
     State state
     {
@@ -122,23 +123,12 @@ public class ChenRig : MonoBehaviour
     {
         UpdateVelocityAndAcceleration();
 
-        if (state == State.Climbing && (abilityRunner.currentAbility as ClimbingAbility).state == ClimbingAbility.State.Climbing)
+        if (state == State.Climbing &&
+            (abilityRunner.currentAbility as ClimbingAbility).state == ClimbingAbility.State.Climbing)
         {
-            root.position = climber.root.position;
-            root.rotation = climber.root.rotation * Quaternion.Inverse(climberRotation);
+            UpdateClimbing();
 
-            rig.hip.localPosition = climberRotation * climber.body.localPosition;
-            rig.hip.localRotation = climber.body.localRotation;
-
-            rig.torso.localRotation = torsoRotation;
-
-            rig.handLeft.position = root.InverseTransformPoint(climber.handLeft.position);
-            rig.handRight.position = root.InverseTransformPoint(climber.handRight.position);
-            rig.footLeft.position = root.InverseTransformPoint(climber.footLeft.position);
-            rig.footRight.position = root.InverseTransformPoint(climber.footRight.position);
-
-            rig.handLeft.rotation = Quaternion.Euler(0, 90, 30);
-            rig.handRight.rotation = Quaternion.Euler(0, -90, -30);
+            climbingTimer += Time.deltaTime;
         }
         else
         {
@@ -163,7 +153,7 @@ public class ChenRig : MonoBehaviour
             chestAngle *= shoulderTiltScale;
             rig.chest.localRotation = Quaternion.Euler(0, chestAngle, 0) * chestRotation;
 
-            if (state == State.Parkouring)
+            if (state == State.Parkouring || state == State.Climbing)
             {
                 var rotation = Quaternion.FromToRotation(rig.shoulder.up, Vector3.up) * chestRotation;
                 rig.chest.localRotation = rig.chest.localRotation.Fallout(rotation, 10);
@@ -171,6 +161,8 @@ public class ChenRig : MonoBehaviour
                 UpdateSnapHand(Side.Left, rig.handLeft, snapLeft);
                 UpdateSnapHand(Side.Right, rig.handRight, snapRight);
             }
+
+            climbingTimer = 0;
         }
     }
 
@@ -189,8 +181,8 @@ public class ChenRig : MonoBehaviour
 
         Gizmos.matrix = root.localToWorldMatrix * rig.chest.localToWorldMatrix;
 
-        var center = grabBounds.center;
-        var size = grabBounds.size;
+        var center = handSnapBounds.center;
+        var size = handSnapBounds.size;
         Gizmos.DrawWireCube(center, size);
 
         center.x = -center.x;
@@ -215,7 +207,7 @@ public class ChenRig : MonoBehaviour
         float target = 0;
         if (state == State.Standing) target = hip.stance;
         else if (state == State.Running) target = hip.locomotion;
-        else if (state == State.Parkouring) target = hip.parkour;
+        else if (state == State.Parkouring || state == State.Climbing) target = hip.parkour;
 
         hip.height = hip.height.Fallout(target, 10);
 
@@ -231,7 +223,7 @@ public class ChenRig : MonoBehaviour
         var velocity = root.InverseTransformDirection(this.velocity);
         Quaternion rotation;
 
-        if (state == State.Parkouring)
+        if (state == State.Parkouring || state == State.Climbing)
         {
             var up = rig.torso.up;
             // rotation = Quaternion.FromToRotation(up, Vector3.up) * torsoRotation;
@@ -263,7 +255,7 @@ public class ChenRig : MonoBehaviour
                         - armSwingScale.x * delta * delta * sign * pivot.right;
 
         float centrifugalScale;
-        if (state == State.Parkouring) centrifugalScale = parkourCentrifugalScale * Mathf.Abs(acceleration.x);
+        if (state == State.Parkouring || state == State.Climbing) centrifugalScale = parkourCentrifugalScale * Mathf.Abs(acceleration.x);
         else centrifugalScale = locomotionCentrifugalScale * Mathf.Abs(acceleration.x);
 
         var centerfugal = centrifugalScale * sign * pivot.right;
@@ -282,7 +274,7 @@ public class ChenRig : MonoBehaviour
         RaycastHit hit;
         Debug.DrawRay(root.position, root.forward, Color.white);
 
-        if (Physics.SphereCast(root.position - 5 * root.forward, 0.1f, root.forward, out hit, 10, grabLayer) && hit.collider is BoxCollider)
+        if (Physics.SphereCast(root.position - 5 * root.forward, 0.1f, root.forward, out hit, 10, handSnapLayer) && hit.collider is BoxCollider)
         {
             // Get the upper platform.
             var collider = hit.collider as BoxCollider;
@@ -317,9 +309,9 @@ public class ChenRig : MonoBehaviour
             point = contactTransform.t;
             direction = Missing.zaxis(contactTransform.q);
 
-            center = grabBounds.center;
+            center = handSnapBounds.center;
             center.x *= (int)side;
-            Bounds bounds = new Bounds(center, grabBounds.size);
+            Bounds bounds = new Bounds(center, handSnapBounds.size);
 
             var localPoint = rig.chest.InverseTransformPoint(root.InverseTransformPoint(point));
             return bounds.Contains(localPoint);
@@ -353,5 +345,27 @@ public class ChenRig : MonoBehaviour
         hand.rotation = Quaternion.LookRotation(direction, Vector3.up) * rotation;
 
         Debug.DrawRay(snap.point, snap.direction, Color.blue);
+    }
+
+    void UpdateClimbing()
+    {
+        float damp = climbingTimer < 1 ? 10 : float.MaxValue;
+
+        AffineTransform targetRootTransform = new AffineTransform(climber.root.position, climber.root.rotation * Quaternion.Inverse(climberRotation));
+        root.position = targetRootTransform.t;
+        root.rotation = targetRootTransform.q;
+
+        rig.hip.localPosition = climberRotation * climber.body.localPosition;
+        rig.hip.localRotation = climber.body.localRotation;
+
+        rig.torso.localRotation = torsoRotation;
+
+        rig.handLeft.position = rig.handLeft.position.Fallout(targetRootTransform.inverseTransform(climber.handLeft.position), damp);
+        rig.handRight.position = rig.handRight.position.Fallout(targetRootTransform.inverseTransform(climber.handRight.position), damp);
+        rig.footLeft.position = rig.footLeft.position.Fallout(targetRootTransform.inverseTransform(climber.footLeft.position), damp);
+        rig.footRight.position = rig.footRight.position.Fallout(targetRootTransform.inverseTransform(climber.footRight.position), damp);
+
+        rig.handLeft.rotation = Quaternion.Euler(0, 90, 30);
+        rig.handRight.rotation = Quaternion.Euler(0, -90, -30);
     }
 }
