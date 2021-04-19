@@ -61,4 +61,18 @@ public class AbilityRunner : Kinematica
         transform.position = worldRootTransform.t;
         transform.rotation = worldRootTransform.q;
     }
+
+    public void MoveTo(Vector3 position, Quaternion rotation)
+    {
+        controller.collisionEnabled = false;
+        controller.groundSnap = false;
+        controller.resolveGroundPenetration = false;
+        controller.gravityEnabled = false;
+
+        controller.MoveTo(position);
+        controller.Tick(Time.deltaTime);
+
+        ref var synthesizer = ref Synthesizer.Ref;
+        synthesizer.SetWorldTransform(new AffineTransform(position, rotation));
+    }
 }

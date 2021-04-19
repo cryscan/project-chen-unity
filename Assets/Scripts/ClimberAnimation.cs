@@ -90,9 +90,9 @@ public class ClimberAnimation : MonoBehaviour
             Gizmos.DrawWireSphere(limb.position, 0.1f);
     }
 
-    public void Move(Vector3 position, Quaternion rotation)
+    public void MoveTo(Vector3 position, Quaternion rotation)
     {
-        controller.Move(position, rotation);
+        controller.MoveTo(position, rotation);
 
         StopAllCoroutines();
         limbMoving = false;

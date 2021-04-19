@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Mount Youkai.unity
+    guid: b59ad5a3064ff18c1a06fed3d9053bb9
+  - enabled: 1
     path: Assets/Scenes/Kinematica.unity
     guid: 79290046bef1054cca16b55a15321a45
   m_configObjects: {}
