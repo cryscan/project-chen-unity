@@ -116,7 +116,8 @@ public class ParkourAbility : SnapshotProvider, IAbility
 
             if (type.IsType(Parkour.Type.Wall) || type.IsType(Parkour.Type.Table))
             {
-                if (IsAxis(collider, contactTransform, Missing.forward))
+                if (IsAxis(collider, contactTransform, Missing.forward) ||
+                    IsAxis(collider, contactTransform, Missing.right))
                 {
                     return OnContact(ref synthesizer, contactTransform, deltaTime, type);
                 }

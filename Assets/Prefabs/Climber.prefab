@@ -497,7 +497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8ad3b88e022e09e6be97d18c78d274d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 0.5
+  _speed: 1
   damp: 10
   climbLayer:
     serializedVersion: 2
@@ -540,13 +540,13 @@ MonoBehaviour:
       time: 0
       value: 0
       inSlope: 9.411764
-      outSlope: 3.3333333
+      outSlope: 6.6666665
       tangentMode: 65
       weightedMode: 0
       inWeight: 0
       outWeight: 0.083333336
     - serializedVersion: 3
-      time: 0.3
+      time: 0.15
       value: 1
       inSlope: 0
       outSlope: 0
