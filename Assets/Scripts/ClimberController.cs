@@ -108,7 +108,7 @@ public class ClimberController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, 0.5f);
     }
 
-    public void Move(Vector3 position, Quaternion rotation)
+    public void MoveTo(Vector3 position, Quaternion rotation)
     {
         transform.SetPositionAndRotation(position, rotation);
         this.position = position;

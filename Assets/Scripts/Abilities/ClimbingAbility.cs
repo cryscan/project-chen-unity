@@ -127,7 +127,7 @@ public class ClimbingAbility : SnapshotProvider, IAbility
                 ref var closure = ref controller.current;
                 var position = synthesizer.WorldRootTransform.t + synthesizer.WorldRootTransform.transformDirection(offset);
                 var rotation = Quaternion.LookRotation(climber.transform.forward, -Missing.zaxis(synthesizer.WorldRootTransform.q));
-                climber.Move(position, rotation);
+                climber.MoveTo(position, rotation);
             }
             {
                 _state = State.Climbing;
