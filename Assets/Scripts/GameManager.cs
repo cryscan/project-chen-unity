@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 using Unity.Mathematics;
@@ -14,7 +15,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] float timeScale = 1;
 
     List<AffineTransform> checkpoints = new List<AffineTransform>();
+    List<AudioMixerSnapshot> audioMixerSnapshots = new List<AudioMixerSnapshot>();
+
     [SerializeField] int currentCheckpoint = 0;
+    [SerializeField] float audioTransitionTime = 2;
 
     void Awake()
     {
@@ -40,18 +44,25 @@ public class GameManager : MonoBehaviour
             Application.Quit();
     }
 
-    public void ClearCheckpoints() => checkpoints.Clear();
+    public void ClearCheckpoints()
+    {
+        checkpoints.Clear();
+        audioMixerSnapshots.Clear();
+    }
 
     public void AddCheckpoint(Checkpoint checkpoint)
     {
         var position = checkpoint.transform.position;
         var rotation = checkpoint.transform.rotation;
         checkpoints.Add(new AffineTransform(position, rotation));
+        audioMixerSnapshots.Add(checkpoint.audioMixerSnapshot);
     }
 
     public void SetCurrentCheckpoint(int index)
     {
         currentCheckpoint = index;
+        var snapshot = audioMixerSnapshots[index];
+        if (snapshot) snapshot.TransitionTo(audioTransitionTime);
     }
 
     public void GetCurrentCheckpoint(out Vector3 position, out Quaternion rotation)

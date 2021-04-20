@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class Checkpoint : MonoBehaviour
 {
+    public AudioMixerSnapshot audioMixerSnapshot;
     public int index;
 
     void OnTriggerEnter(Collider collider)

@@ -31,5 +31,12 @@ public class PlayerReload : MonoBehaviour
         // controller.Tick(Time.deltaTime);
         controller.Position = position;
         transform.position = position;
+        StartCoroutine(MoveToCoroutine(position));
+    }
+
+    IEnumerator MoveToCoroutine(Vector3 position)
+    {
+        yield return new WaitForEndOfFrame();
+        transform.position = position;
     }
 }
