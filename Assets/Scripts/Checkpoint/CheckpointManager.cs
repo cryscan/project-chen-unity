@@ -5,15 +5,19 @@ using UnityEngine;
 
 public class CheckpointManager : MonoBehaviour
 {
-    Transform[] checkpoints;
+    Checkpoint[] checkpoints;
 
     void Awake()
     {
-        checkpoints = Enumerable.Range(0, transform.childCount).Select(x => transform.GetChild(x).transform).ToArray();
+        checkpoints = GetComponentsInChildren<Checkpoint>();
+        for (int i = 0; i < checkpoints.Length; ++i)
+            checkpoints[i].index = i;
     }
 
     void Start()
     {
-        GameManager.instance.SetCheckpoints(checkpoints);
+        GameManager.instance.ClearCheckpoints();
+        foreach (var checkpoint in checkpoints)
+            GameManager.instance.AddCheckpoint(checkpoint);
     }
 }

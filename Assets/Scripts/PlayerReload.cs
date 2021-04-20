@@ -14,8 +14,10 @@ public class PlayerReload : MonoBehaviour
 
     void Start()
     {
-        var checkpoint = GameManager.instance.GetCurrentCheckpoint();
-        MoveTo(checkpoint.t);
+        Vector3 position;
+        Quaternion rotation;
+        GameManager.instance.GetCurrentCheckpoint(out position, out rotation);
+        MoveTo(position);
     }
 
     void MoveTo(Vector3 position)
