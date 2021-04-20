@@ -21,14 +21,14 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Climb
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 4aa46d33b0afb5e49bb0703218e42e0e,
+    type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
-  stringTagMap:
-    RenderType: Opaque
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -91,7 +91,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - Vector1_38BD3441: 0.4
-    - Vector1_CF8B0D8D: 6
+    - Vector1_CF8B0D8D: 10
     - Vector1_ED5ABFD9: 0
     - Vector1_F3F6B787: 0
     - _AlphaClip: 0

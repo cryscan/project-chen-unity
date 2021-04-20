@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] float timeScale = 1;
 
-    AffineTransform[] checkpoints;
+    List<AffineTransform> checkpoints = new List<AffineTransform>();
     [SerializeField] int currentCheckpoint = 0;
 
     void Awake()
@@ -40,9 +40,13 @@ public class GameManager : MonoBehaviour
             Application.Quit();
     }
 
-    public void SetCheckpoints(Transform[] transforms)
+    public void ClearCheckpoints() => checkpoints.Clear();
+
+    public void AddCheckpoint(Checkpoint checkpoint)
     {
-        checkpoints = transforms.Select(x => new AffineTransform(x.position, x.rotation)).ToArray();
+        var position = checkpoint.transform.position;
+        var rotation = checkpoint.transform.rotation;
+        checkpoints.Add(new AffineTransform(position, rotation));
     }
 
     public void SetCurrentCheckpoint(int index)
@@ -50,10 +54,16 @@ public class GameManager : MonoBehaviour
         currentCheckpoint = index;
     }
 
-    public AffineTransform GetCurrentCheckpoint()
+    public void GetCurrentCheckpoint(out Vector3 position, out Quaternion rotation)
     {
-        if (checkpoints == null || checkpoints.Length == 0) return new AffineTransform();
-        return checkpoints[currentCheckpoint];
+        position = new Vector3();
+        rotation = new Quaternion();
+
+        if (checkpoints.Count == 0) return;
+
+        var checkpoint = checkpoints[currentCheckpoint];
+        position = checkpoint.t;
+        rotation = checkpoint.q;
     }
 
     public void Reload()
