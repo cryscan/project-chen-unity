@@ -93,4 +93,10 @@ public class GameManager : MonoBehaviour
         var index = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(index);
     }
+
+    public void Load(string sceneName)
+    {
+        currentCheckpoint = 0;
+        SceneManager.LoadScene(sceneName);
+    }
 }

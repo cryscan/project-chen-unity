@@ -57,6 +57,10 @@ PrefabInstance:
       propertyPath: climber
       value: 
       objectReference: {fileID: 7577097605605309236}
+    - target: {fileID: 1667829406, guid: ce5b9352cc50d95d8a31f4c9acb02ab4, type: 3}
+      propertyPath: rig
+      value: 
+      objectReference: {fileID: 2740552366213215954}
     - target: {fileID: 1667829407, guid: ce5b9352cc50d95d8a31f4c9acb02ab4, type: 3}
       propertyPath: view
       value: 
@@ -300,6 +304,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2740552365099443154}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2740552366213215954 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1181046016, guid: 1b975acf81bae0f288bc5b0202aa8018,
+    type: 3}
+  m_PrefabInstance: {fileID: 2740552365099443154}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7545824390224169774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 295701dcf18cdfc4e9a3712cd41da09d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7202372775749226900 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5042784985919124038, guid: 1b975acf81bae0f288bc5b0202aa8018,

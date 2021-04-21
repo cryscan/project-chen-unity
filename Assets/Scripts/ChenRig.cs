@@ -107,7 +107,7 @@ public class ChenRig : MonoBehaviour
 
     void Start()
     {
-        hip.nominal = robot.body.position.y;
+        hip.nominal = robot.body.localPosition.y;
         nominalStance = (robot.footLeft.localPosition.z + robot.footRight.localPosition.z) / 2;
 
         hip.height = hip.stance;
