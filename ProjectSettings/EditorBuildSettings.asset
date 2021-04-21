@@ -6,7 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Main Menu.unity
+    guid: 6d87bc96454d3cfda8f34b27fd216fcd
+  - enabled: 1
     path: Assets/Scenes/Mount Youkai.unity
+    guid: 6de3f3df5ebf409a7994235978d9353f
+  - enabled: 1
+    path: Assets/Scenes/Octave.unity
     guid: b59ad5a3064ff18c1a06fed3d9053bb9
   - enabled: 1
     path: Assets/Scenes/Kinematica.unity

@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
+using Cinemachine;
+
 using Unity.Mathematics;
 
 public class GameManager : MonoBehaviour
@@ -16,9 +18,12 @@ public class GameManager : MonoBehaviour
 
     List<AffineTransform> checkpoints = new List<AffineTransform>();
     List<AudioMixerSnapshot> audioMixerSnapshots = new List<AudioMixerSnapshot>();
+    List<CinemachineVirtualCamera> virtualCameras = new List<CinemachineVirtualCamera>();
 
     [SerializeField] int currentCheckpoint = 0;
     [SerializeField] float audioTransitionTime = 2;
+
+    int virtualCameraPriority = 20;
 
     void Awake()
     {
@@ -48,6 +53,7 @@ public class GameManager : MonoBehaviour
     {
         checkpoints.Clear();
         audioMixerSnapshots.Clear();
+        virtualCameras.Clear();
     }
 
     public void AddCheckpoint(Checkpoint checkpoint)
@@ -56,13 +62,18 @@ public class GameManager : MonoBehaviour
         var rotation = checkpoint.transform.rotation;
         checkpoints.Add(new AffineTransform(position, rotation));
         audioMixerSnapshots.Add(checkpoint.audioMixerSnapshot);
+        virtualCameras.Add(checkpoint.virtualCamera);
     }
 
     public void SetCurrentCheckpoint(int index)
     {
         currentCheckpoint = index;
+
         var snapshot = audioMixerSnapshots[index];
         if (snapshot) snapshot.TransitionTo(audioTransitionTime);
+
+        var virtualCamera = virtualCameras[index];
+        if (virtualCamera) virtualCamera.Priority = ++virtualCameraPriority;
     }
 
     public void GetCurrentCheckpoint(out Vector3 position, out Quaternion rotation)
@@ -81,5 +92,16 @@ public class GameManager : MonoBehaviour
     {
         var index = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(index);
+    }
+
+    public void Load(string sceneName)
+    {
+        currentCheckpoint = 0;
+        SceneManager.LoadScene(sceneName);
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 }
