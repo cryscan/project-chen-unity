@@ -99,4 +99,9 @@ public class GameManager : MonoBehaviour
         currentCheckpoint = 0;
         SceneManager.LoadScene(sceneName);
     }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }
