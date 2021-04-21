@@ -50,7 +50,7 @@ PrefabInstance:
     - target: {fileID: 963221374937226475, guid: 094565761d61dab8eb1de8d44fa98f95,
         type: 3}
       propertyPath: m_Name
-      value: Climber
+      value: Climber Variant
       objectReference: {fileID: 0}
     - target: {fileID: 963221374981046203, guid: 094565761d61dab8eb1de8d44fa98f95,
         type: 3}

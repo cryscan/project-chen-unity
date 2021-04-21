@@ -32,7 +32,7 @@ MonoBehaviour:
   responsiveness: 0.6
   brakingSpeed: 0
   correctTranslationPercentage: 1
-  correctRotationPercentage: 0.5
+  correctRotationPercentage: 1
   correctMotionStartSpeed: 1
   correctMotionEndSpeed: 2
 --- !u!114 &1667829400

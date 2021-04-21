@@ -62,6 +62,7 @@ public class ChenRig : MonoBehaviour
     [SerializeField] Robot robot;
     [SerializeField] Climber climber;
 
+    [SerializeField] Transform rigRoot;
     [SerializeField] Transform root;
     [SerializeField] Hip hip;
 
@@ -87,6 +88,7 @@ public class ChenRig : MonoBehaviour
     Vector3 velocity = Vector3.zero;
     Vector3 acceleration = Vector3.zero;
 
+    Quaternion rigRootRotation;
     Quaternion hipRotation;
     Quaternion torsoRotation;
     Quaternion chestRotation;
@@ -112,6 +114,7 @@ public class ChenRig : MonoBehaviour
 
         hip.height = hip.stance;
 
+        rigRootRotation = rigRoot.rotation;
         hipRotation = rig.hip.localRotation;
         torsoRotation = rig.torso.localRotation;
         chestRotation = rig.chest.localRotation;
@@ -132,6 +135,7 @@ public class ChenRig : MonoBehaviour
         }
         else
         {
+            UpdateRigRoot();
             UpdateHip();
             UpdateTorso();
 
@@ -200,6 +204,12 @@ public class ChenRig : MonoBehaviour
 
         Debug.DrawRay(root.position, this.acceleration, Color.red);
         Debug.DrawRay(root.position, this.velocity, Color.blue);
+    }
+
+    void UpdateRigRoot()
+    {
+        rigRoot.position = root.position;
+        rigRoot.rotation = root.rotation * rigRootRotation;
     }
 
     void UpdateHip()
@@ -351,12 +361,14 @@ public class ChenRig : MonoBehaviour
     {
         float damp = climbingTimer < 1 ? 10 : float.MaxValue;
 
-        AffineTransform targetRootTransform = new AffineTransform(climber.root.position, climber.root.rotation * Quaternion.Inverse(climberRotation));
-        root.position = targetRootTransform.t;
-        root.rotation = root.rotation.Fallout(targetRootTransform.q, 100);
+        rigRoot.position = climber.root.position;
+        rigRoot.rotation = climber.root.rotation * Quaternion.Inverse(climberRotation) * rigRootRotation;
+
+        root.position = climber.root.position;
+        root.rotation = climber.root.rotation * Quaternion.Inverse(climberRotation);
 
         rig.hip.localPosition = climberRotation * climber.body.localPosition;
-        rig.hip.localRotation = rig.hip.rotation.Fallout(climber.body.localRotation, damp);
+        rig.hip.localRotation = climber.body.localRotation;
 
         rig.torso.localRotation = torsoRotation;
 

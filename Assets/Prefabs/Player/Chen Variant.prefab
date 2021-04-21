@@ -2347,6 +2347,7 @@ MonoBehaviour:
     handRight: {fileID: 0}
     footLeft: {fileID: 0}
     footRight: {fileID: 0}
+  rigRoot: {fileID: 7727047071804674199}
   root: {fileID: 0}
   hip:
     stance: 0.65
