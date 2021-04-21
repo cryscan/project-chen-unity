@@ -12,7 +12,7 @@ public class RotationTrap : MonoBehaviour
     [SerializeField] Transform[] pathPoints;
     [SerializeField] float speed = 4;
 
-    float timer = 0;
+    [SerializeField] float timer = 0;
     List<float> timePoints = new List<float>();
 
     void Awake()
