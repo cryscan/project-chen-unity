@@ -32,7 +32,7 @@ public class PlayerHealth : MonoBehaviour
             Kill();
 
         if (transform.position.y < killHeight)
-            Kill();
+            GameManager.instance.Reload();
     }
 
     public void Kill()
