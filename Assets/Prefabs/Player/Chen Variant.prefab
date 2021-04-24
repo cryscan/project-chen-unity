@@ -2326,6 +2326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityRunner: {fileID: 0}
   rig:
+    root: {fileID: 7727047071804674199}
     hip: {fileID: 1355834703}
     torso: {fileID: 647307285}
     chest: {fileID: 379381879}
@@ -2337,6 +2338,7 @@ MonoBehaviour:
     pivotLeft: {fileID: 1911877658}
     pivotRight: {fileID: 1133436472}
   robot:
+    root: {fileID: 0}
     body: {fileID: 0}
     footLeft: {fileID: 0}
     footRight: {fileID: 0}
@@ -2347,8 +2349,6 @@ MonoBehaviour:
     handRight: {fileID: 0}
     footLeft: {fileID: 0}
     footRight: {fileID: 0}
-  rigRoot: {fileID: 7727047071804674199}
-  root: {fileID: 0}
   hip:
     stance: 0.65
     locomotion: 0.55

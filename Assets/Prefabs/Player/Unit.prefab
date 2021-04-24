@@ -197,6 +197,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5824065863857594288}
     - target: {fileID: 1181046016, guid: 1b975acf81bae0f288bc5b0202aa8018, type: 3}
+      propertyPath: robot.root
+      value: 
+      objectReference: {fileID: 361049828416101993}
+    - target: {fileID: 1181046016, guid: 1b975acf81bae0f288bc5b0202aa8018, type: 3}
       propertyPath: climber.body
       value: 
       objectReference: {fileID: 7577097605625807389}
