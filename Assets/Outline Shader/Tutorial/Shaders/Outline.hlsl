@@ -44,7 +44,7 @@ void Outline_float(float2 UV, float OutlineThickness, float DepthSensitivity, fl
     // Depth
     float depthFiniteDifference0 = depthSamples[1] - depthSamples[0];
     float depthFiniteDifference1 = depthSamples[3] - depthSamples[2];
-    float edgeDepth = sqrt(pow(depthFiniteDifference0, 2) + pow(depthFiniteDifference1, 2)) * 1000;
+    float edgeDepth = sqrt(pow(depthFiniteDifference0, 2) + pow(depthFiniteDifference1, 2)) * 100;
     float depthThreshold = (1/DepthSensitivity) * depthSamples[0];
     edgeDepth = edgeDepth > depthThreshold ? 1 : 0;
 

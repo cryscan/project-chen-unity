@@ -33,19 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1488737439657930516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8626354154361808396}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dab5b8fb8855e48adb2fde02ffc466dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerHealth: {fileID: 2336132255320343888}
 --- !u!1001 &2336132255842995151
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127,15 +114,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ce5b9352cc50d95d8a31f4c9acb02ab4, type: 3}
---- !u!4 &763469177716068726 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3095090892976118457, guid: ce5b9352cc50d95d8a31f4c9acb02ab4,
-    type: 3}
-  m_PrefabInstance: {fileID: 2336132255842995151}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6865295109685708439 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9164251775699619160, guid: ce5b9352cc50d95d8a31f4c9acb02ab4,
+    type: 3}
+  m_PrefabInstance: {fileID: 2336132255842995151}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &763469177716068726 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3095090892976118457, guid: ce5b9352cc50d95d8a31f4c9acb02ab4,
     type: 3}
   m_PrefabInstance: {fileID: 2336132255842995151}
   m_PrefabAsset: {fileID: 0}
@@ -300,14 +287,13 @@ PrefabInstance:
       propertyPath: m_Name
       value: Chen
       objectReference: {fileID: 0}
+    - target: {fileID: 5921080976258072288, guid: 1b975acf81bae0f288bc5b0202aa8018,
+        type: 3}
+      propertyPath: _playerHealth
+      value: 
+      objectReference: {fileID: 2336132255320343888}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1b975acf81bae0f288bc5b0202aa8018, type: 3}
---- !u!1 &8626354154361808396 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5890306703217952222, guid: 1b975acf81bae0f288bc5b0202aa8018,
-    type: 3}
-  m_PrefabInstance: {fileID: 2740552365099443154}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2740552366213215954 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1181046016, guid: 1b975acf81bae0f288bc5b0202aa8018,
