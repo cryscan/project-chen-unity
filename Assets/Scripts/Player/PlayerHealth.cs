@@ -15,7 +15,6 @@ public class PlayerHealth : MonoBehaviour
 
     AbilityRunner abilityRunner;
     MovementController controller;
-    Collider _collider;
 
     public bool alive { get; private set; } = true;
 
@@ -23,7 +22,6 @@ public class PlayerHealth : MonoBehaviour
     {
         abilityRunner = GetComponent<AbilityRunner>();
         controller = GetComponent<MovementController>();
-        _collider = GetComponent<Collider>();
     }
 
     void Update()
